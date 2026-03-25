@@ -8,7 +8,14 @@ export default defineNuxtConfig({
     description: 'Manage Errandr operations, users, and campus vendors.',
     defaultLocale: 'en',
   },
-
+  nitro: {
+    prerender: {
+      routes: ['/', '/404.html'],
+      ignore: ['/dynamic-routes', '/api'],
+      failOnError: false
+    }
+  },
+  
   devServer: {
     port: 3001,
     host: 'localhost'

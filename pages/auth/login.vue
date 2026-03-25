@@ -6,9 +6,7 @@
       <div class="absolute inset-0 bg-gradient-to-b from-gray-900/90 via-gray-900/80 to-black/90"></div>
       <div class="relative z-10 flex flex-col justify-between h-full p-12 lg:p-16">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center border border-white/20">
-            <ShieldCheck class="w-5 h-5 text-emerald-400" />
-          </div>
+          <img src="@/assets/img/logo.png" alt="Errandr Logo" class="h-10 w-auto object-contain border border-white/20 rounded-xl p-1.5 backdrop-blur-md bg-white/10" />
           <span class="text-xl font-black text-white tracking-tighter">Errandr <span class="text-gray-500 font-medium text-sm ml-1">Ops</span></span>
         </div>
         <div class="max-w-md">
@@ -26,7 +24,7 @@
     <div class="w-full md:w-1/2 flex flex-col justify-center px-6 sm:px-12 md:px-20 lg:px-28 py-12 relative z-10">
       <div class="mb-12">
         <div class="flex items-center gap-2 mb-8 md:hidden">
-          <div class="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center"><ShieldCheck class="w-4 h-4 text-emerald-400" /></div>
+          <img src="@/assets/img/logo.png" alt="Errandr Logo" class="h-8 w-auto object-contain" />
           <span class="text-xl font-bold text-gray-900 tracking-tight">Errandr Ops</span>
         </div>
         <h1 class="text-4xl font-extrabold text-gray-900 mb-3 tracking-tight">Admin Login</h1>

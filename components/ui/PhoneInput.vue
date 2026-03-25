@@ -110,7 +110,7 @@
       <AlertCircle class="h-3 w-3" />
       <span>{{ error }}</span>
     </div>
-    <div v-else-if="displayPhone && !isPhoneValid" class="flex items-center gap-1 text-amber-600 text-xs">
+    <div v-else-if="displayPhone && !isPhoneValid" class="flex items-center gap-1 text-parentPrimary text-xs">
       <AlertTriangle class="h-3 w-3" />
       <span>Please enter a complete {{ selectedCountry.length }}-digit phone number</span>
     </div>
