@@ -5,12 +5,10 @@ const { showToast } = useCustomToast();
 
 const { token, logOut } = useUser();
 
-const $GATEWAY_ENDPOINT_WITHOUT_VERSION = import.meta.env
-  .VITE_BASE_URL as string;
-const $GATEWAY_ENDPOINT = import.meta.env.VITE_API_BASE_URL + "/api/v1";
-const $GATEWAY_ENDPOINT_V2 = import.meta.env.VITE_API_BASE_URL + "/v2";
-const $IMAGE_UPLOAD_ENDPOINT = import.meta.env
-  .VITE_IMAGE_UPLOAD_BASE_URL as string;
+const $GATEWAY_ENDPOINT_WITHOUT_VERSION = "https://api.erranders.org";
+const $GATEWAY_ENDPOINT = "https://api.erranders.org/api/v1";
+const $GATEWAY_ENDPOINT_V2 = "https://api.erranders.org/v2";
+const $IMAGE_UPLOAD_ENDPOINT = "https://api.erranders.org";
 
 export const GATEWAY_ENDPOINT = axios.create({
   baseURL: $GATEWAY_ENDPOINT,
