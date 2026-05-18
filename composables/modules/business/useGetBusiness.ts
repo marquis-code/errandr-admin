@@ -5,9 +5,7 @@ import { useStorage } from "@vueuse/core"
 export const useGetBusiness = () => {
     const loading = ref(false)
     const error = ref<string | null>(null)
-    // Global state for business
     const business = useState<Business | null>('active_business', () => null)
-    // Persist business to localStorage for chat and other features
     const cachedBusiness = useStorage<Business | null>('cached_business', null, undefined, {
         serializer: {
             read: (v: string) => v ? JSON.parse(v) : null,
@@ -15,7 +13,6 @@ export const useGetBusiness = () => {
         },
     })
 
-    // Restore from cache on init if not already loaded
     if (!business.value && cachedBusiness.value) {
         business.value = cachedBusiness.value
     }
