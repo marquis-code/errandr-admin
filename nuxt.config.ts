@@ -21,6 +21,13 @@ export default defineNuxtConfig({
     host: 'localhost'
   },
 
+  imports: {
+    dirs: [
+      'composables',
+      'composables/**'
+    ]
+  },
+
   postcss: {
     plugins: {
       "postcss-import": {},
