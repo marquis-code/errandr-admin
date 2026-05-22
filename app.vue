@@ -32,7 +32,7 @@ import { useRealtimeNotifications } from '@/composables/core/useRealtimeNotifica
 useRealtimeNotifications()
 
 useHead({
-  title: 'Errandr - Admin Portal',
+  title: 'Errander - Admin Portal',
   htmlAttrs: {
     lang: 'en'
   },
@@ -52,18 +52,18 @@ useHead({
 })
 
 useSeoMeta({
-  title: 'Errandr — Admin Portal',
-  ogTitle: 'Errandr — Admin Portal',
-  description: 'Official Errandr Administrator Portal. Manage users, vendors, and platform analytics with ease.',
-  ogDescription: 'Official Errandr Administrator Portal. Manage users, vendors, and platform analytics with ease.',
-  keywords: 'Errandr admin, logistics management, vendor portal, user management, platform analytics',
-  author: 'Errandr Team',
+  title: 'Errander — Admin Portal',
+  ogTitle: 'Errander — Admin Portal',
+  description: 'Official Errander Administrator Portal. Manage users, vendors, and platform analytics with ease.',
+  ogDescription: 'Official Errander Administrator Portal. Manage users, vendors, and platform analytics with ease.',
+  keywords: 'Errander admin, logistics management, vendor portal, user management, platform analytics',
+  author: 'Errander Team',
   ogType: 'website',
-  ogUrl: 'https://errandr.com',
-  ogImage: 'https://errandr.com/og-image.jpg',
+  ogUrl: 'https://Errander.com',
+  ogImage: 'https://Errander.com/og-image.jpg',
   twitterCard: 'summary_large_image',
-  twitterTitle: 'Errandr — Admin Portal',
-  twitterDescription: 'Official Errandr Administrator Portal. Manage users, vendors, and platform analytics with ease.',
-  twitterImage: 'https://errandr.com/og-image.jpg'
+  twitterTitle: 'Errander — Admin Portal',
+  twitterDescription: 'Official Errander Administrator Portal. Manage users, vendors, and platform analytics with ease.',
+  twitterImage: 'https://Errander.com/og-image.jpg'
 })
 </script>

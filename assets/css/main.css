@@ -18,9 +18,9 @@ h1 {
 
 /* Theme CSS Variables - These are dynamically overridden by useTheme composable */
 :root {
-  --color-primary: #065fdb;
-  --color-secondary: #E6EFFC;
-  --color-accent: #0448A8;
+  --color-primary: #FF5C1A;
+  --color-secondary: #FFF3ED;
+  --color-accent: #C2410C;
   --color-background: #FFFFFF;
   --color-text: #1C1B19;
   --color-error: #EF4444;
@@ -161,8 +161,8 @@ input[type=number] {
 }
 
 .custom-checkbox:checked {
-  background-color: #065fdb;
-  border-color: #065fdb;
+  background-color: #FF5C1A;
+  border-color: #FF5C1A;
 }
 
 .custom-checkbox:checked::after {
@@ -178,12 +178,12 @@ input[type=number] {
 }
 
 .custom-checkbox:hover {
-  border-color: #065fdb;
+  border-color: #FF5C1A;
 }
 
 .custom-checkbox:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(6, 95, 219, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 92, 26, 0.1);
 }
 
 .custom-input {

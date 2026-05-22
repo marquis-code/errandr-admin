@@ -20,7 +20,7 @@ export const useAuth = () => {
         message: "You've successfully logged in.",
         toastType: "success",
       });
-      navigateTo('/');
+      navigateTo('/dashboard');
       return res.data;
     } catch (e: any) {
       // Error handled by axios interceptor
@@ -38,10 +38,10 @@ export const useAuth = () => {
       setToken(res.data.token);
       showToast({
         title: "Account Created!",
-        message: "Welcome to Errandr.",
+        message: "Welcome to Errander.",
         toastType: "success",
       });
-      navigateTo('/');
+      navigateTo('/dashboard');
       return res.data;
     } catch (e: any) {
       throw e;

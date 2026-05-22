@@ -9,8 +9,16 @@ export const admin_api = {
     return GATEWAY_ENDPOINT_WITH_AUTH.get('/admin/users');
   },
 
+  getUser: (id: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get(`/admin/users/${id}`);
+  },
+
   getVendors: () => {
     return GATEWAY_ENDPOINT_WITH_AUTH.get('/admin/vendors');
+  },
+
+  getVendor: (id: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get(`/admin/vendors/${id}`);
   },
 
   getReports: () => {

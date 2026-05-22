@@ -34,7 +34,7 @@ export const useAdminDashboard = () => {
       await admin_api.approveVendor(id);
       showToast({
         title: "Vendor Approved",
-        message: "The vendor can now start selling on Errandr.",
+        message: "The vendor can now start selling on Errander.",
         toastType: "success",
       });
       await fetchDashboardData();

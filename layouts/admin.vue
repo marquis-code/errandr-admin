@@ -1,32 +1,22 @@
 <template>
  <FullScreenLoader />
- <div class="min-h-screen bg-[#fafafa]">
+ <div class="min-h-screen bg-white">
  <!-- Desktop Sidebar -->
  <aside class="hidden lg:block w-72 bg-white border-r border-gray-100 min-h-screen fixed left-0 top-0 z-50 transition-all duration-300">
  <!-- Logo Section -->
  <div class="h-20 flex items-center px-8 border-b border-gray-50/50">
   <div class="flex items-center gap-3 group cursor-pointer">
-  <img src="@/assets/img/logo.png" alt="Errandr Logo" class="h-9 w-auto object-contain transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" />
-  <span class="text-xl font-black text-gray-900 tracking-tighter leading-none">Admin</span>
+  <img src="@/assets/img/logo-light.png" alt="Errander Logo" class="h-9 w-auto object-contain transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" />
   </div>
  </div>
  
  <!-- User Quick Info -->
  <div class="px-6 py-8">
- <div class="p-4 bg-gray-50/50 rounded-2xl border border-gray-100/50 flex items-center gap-3 mb-6">
- <div class="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-[#065fdb] font-bold">
- {{ userInitials }}
- </div>
- <div class="flex flex-col min-w-0">
- <span class="text-sm font-black text-gray-900 truncate">{{ userDisplayName }}</span>
- <span class="text-[10px] font-bold text-gray-400 tracking-wider">Super Administrator</span>
- </div>
- </div>
 
  <!-- Navigation -->
  <nav class="space-y-1.5">
  <div class="px-2 pb-2">
- <p class="text-[10px] font-black text-gray-400 tracking-[0.2em] ml-1">Main Menu</p>
+ <p class="text-sm font-black text-gray-400 tracking-[0.2em] ml-1">Main Menu</p>
  </div>
  <NuxtLink
  v-for="item in navItems"
@@ -34,10 +24,10 @@
  :to="item.path"
  class="flex items-center px-4 py-3.5 text-sm font-bold rounded-2xl transition-all duration-300 group"
  :class="isActive(item.path) 
- ? 'bg-[#065fdb] text-white shadow-xl shadow-[#065fdb]/20 translate-x-1' 
+ ? 'bg-[#FF5C1A] text-white shadow-xl shadow-[#FF5C1A]/20 translate-x-1' 
  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'"
  >
- <component :is="item.icon" class="w-5 h-5 mr-3 transition-transform duration-500 group-hover:scale-110" :class="isActive(item.path) ? 'text-white' : 'text-gray-400 group-hover:text-[#065fdb]'" />
+ <component :is="item.icon" class="w-5 h-5 mr-3 transition-transform duration-500 group-hover:scale-110" :class="isActive(item.path) ? 'text-white' : 'text-gray-400 group-hover:text-[#FF5C1A]'" />
  <span class="tracking-tight">{{ item.label }}</span>
  <ChevronRight v-if="isActive(item.path)" class="w-4 h-4 ml-auto opacity-50" />
  </NuxtLink>
@@ -51,7 +41,7 @@
  class="flex items-center w-full px-5 py-4 text-sm font-black text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all duration-300 group"
  >
  <LogOut class="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform" />
- <span class=" tracking-widest text-[11px]">Logout Session</span>
+ <span class="  text-[11px]">Logout Session</span>
  </button>
  </div>
  </aside>
@@ -59,13 +49,12 @@
  <!-- Mobile Header -->
  <header class="lg:hidden bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40">
  <div class="flex items-center justify-between px-6 py-4">
- <div class="flex items-center gap-2">
- <img src="@/assets/img/logo.png" alt="Errandr Logo" class="h-8 w-auto object-contain" />
- <span class="text-xl font-black text-gray-900 tracking-tighter">Admin</span>
- </div>
+  <div class="flex items-center gap-3 group cursor-pointer">
+  <img src="@/assets/img/logo-light.png" alt="Errander Logo" class="h-9 w-auto object-contain transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" />
+  </div>
  <button
  @click="showMobileMenu = !showMobileMenu"
- class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-900 hover:bg-gray-100 transition-colors"
+ class="w-10 h-10 flex items-center justify-center rounded-xl bg-white text-gray-900 hover:bg-gray-50 transition-colors"
  >
  <Menu v-if="!showMobileMenu" class="w-6 h-6" />
  <X v-else class="w-6 h-6" />
@@ -89,23 +78,22 @@
  class="lg:hidden w-80 bg-white min-h-screen fixed left-0 top-0 z-50 shadow-2xl overflow-y-auto"
  >
  <div class="p-6 border-b border-gray-50 flex items-center justify-between">
- <div class="flex items-center gap-3">
- <img src="@/assets/img/logo.png" alt="Errandr Logo" class="h-9 w-auto object-contain" />
- <span class="text-2xl font-black text-gray-900 tracking-tighter">Admin</span>
- </div>
+  <div class="flex items-center gap-3 group cursor-pointer">
+  <img src="@/assets/img/logo-light.png" alt="Errander Logo" class="h-9 w-auto object-contain transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" />
+  </div>
  <button @click="showMobileMenu = false" class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50">
  <X class="w-5 h-5 text-gray-900" />
  </button>
  </div>
 
  <div class="p-6 space-y-8">
- <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
- <div class="w-12 h-12 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-[#065fdb] font-bold text-lg">
+ <div class="flex items-center gap-4 p-4 bg-white rounded-2xl border border-gray-100">
+ <div class="w-12 h-12 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-[#FF5C1A] font-bold text-lg">
  {{ userInitials }}
  </div>
  <div class="flex flex-col">
  <span class="text-base font-black text-gray-900 leading-none">{{ userDisplayName }}</span>
- <span class="text-[10px] font-bold text-gray-400 tracking-widest mt-1">Super Admin</span>
+ <span class="text-sm font-bold text-gray-400  mt-1">Super Admin</span>
  </div>
  </div>
 
@@ -116,7 +104,7 @@
  :to="item.path"
  class="flex items-center px-5 py-4 text-base font-bold rounded-2xl transition-all"
  :class="isActive(item.path) 
- ? 'bg-[#065fdb] text-white shadow-xl shadow-[#065fdb]/20' 
+ ? 'bg-[#FF5C1A] text-white shadow-xl shadow-[#FF5C1A]/20' 
  : 'text-gray-500 hover:bg-gray-50'"
  @click="showMobileMenu = false"
  >
@@ -137,25 +125,44 @@
 
  <!-- Main Content -->
  <main class="flex-1 lg:ml-72 min-h-screen">
- <!-- Page Header (Optional, used in pages) -->
- <div class="hidden lg:flex h-20 items-center justify-between px-10 border-b border-gray-50/50 bg-white/50 backdrop-blur-sm sticky top-0 z-30">
- <div class="flex items-center gap-4">
- <div class="w-1 h-8 bg-[#065fdb]/20 rounded-full"></div>
- <div>
- <h1 class="text-sm font-black text-gray-900 tracking-widest">{{ pageTitle }}</h1>
- <p class="text-[10px] font-bold text-gray-400 tracking-tight">{{ pageDescription }}</p>
- </div>
- </div>
+ <!-- Page Header -->
+ <div class="hidden lg:flex h-20 items-center justify-between px-10 border-b border-gray-100 bg-white sticky top-0 z-30 gap-6">
+  <!-- Left: Page Title -->
+  <div class="flex items-center gap-4 min-w-[200px]">
+   <div class="w-1 h-8 bg-[#FF5C1A]/20 rounded-full"></div>
+   <div>
+    <h1 class="text-sm font-black text-gray-900">{{ pageTitle }}</h1>
+    <p class="text-xs font-bold text-gray-400 tracking-tight">{{ pageDescription }}</p>
+   </div>
+  </div>
 
- <div class="flex items-center gap-4">
- <!-- Potential search/notifications here -->
- <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer">
- <span class="relative">
- <LayoutDashboard class="w-5 h-5" />
- <span class="absolute -top-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full border-2 border-white"></span>
- </span>
- </div>
- </div>
+  <!-- Center: Search Field -->
+  <div class="flex-1 max-w-md">
+   <div class="relative group">
+    <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#FF5C1A] transition-colors pointer-events-none" />
+    <input
+     type="text"
+     placeholder="Search routes... (type a page name)"
+     class="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium text-gray-800 focus:outline-none focus:border-[#FF5C1A]/30 focus:bg-white focus:ring-2 focus:ring-[#FF5C1A]/10 placeholder:text-gray-400 transition-all cursor-pointer"
+     readonly
+     @click="searchModalOpen = true"
+    />
+    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-300 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 tracking-widest">⌘K</span>
+   </div>
+  </div>
+
+  <!-- Right: Profile -->
+  <div class="flex items-center gap-3 min-w-[200px] justify-end">
+   <div class="flex items-center gap-3 px-4 py-2 rounded-xl bg-gray-50 border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors">
+    <div class="w-8 h-8 rounded-full bg-[#FF5C1A]/10 border border-[#FF5C1A]/20 flex items-center justify-center text-[#FF5C1A] text-sm font-black">
+     {{ userInitials }}
+    </div>
+    <div class="flex flex-col">
+     <span class="text-xs font-black text-gray-900 leading-none">{{ userDisplayName }}</span>
+     <span class="text-[10px] font-semibold text-gray-400">Super Admin</span>
+    </div>
+   </div>
+  </div>
  </div>
 
  <!-- Page Content -->
@@ -201,7 +208,7 @@
  </h3>
  <p class="text-sm text-gray-600 leading-relaxed">
  You’ll be signed out of your account. 
- Don’t worry — your Errandr data will be waiting for you ✨
+ Don’t worry — your Errander data will be waiting for you ✨
  </p>
  </div>
 
@@ -226,11 +233,14 @@
  </div>
 </Transition>
 
+  <!-- Route Search Modal -->
+  <RouteSearchModal :isOpen="searchModalOpen" @close="searchModalOpen = false" />
+
  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useUser } from '@/composables/modules/auth/user'
 import { useRouter, useRoute } from 'vue-router'
 import { 
@@ -244,14 +254,17 @@ import {
  Menu, 
  X,
  ShieldCheck,
- ChevronRight
+ ChevronRight,
+ Search
 } from 'lucide-vue-next'
+import RouteSearchModal from '@/components/ui/RouteSearchModal.vue'
 
 const route = useRoute()
 const router = useRouter()
 const { user, logOut } = useUser()
 const showMobileMenu = ref(false)
 const logoutModalOpen = ref(false)
+const searchModalOpen = ref(false)
 
 const navItems = [
  { path: '/dashboard', label: 'Overview', icon: LayoutDashboard },
@@ -272,7 +285,7 @@ const pageTitles: Record<string, { title: string; description: string }> = {
 }
 
 const pageTitle = computed(() => pageTitles[route.path]?.title || 'Admin Dashboard')
-const pageDescription = computed(() => pageTitles[route.path]?.description || 'Welcome to Errandr Admin')
+const pageDescription = computed(() => pageTitles[route.path]?.description || 'Welcome to Errander Admin')
 
 const userDisplayName = computed(() => {
  if (!user.value) return 'Admin'
@@ -300,6 +313,21 @@ const confirmLogout = () => {
  window.location.reload()
  }
 }
+
+const handleKeyDown = (e: KeyboardEvent) => {
+ if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+  e.preventDefault()
+  searchModalOpen.value = true
+ }
+}
+
+onMounted(() => {
+ document.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+ document.removeEventListener('keydown', handleKeyDown)
+})
 
 watch(() => route.path, () => showMobileMenu.value = false)
 </script>

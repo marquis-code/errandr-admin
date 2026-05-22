@@ -70,7 +70,7 @@
                       <div class="font-medium text-gray-900 text-sm truncate">
                         {{ country.name }}
                       </div>
-                      <div class="text-xs text-gray-500">{{ country.dialCode }}</div>
+                      <div class="text-sm text-gray-500">{{ country.dialCode }}</div>
                     </div>
                     <Check 
                       v-if="selectedCountry.code === country.code"
@@ -106,19 +106,19 @@
     </div>
 
     <!-- Helper text or error -->
-    <div v-if="error" class="flex items-center gap-1 text-red-600 text-xs">
+    <div v-if="error" class="flex items-center gap-1 text-red-600 text-sm">
       <AlertCircle class="h-3 w-3" />
       <span>{{ error }}</span>
     </div>
-    <div v-else-if="displayPhone && !isPhoneValid" class="flex items-center gap-1 text-parentPrimary text-xs">
+    <div v-else-if="displayPhone && !isPhoneValid" class="flex items-center gap-1 text-parentPrimary text-sm">
       <AlertTriangle class="h-3 w-3" />
       <span>Please enter a complete {{ selectedCountry.length }}-digit phone number</span>
     </div>
-    <div v-else-if="displayPhone && isPhoneValid" class="flex items-center gap-1 text-green-600 text-xs">
+    <div v-else-if="displayPhone && isPhoneValid" class="flex items-center gap-1 text-green-600 text-sm">
       <CheckCircle class="h-3 w-3" />
       <span>Valid phone number</span>
     </div>
-    <div v-else class="text-xs text-gray-500">
+    <div v-else class="text-sm text-gray-500">
       Enter your phone number with country code
     </div>
   </div>

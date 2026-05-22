@@ -42,7 +42,7 @@
         </section>
         <section>
           <h2 class="text-xl font-bold text-gray-900">8. Contact</h2>
-          <p>For security concerns or policy questions, contact the security team at <a href="mailto:security@errandr.com" class="text-gray-900 font-bold hover:underline">security@errandr.com</a>.</p>
+          <p>For security concerns or policy questions, contact the security team at <a href="mailto:security@erranders.org" class="text-gray-900 font-bold hover:underline">security@erranders.org</a>.</p>
         </section>
       </div>
     </main>

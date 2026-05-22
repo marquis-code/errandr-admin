@@ -11,8 +11,8 @@
  class="w-full pl-11 pr-14 py-2.5 bg-gray-50/70 hover:bg-gray-100 transition-colors border-none rounded-xl text-sm font-medium focus:outline-none focus:bg-white focus:ring-2 focus:ring-parentPrimary/20"
  />
  <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
- <kbd class="px-1.5 py-0.5 text-[10px] font-bold bg-white text-gray-400 rounded-md border border-gray-200">⌘</kbd>
- <kbd class="px-1.5 py-0.5 text-[10px] font-bold bg-white text-gray-400 rounded-md border border-gray-200">K</kbd>
+ <kbd class="px-1.5 py-0.5 text-sm font-bold bg-white text-gray-400 rounded-md border border-gray-200">⌘</kbd>
+ <kbd class="px-1.5 py-0.5 text-sm font-bold bg-white text-gray-400 rounded-md border border-gray-200">K</kbd>
  </div>
  </div>
  <div class="flex items-center gap-4">
@@ -40,7 +40,7 @@
  <button 
  v-for="s in ['all', 'pending', 'resolved', 'rejected']" :key="s" 
  @click="statusFilter = s"
- class="px-4 py-1.5 rounded-full text-xs font-bold transition-all tracking-wider whitespace-nowrap"
+ class="px-4 py-1.5 rounded-full text-sm font-bold transition-all r whitespace-nowrap"
  :class="statusFilter === s ? 'bg-parentPrimary text-white shadow-sm' : 'text-gray-500 hover:bg-gray-100 bg-gray-50 border border-transparent'"
  >
  {{ s }}
@@ -74,7 +74,7 @@
  <tbody class="divide-y divide-gray-50/50">
  <tr v-for="report in filteredReports" :key="report._id" class="hover:bg-gray-50/80 transition-colors group cursor-pointer" @click="viewReport(report)">
  <td class="py-4 px-2">
- <span class="text-xs font-bold text-parentPrimary ">#{{ report._id.slice(-6) }}</span>
+ <span class="text-sm font-bold text-parentPrimary ">#{{ report._id.slice(-6) }}</span>
  </td>
  <td class="py-4 px-2 min-w-[200px]">
  <div class="flex items-center gap-3">
@@ -90,7 +90,7 @@
  <p class="text-[13px] font-medium text-gray-700 truncate">{{ report.subject }}</p>
  </td>
  <td class="py-4 px-2">
- <p class="text-xs font-medium text-gray-900">{{ new Date(report.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}</p>
+ <p class="text-sm font-medium text-gray-900">{{ new Date(report.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}</p>
  </td>
  <td class="py-4 px-2">
  <span :class="statusBadge(report.status)" class="text-[11px] font-bold capitalize px-2.5 py-1 rounded-md border">
@@ -116,43 +116,43 @@
  <h3 class="text-lg font-bold text-gray-900 text-center px-4">{{ selectedReport.subject }}</h3>
  
  <div class="flex flex-col items-center justify-center w-full mt-6 bg-gray-50 p-6 rounded-xl border border-gray-100/50">
- <span :class="statusBadge(selectedReport.status)" class="text-[11px] font-bold tracking-widest px-3 py-1.5 rounded-full border mb-3">
+ <span :class="statusBadge(selectedReport.status)" class="text-[11px] font-bold  px-3 py-1.5 rounded-full border mb-3">
  {{ selectedReport.status }}
  </span>
- <p class="text-[10px] text-gray-400 font-bold tracking-wider">Ticket #{{ selectedReport._id.slice(-6).toUpperCase() }}</p>
- <p class="text-xs text-gray-500 font-medium mt-1">Submitted on {{ new Date(selectedReport.createdAt).toLocaleString() }}</p>
+ <p class="text-sm text-gray-400 font-bold r">Ticket #{{ selectedReport._id.slice(-6).toUpperCase() }}</p>
+ <p class="text-sm text-gray-500 font-medium mt-1">Submitted on {{ new Date(selectedReport.createdAt).toLocaleString() }}</p>
  </div>
  </div>
 
  <div class="py-6 space-y-6">
  <div class="grid grid-cols-2 gap-4">
  <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
- <p class="text-[10px] font-bold tracking-widest text-gray-400 mb-2">Reporter</p>
+ <p class="text-sm font-bold  text-gray-400 mb-2">Reporter</p>
  <div class="flex items-center gap-2 mb-1">
- <div class="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center text-white text-[9px] font-bold shadow-sm">
+ <div class="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center text-white text-sm font-bold shadow-sm">
  {{ selectedReport.reporter?.name?.charAt(0) || 'U' }}
  </div>
- <p class="text-xs font-bold text-gray-900 truncate">{{ selectedReport.reporter?.name }}</p>
+ <p class="text-sm font-bold text-gray-900 truncate">{{ selectedReport.reporter?.name }}</p>
  </div>
- <p class="text-[10px] text-gray-500 truncate ml-8">{{ selectedReport.reporter?.email }}</p>
+ <p class="text-sm text-gray-500 truncate ml-8">{{ selectedReport.reporter?.email }}</p>
  </div>
  
  <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100" v-if="selectedReport.orderId">
- <p class="text-[10px] font-bold tracking-widest text-gray-400 mb-2">Related Order</p>
+ <p class="text-sm font-bold  text-gray-400 mb-2">Related Order</p>
  <p class="text-sm font-bold text-parentPrimary mb-1">#{{ selectedReport.orderId.slice(-8).toUpperCase() }}</p>
- <p class="text-[10px] text-gray-500 font-medium cursor-pointer hover:underline mb-1">View Transation</p>
+ <p class="text-sm text-gray-500 font-medium cursor-pointer hover:underline mb-1">View Transation</p>
  </div>
  </div>
 
  <div>
- <h4 class="text-[10px] font-bold tracking-widest text-gray-400 mb-2">Description</h4>
+ <h4 class="text-sm font-bold  text-gray-400 mb-2">Description</h4>
  <div class="bg-white p-4 rounded-2xl border border-gray-100 text-sm font-medium text-gray-700 leading-relaxed shadow-sm">
  {{ selectedReport.description }}
  </div>
  </div>
 
  <div class="pt-6 border-t border-gray-100">
- <h4 class="text-[10px] font-bold tracking-widest text-gray-400 mb-4">Resolution Note</h4>
+ <h4 class="text-sm font-bold  text-gray-400 mb-4">Resolution Note</h4>
  <textarea 
  v-model="adminNote" 
  rows="3" 

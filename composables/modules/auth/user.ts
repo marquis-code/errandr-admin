@@ -35,10 +35,9 @@ export const useUser = () => {
   const logOut = () => {
     user.value = null;
     token.value = null;
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('errandr_cart');
-      window.location.href = '/auth/login';
-    }
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    window.location.href = '/';
   };
 
   const isLoggedIn = computed(() => !!token.value);

@@ -1,7 +1,7 @@
 <template>
  <span 
  :class="[
- 'px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider border transition-all duration-300',
+ 'px-2.5 py-1 rounded-full text-sm font-bold r border transition-all duration-300',
  config.bg,
  config.text,
  config.border

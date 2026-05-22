@@ -7,7 +7,7 @@
         :class="[
           'absolute transition-all duration-300 ease-in-out pointer-events-none z-10',
           isFocused || phoneNumber ? 
-            'text-xs text-gray-500 left-3 top-2' : 
+            'text-sm text-gray-500 left-3 top-2' : 
             'text-base text-gray-500 left-3 top-1/2 transform -translate-y-1/2'
         ]"
       >
@@ -117,12 +117,12 @@
     </div>
     
     <!-- Error Message -->
-    <p v-if="errorMessage" class="mt-1 text-xs text-red-500 flex items-center">
+    <p v-if="errorMessage" class="mt-1 text-sm text-red-500 flex items-center">
       <AlertTriangle class="mr-1 w-3 h-3" />{{ errorMessage }}
     </p>
 
     <!-- Helper Text -->
-    <p v-if="helperText && !errorMessage" class="mt-1 text-xs text-gray-500">
+    <p v-if="helperText && !errorMessage" class="mt-1 text-sm text-gray-500">
       {{ helperText }}
     </p>
   </div>
