@@ -9,7 +9,7 @@
           <div class="inline-flex items-center justify-center w-16 h-16 rounded-[1.5rem] bg-gray-900/10 text-gray-900 mb-6 shadow-inner border border-gray-200">
             <ShieldCheck class="w-8 h-8" />
           </div>
-          <h1 class="text-3xl font-black text-gray-900 tracking-tight mb-2">Admin Login</h1>
+          <h1 class="text-3xl font-medium text-gray-900 tracking-tight mb-2">Admin Login</h1>
           <p class="text-gray-500 font-medium text-sm">Access the Errandr operations dashboard</p>
           <div class="flex items-center justify-center gap-2 mt-4 text-emerald-600 text-sm font-bold bg-emerald-50 py-1 px-3 rounded-full border border-emerald-100 max-w-max mx-auto">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -45,7 +45,7 @@
           </transition>
 
           <button type="submit" :disabled="loading"
-            class="w-full py-4 bg-gray-900 hover:bg-black text-white rounded-2xl font-black text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-xl shadow-gray-900/20 group active:scale-[0.98]">
+            class="w-full py-4 bg-gray-900 hover:bg-black text-white rounded-2xl font-medium text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-xl shadow-gray-900/20 group active:scale-[0.98]">
             <Loader2 v-if="loading" class="animate-spin w-5 h-5" />
             <span v-else>Secure Login</span>
             <Lock v-if="!loading" class="w-4 h-4 group-hover:text-emerald-400 transition-colors" />

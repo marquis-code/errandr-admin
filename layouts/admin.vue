@@ -16,7 +16,7 @@
  <!-- Navigation -->
  <nav class="space-y-1.5">
  <div class="px-2 pb-2">
- <p class="text-sm font-black text-gray-400 tracking-[0.2em] ml-1">Main Menu</p>
+ <p class="text-sm font-medium text-gray-400 tracking-[0.2em] ml-1">Main Menu</p>
  </div>
  <NuxtLink
  v-for="item in navItems"
@@ -38,7 +38,7 @@
  <div class="absolute bottom-6 left-6 right-6">
  <button
  @click="handleLogoutClick"
- class="flex items-center w-full px-5 py-4 text-sm font-black text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all duration-300 group"
+ class="flex items-center w-full px-5 py-4 text-sm font-medium text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all duration-300 group"
  >
  <LogOut class="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform" />
  <span class="  text-[11px]">Logout Session</span>
@@ -92,7 +92,7 @@
  {{ userInitials }}
  </div>
  <div class="flex flex-col">
- <span class="text-base font-black text-gray-900 leading-none">{{ userDisplayName }}</span>
+ <span class="text-base font-medium text-gray-900 leading-none">{{ userDisplayName }}</span>
  <span class="text-sm font-bold text-gray-400  mt-1">Super Admin</span>
  </div>
  </div>
@@ -115,7 +115,7 @@
  </div>
 
  <div class="p-6 mt-10">
- <button @click="handleLogoutClick" class="flex items-center w-full px-5 py-4 text-base font-black text-red-500 bg-red-50 rounded-2xl transition-all">
+ <button @click="handleLogoutClick" class="flex items-center w-full px-5 py-4 text-base font-medium text-red-500 bg-red-50 rounded-2xl transition-all">
  <LogOut class="w-6 h-6 mr-4" />
  LOGOUT SESSION
  </button>
@@ -131,7 +131,7 @@
   <div class="flex items-center gap-4 min-w-[200px]">
    <div class="w-1 h-8 bg-[#FF5C1A]/20 rounded-full"></div>
    <div>
-    <h1 class="text-sm font-black text-gray-900">{{ pageTitle }}</h1>
+    <h1 class="text-sm font-medium text-gray-900">{{ pageTitle }}</h1>
     <p class="text-xs font-bold text-gray-400 tracking-tight">{{ pageDescription }}</p>
    </div>
   </div>
@@ -154,11 +154,11 @@
   <!-- Right: Profile -->
   <div class="flex items-center gap-3 min-w-[200px] justify-end">
    <div class="flex items-center gap-3 px-4 py-2 rounded-xl bg-gray-50 border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors">
-    <div class="w-8 h-8 rounded-full bg-[#FF5C1A]/10 border border-[#FF5C1A]/20 flex items-center justify-center text-[#FF5C1A] text-sm font-black">
+    <div class="w-8 h-8 rounded-full bg-[#FF5C1A]/10 border border-[#FF5C1A]/20 flex items-center justify-center text-[#FF5C1A] text-sm font-medium">
      {{ userInitials }}
     </div>
     <div class="flex flex-col">
-     <span class="text-xs font-black text-gray-900 leading-none">{{ userDisplayName }}</span>
+     <span class="text-xs font-medium text-gray-900 leading-none">{{ userDisplayName }}</span>
      <span class="text-[10px] font-semibold text-gray-400">Super Admin</span>
     </div>
    </div>
@@ -255,7 +255,8 @@ import {
  X,
  ShieldCheck,
  ChevronRight,
- Search
+ Search,
+ Settings
 } from 'lucide-vue-next'
 import RouteSearchModal from '@/components/ui/RouteSearchModal.vue'
 
@@ -272,7 +273,8 @@ const navItems = [
  { path: '/vendors', label: 'Vendors', icon: Store },
  { path: '/orders', label: 'Orders', icon: Package },
  { path: '/finances', label: 'Finances', icon: Wallet },
- { path: '/reports', label: 'Reports', icon: FileText }
+ { path: '/reports', label: 'Reports', icon: FileText },
+ { path: '/settings', label: 'Settings', icon: Settings }
 ]
 
 const pageTitles: Record<string, { title: string; description: string }> = {
@@ -281,7 +283,8 @@ const pageTitles: Record<string, { title: string; description: string }> = {
  '/vendors': { title: 'Vendor Management', description: 'Manage merchants and store settings' },
  '/orders': { title: 'Order Management', description: 'Track platform-wide order fulfillment' },
  '/finances': { title: 'Financials', description: 'Transaction history and platform revenue' },
- '/reports': { title: 'Platform Reports', description: 'Analytical insights and system health' }
+ '/reports': { title: 'Platform Reports', description: 'Analytical insights and system health' },
+ '/settings': { title: 'System Settings', description: 'Configure platform parameters and service fees' }
 }
 
 const pageTitle = computed(() => pageTitles[route.path]?.title || 'Admin Dashboard')

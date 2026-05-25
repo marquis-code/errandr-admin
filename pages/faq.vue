@@ -2,14 +2,14 @@
   <div class="min-h-screen bg-white">
     <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 py-4">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 flex items-center justify-between">
-        <NuxtLink to="/" class="flex items-center gap-2"><div class="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center"><ShieldCheck class="w-4 h-4 text-emerald-400" /></div><span class="text-lg font-black text-gray-900 tracking-tight">Errander <span class="text-gray-400 font-medium text-sm">Ops</span></span></NuxtLink>
+        <NuxtLink to="/" class="flex items-center gap-2"><div class="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center"><ShieldCheck class="w-4 h-4 text-emerald-400" /></div><span class="text-lg font-medium text-gray-900 tracking-tight">Errander <span class="text-gray-400 font-medium text-sm">Ops</span></span></NuxtLink>
         <div class="flex items-center gap-6 text-sm font-semibold text-gray-500">
           <NuxtLink to="/about" class="hover:text-gray-900">About</NuxtLink><NuxtLink to="/contact" class="hover:text-gray-900">Contact</NuxtLink><NuxtLink to="/faq" class="hover:text-gray-900">FAQ</NuxtLink><NuxtLink to="/terms" class="hover:text-gray-900">Terms</NuxtLink>
         </div>
       </div>
     </nav>
     <main class="max-w-3xl mx-auto px-4 sm:px-6 py-16">
-      <h1 class="text-4xl font-black text-gray-900 tracking-tight mb-2">Admin Runbooks</h1>
+      <h1 class="text-4xl font-medium text-gray-900 tracking-tight mb-2">Admin Runbooks</h1>
       <p class="text-lg text-gray-500 mb-10">Common operational procedures for the Errander Ops team.</p>
       <div class="space-y-6">
         <div v-for="(faq, i) in faqs" :key="i" class="bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden">

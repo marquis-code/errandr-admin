@@ -40,4 +40,12 @@ export const admin_api = {
   getRecentOrders: (limit: number = 10) => {
     return GATEWAY_ENDPOINT_WITH_AUTH.get(`/admin/orders/recent?limit=${limit}`);
   },
+
+  getCustomErrandSettings: () => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get('/settings/errands/custom');
+  },
+
+  updateCustomErrandSettings: (payload: { baseFee: number; expressFee: number }) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put('/settings/errands/custom', payload);
+  },
 };

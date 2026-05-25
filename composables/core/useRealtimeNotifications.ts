@@ -4,6 +4,15 @@ import { useRealtimeSocket } from '@/composables/core/useRealtimeSocket'
 
 const LISTENERS_KEY = 'realtime_notification_listeners'
 
+const playNotificationSound = () => {
+  try {
+    const audio = new Audio('/sounds/notification.wav')
+    audio.play().catch(e => console.warn('Audio playback failed', e))
+  } catch (error) {
+    // ignore
+  }
+}
+
 export const useRealtimeNotifications = () => {
   const { showToast } = useCustomToast()
   const { socket, connectSocket } = useRealtimeSocket()
@@ -11,6 +20,8 @@ export const useRealtimeNotifications = () => {
 
   const handleNotification = (payload: any) => {
     if (!payload) return
+
+    playNotificationSound()
 
     showToast({
       title: payload.title || 'Notification',
@@ -22,6 +33,9 @@ export const useRealtimeNotifications = () => {
 
   const handleAudit = (payload: any) => {
     if (!payload) return
+
+    playNotificationSound()
+
     showToast({
       title: payload.action ? `Audit: ${payload.action}` : 'Audit Update',
       message: payload.description || 'A new audit log was recorded',
