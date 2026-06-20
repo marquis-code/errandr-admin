@@ -49,6 +49,30 @@
               />
             </div>
           </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">buyer convenience fee (₦)</label>
+              <input 
+                v-model.number="form.convenienceFee"
+                type="number"
+                required
+                min="0"
+                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+              />
+            </div>
+            <div class="space-y-2">
+              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">runner commission (%)</label>
+              <input 
+                v-model.number="form.commissionPercentage"
+                type="number"
+                required
+                min="0"
+                max="100"
+                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+              />
+            </div>
+          </div>
 
           <div class="pt-4 flex justify-end">
             <button 
@@ -102,6 +126,8 @@ const saving = ref(false);
 const form = reactive({
   baseFee: 450,
   expressFee: 850,
+  convenienceFee: 50,
+  commissionPercentage: 10,
 });
 
 const loadSettings = async () => {
@@ -111,6 +137,8 @@ const loadSettings = async () => {
     if (data) {
       form.baseFee = data.baseFee || 450;
       form.expressFee = data.expressFee || 850;
+      form.convenienceFee = data.convenienceFee ?? 50;
+      form.commissionPercentage = data.commissionPercentage ?? 10;
     }
   } catch (e: any) {
     console.error('Failed to load settings:', e);
@@ -128,6 +156,8 @@ const saveSettings = async () => {
     const res = await admin_api.updateCustomErrandSettings({
       baseFee: Number(form.baseFee),
       expressFee: Number(form.expressFee),
+      convenienceFee: Number(form.convenienceFee),
+      commissionPercentage: Number(form.commissionPercentage),
     });
     showToast({
       title: 'success',

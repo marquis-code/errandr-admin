@@ -63,4 +63,9 @@ export const chat_api = {
     const url = '/chat/auto-responses'
     return GATEWAY_ENDPOINT.get(url, { params: { businessId } })
   },
+
+  getSupportThreads: () => {
+    const url = '/chat/support/threads'
+    return GATEWAY_ENDPOINT_WITH_AUTH.get(url)
+  },
 }

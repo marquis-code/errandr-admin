@@ -45,7 +45,7 @@ export const admin_api = {
     return GATEWAY_ENDPOINT_WITH_AUTH.get('/settings/errands/custom');
   },
 
-  updateCustomErrandSettings: (payload: { baseFee: number; expressFee: number }) => {
+  updateCustomErrandSettings: (payload: { baseFee: number; expressFee: number; convenienceFee?: number; commissionPercentage?: number }) => {
     return GATEWAY_ENDPOINT_WITH_AUTH.put('/settings/errands/custom', payload);
   },
 };

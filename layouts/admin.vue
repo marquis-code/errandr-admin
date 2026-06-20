@@ -256,7 +256,9 @@ import {
  ShieldCheck,
  ChevronRight,
  Search,
- Settings
+ Settings,
+ Gift,
+ MessageSquare
 } from 'lucide-vue-next'
 import RouteSearchModal from '@/components/ui/RouteSearchModal.vue'
 
@@ -272,7 +274,9 @@ const navItems = [
  { path: '/users', label: 'Users', icon: Users },
  { path: '/vendors', label: 'Vendors', icon: Store },
  { path: '/orders', label: 'Orders', icon: Package },
+ { path: '/referrals', label: 'Referrals', icon: Gift },
  { path: '/finances', label: 'Finances', icon: Wallet },
+ { path: '/chats', label: 'Support Chats', icon: MessageSquare },
  { path: '/reports', label: 'Reports', icon: FileText },
  { path: '/settings', label: 'Settings', icon: Settings }
 ]
@@ -282,7 +286,9 @@ const pageTitles: Record<string, { title: string; description: string }> = {
  '/users': { title: 'User Management', description: 'Manage accounts and permissions' },
  '/vendors': { title: 'Vendor Management', description: 'Manage merchants and store settings' },
  '/orders': { title: 'Order Management', description: 'Track platform-wide order fulfillment' },
+ '/referrals': { title: 'Referral System', description: 'Manage ambassadors and track referral growth' },
  '/finances': { title: 'Financials', description: 'Transaction history and platform revenue' },
+ '/chats': { title: 'Support Chats', description: 'Manage incoming support requests' },
  '/reports': { title: 'Platform Reports', description: 'Analytical insights and system health' },
  '/settings': { title: 'System Settings', description: 'Configure platform parameters and service fees' }
 }
