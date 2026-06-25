@@ -1,19 +1,19 @@
 <template>
   <div class="space-y-10 animate-fade-in max-w-7xl mx-auto pb-20">
     <!-- Header & Tabs -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
       <div class="space-y-1">
-        <h1 class="text-4xl font-bold text-gray-900 font-display">Reports</h1>
-        <p class="text-sm font-medium text-gray-500">Review user complaints and manage dispute resolutions.</p>
+        <h1 class="text-2xl font-semibold text-gray-900 font-heading tracking-tight">Reports</h1>
+        <p class="text-xs font-medium text-gray-500">Review user complaints and manage dispute resolutions.</p>
       </div>
 
-      <div class="flex items-center gap-2 p-1.5 bg-gray-50 border border-gray-100 rounded-2xl overflow-x-auto max-w-full">
+      <div class="flex items-center gap-1 p-1 bg-gray-50 border border-gray-200 rounded-lg overflow-x-auto max-w-full">
         <button
           v-for="tab in tabs"
           :key="tab.key"
           @click="activeTab = tab.key"
-          class="text-sm py-2.5 px-5 rounded-xl transition-colors font-semibold whitespace-nowrap"
-          :class="activeTab === tab.key ? 'bg-[#FF5C1A] text-white' : 'text-gray-500 hover:text-gray-900 hover:bg-white'"
+          class="text-xs py-1.5 px-4 rounded-md transition-all font-medium whitespace-nowrap"
+          :class="activeTab === tab.key ? 'bg-white text-gray-900 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'"
         >
           {{ tab.label }}
         </button>
@@ -21,22 +21,22 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div v-for="i in 4" :key="`report-loading-${i}`" class="bg-gray-50 rounded-3xl p-8 border border-gray-100 animate-pulse h-52">
-        <div class="flex items-start gap-4 mb-6">
-          <div class="w-12 h-12 bg-gray-200 rounded-2xl"></div>
+    <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div v-for="i in 4" :key="`report-loading-${i}`" class="bg-white rounded-xl p-5 border border-gray-200 animate-pulse h-40 shadow-sm">
+        <div class="flex items-start gap-3 mb-4">
+          <div class="w-10 h-10 bg-gray-200 rounded-lg"></div>
           <div class="flex-1 space-y-2">
-            <div class="w-20 h-3 bg-gray-200 rounded-md"></div>
-            <div class="w-48 h-5 bg-gray-200 rounded-md"></div>
+            <div class="w-20 h-2 bg-gray-200 rounded"></div>
+            <div class="w-40 h-4 bg-gray-200 rounded"></div>
           </div>
         </div>
-        <div class="w-full h-4 bg-gray-200 rounded-md mb-2"></div>
-        <div class="w-3/4 h-4 bg-gray-200 rounded-md"></div>
+        <div class="w-full h-3 bg-gray-200 rounded mb-2"></div>
+        <div class="w-3/4 h-3 bg-gray-200 rounded"></div>
       </div>
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="filteredReports.length === 0" class="py-40 bg-gray-50 rounded-3xl border border-gray-100">
+    <div v-else-if="filteredReports.length === 0" class="py-20 bg-white rounded-xl border border-gray-200 shadow-sm text-center">
       <EmptyState 
         title="No reports found" 
         :description="`There are no ${activeTab === 'all' ? '' : activeTab} reports at this time.`"
@@ -44,39 +44,39 @@
     </div>
 
     <!-- Report Cards -->
-    <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div
         v-for="report in filteredReports"
         :key="report._id"
-        class="bg-gray-50 rounded-3xl p-8 border border-gray-100 hover:bg-white hover:border-gray-200 transition-all cursor-pointer group flex flex-col border-l-4"
+        class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow transition-all cursor-pointer group flex flex-col border-l-4"
         :style="{ borderLeftColor: getCatColor(report.category) }"
         @click="selectedReport = report"
       >
         <!-- Status Indicator -->
-        <div class="flex items-start justify-between mb-6">
-          <div class="flex items-start gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center border border-gray-200 shrink-0">
-              <component :is="catIcon(report.category)" class="w-5 h-5" :style="{ color: getCatColor(report.category) }" />
+        <div class="flex items-start justify-between mb-4">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center border border-gray-100 shrink-0">
+              <component :is="catIcon(report.category)" class="w-4 h-4" :style="{ color: getCatColor(report.category) }" />
             </div>
-            <div class="min-w-0 flex-1 pt-1">
-              <p class="text-xs font-bold mb-1 capitalize" :style="{ color: getCatColor(report.category) }">{{ report.category?.replace('_', ' ') }}</p>
-              <h3 class="font-bold text-gray-900 text-lg leading-snug group-hover:text-[#FF5C1A] transition-colors line-clamp-1">{{ report.title }}</h3>
+            <div class="min-w-0 flex-1 pt-0.5">
+              <p class="text-[10px] font-bold mb-0.5 uppercase tracking-wide" :style="{ color: getCatColor(report.category) }">{{ report.category?.replace('_', ' ') }}</p>
+              <h3 class="font-semibold text-gray-900 text-sm leading-snug group-hover:text-[#FF5C1A] transition-colors line-clamp-1">{{ report.title }}</h3>
             </div>
           </div>
-          <StatusBadge :status="report.status" class="shrink-0 ml-4" />
+          <StatusBadge :status="report.status" class="shrink-0 ml-2 scale-75 origin-top-right" />
         </div>
         
-        <p class="text-sm text-gray-500 line-clamp-2 mb-6 font-medium leading-relaxed flex-1">{{ report.description }}</p>
+        <p class="text-xs text-gray-500 line-clamp-2 mb-4 font-medium leading-relaxed flex-1">{{ report.description }}</p>
         
-        <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-          <div class="flex items-center gap-3">
-            <div class="w-7 h-7 rounded-lg bg-[#FF5C1A]/10 flex items-center justify-center text-[#FF5C1A] text-xs font-bold">
-              {{ report.reporter?.firstName?.[0] }}
+        <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded flex items-center justify-center bg-gray-100 text-gray-600 text-[10px] font-bold border border-gray-200">
+              {{ report.reporter?.firstName?.[0] || 'U' }}
             </div>
-            <span class="text-sm font-semibold text-gray-500">{{ report.reporter?.firstName }} {{ report.reporter?.lastName }}</span>
+            <span class="text-xs font-semibold text-gray-600">{{ report.reporter?.firstName }} {{ report.reporter?.lastName }}</span>
           </div>
-          <div class="flex items-center gap-2 text-sm font-medium text-gray-400">
-            <Clock class="w-3.5 h-3.5" />
+          <div class="flex items-center gap-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+            <Clock class="w-3 h-3" />
             {{ new Date(report.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) }}
           </div>
         </div>
@@ -85,44 +85,44 @@
 
     <!-- Case Resolution Modal -->
     <Transition name="fade">
-      <div v-if="selectedReport" class="fixed inset-0 z-50 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-6 transition-all" @click.self="selectedReport = null">
-        <div class="bg-white rounded-3xl p-0 w-full max-w-2xl relative animate-scale-in flex flex-col max-h-[90vh] overflow-hidden border border-gray-200">
+      <div v-if="selectedReport" class="fixed inset-0 z-50 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4 transition-all" @click.self="selectedReport = null">
+        <div class="bg-white rounded-xl p-0 w-full max-w-2xl relative animate-scale-in flex flex-col max-h-[90vh] overflow-hidden border border-gray-200 shadow-xl">
           <!-- Modal Header -->
-          <div class="p-8 border-b border-gray-200 flex items-center justify-between bg-white">
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center border border-gray-200">
-                <component :is="catIcon(selectedReport.category)" class="w-5 h-5" :style="{ color: getCatColor(selectedReport.category) }" />
+          <div class="p-5 border-b border-gray-100 flex items-center justify-between bg-white">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center border border-gray-100">
+                <component :is="catIcon(selectedReport.category)" class="w-4 h-4" :style="{ color: getCatColor(selectedReport.category) }" />
               </div>
-              <div class="space-y-1">
-                <h2 class="text-xl font-bold text-gray-900 font-display">{{ selectedReport.title }}</h2>
-                <p class="text-sm font-semibold capitalize" :style="{ color: getCatColor(selectedReport.category) }">{{ selectedReport.category?.replace('_', ' ') }}</p>
+              <div class="space-y-0.5">
+                <h2 class="text-base font-semibold text-gray-900 font-heading">{{ selectedReport.title }}</h2>
+                <p class="text-[10px] font-bold uppercase tracking-wide" :style="{ color: getCatColor(selectedReport.category) }">{{ selectedReport.category?.replace('_', ' ') }}</p>
               </div>
             </div>
-            <button @click="selectedReport = null" class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-rose-50 hover:text-rose-500 transition-colors border border-gray-200">
-              <X class="w-5 h-5" />
+            <button @click="selectedReport = null" class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-rose-50 hover:text-rose-500 transition-colors border border-gray-200">
+              <X class="w-4 h-4" />
             </button>
           </div>
           
           <!-- Modal Body -->
-          <div class="overflow-y-auto p-8 space-y-8 flex-1 custom-scrollbar bg-white">
-            <div class="space-y-3">
-              <h4 class="text-xs font-bold text-gray-400 uppercase">Description</h4>
-              <div class="text-sm text-gray-700 leading-relaxed font-medium bg-gray-50 p-6 rounded-2xl border border-gray-100">
+          <div class="overflow-y-auto p-5 space-y-6 flex-1 custom-scrollbar bg-gray-50/30">
+            <div class="space-y-2">
+              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Description</h4>
+              <div class="text-xs text-gray-700 leading-relaxed font-medium bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
                 {{ selectedReport.description }}
               </div>
             </div>
 
-            <div v-if="selectedReport.thread?.length" class="space-y-3">
-              <h4 class="text-xs font-bold text-gray-400 uppercase">Conversation</h4>
-              <div class="space-y-4">
+            <div v-if="selectedReport.thread?.length" class="space-y-2">
+              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Conversation</h4>
+              <div class="space-y-3">
                 <div v-for="msg in selectedReport.thread" :key="msg.timestamp" class="flex flex-col" :class="msg.isAdmin ? 'items-end' : 'items-start'">
-                  <div :class="msg.isAdmin ? 'bg-gray-900 text-white rounded-tr-sm' : 'bg-gray-50 text-gray-900 rounded-tl-sm border border-gray-200'" class="max-w-[85%] px-5 py-3 rounded-2xl">
-                    <p class="text-sm font-medium leading-relaxed">{{ msg.message }}</p>
+                  <div :class="msg.isAdmin ? 'bg-gray-900 text-white rounded-tr-sm shadow-sm' : 'bg-white text-gray-900 rounded-tl-sm border border-gray-200 shadow-sm'" class="max-w-[85%] px-4 py-2.5 rounded-xl">
+                    <p class="text-xs font-medium leading-relaxed">{{ msg.message }}</p>
                   </div>
-                  <div class="flex items-center gap-2 mt-1.5 px-1">
-                    <span class="text-xs text-gray-400 font-semibold">{{ msg.isAdmin ? 'Admin' : 'User' }}</span>
+                  <div class="flex items-center gap-1.5 mt-1 px-1">
+                    <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wide">{{ msg.isAdmin ? 'Admin' : 'User' }}</span>
                     <div class="w-1 h-1 rounded-full bg-gray-300" />
-                    <span class="text-xs text-gray-400 font-medium">{{ new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</span>
+                    <span class="text-[10px] text-gray-400 font-semibold">{{ new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</span>
                   </div>
                 </div>
               </div>
@@ -130,24 +130,24 @@
           </div>
 
           <!-- Admin Response Area -->
-          <div class="p-6 bg-gray-50 border-t border-gray-200 space-y-4">
+          <div class="p-4 bg-white border-t border-gray-200 space-y-3">
             <textarea 
               v-model="adminMessage" 
               placeholder="Write your response..." 
-              class="w-full h-28 p-5 rounded-2xl bg-white border border-gray-200 focus:ring-4 focus:ring-[#FF5C1A]/5 focus:border-[#FF5C1A]/20 transition-all text-sm font-medium resize-none placeholder:text-gray-400" 
+              class="w-full h-24 p-3 rounded-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] transition-all text-xs font-medium resize-none placeholder:text-gray-400" 
             />
-            <div class="flex gap-3">
+            <div class="flex gap-2">
               <button 
                 @click="handleReply" 
                 :disabled="!adminMessage.trim()"
-                class="flex-1 py-3.5 bg-[#FF5C1A] text-white rounded-xl font-bold text-sm hover:bg-[#E54D12] disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                class="flex-1 py-2.5 bg-gray-900 text-white rounded-lg font-semibold text-xs hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1.5 shadow-sm"
               >
-                <Send class="w-4 h-4" /> Send Reply
+                <Send class="w-3.5 h-3.5" /> Send Reply
               </button>
               <button 
                 v-if="selectedReport.status !== 'resolved'"
                 @click="handleResolve('resolved')" 
-                class="px-8 py-3.5 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 transition-colors"
+                class="px-6 py-2.5 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-lg font-semibold text-xs hover:bg-emerald-100 transition-colors shadow-sm"
               >
                 Resolve
               </button>
@@ -248,7 +248,7 @@ onMounted(fetchReports);
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.3s ease-out;
+  animation: scaleIn 0.2s ease-out;
 }
 
 @keyframes scaleIn {
@@ -258,10 +258,6 @@ onMounted(fetchReports);
 
 .fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
-
-.font-display {
-  font-family: 'Roobert PRO', sans-serif;
-}
 
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;

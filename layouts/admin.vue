@@ -22,9 +22,9 @@
  v-for="item in navItems"
  :key="item.path"
  :to="item.path"
- class="flex items-center px-4 py-3.5 text-sm font-bold rounded-2xl transition-all duration-300 group"
+ class="flex items-center px-4 py-3.5 text-sm font-medium rounded-xl transition-all duration-300 group"
  :class="isActive(item.path) 
- ? 'bg-[#FF5C1A] text-white shadow-xl shadow-[#FF5C1A]/20 translate-x-1' 
+ ? 'bg-[#FF5C1A] text-white translate-x-1' 
  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'"
  >
  <component :is="item.icon" class="w-5 h-5 mr-3 transition-transform duration-500 group-hover:scale-110" :class="isActive(item.path) ? 'text-white' : 'text-gray-400 group-hover:text-[#FF5C1A]'" />
@@ -68,7 +68,8 @@
  v-if="showMobileMenu"
  class="lg:hidden fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-40"
  @click="showMobileMenu = false"
- ></div>
+ >
+ </div>
  </Transition>
 
  <!-- Mobile Sidebar -->
@@ -102,9 +103,9 @@
  v-for="item in navItems"
  :key="item.path"
  :to="item.path"
- class="flex items-center px-5 py-4 text-base font-bold rounded-2xl transition-all"
+ class="flex items-center px-5 py-4 text-sm font-medium rounded-xl transition-all"
  :class="isActive(item.path) 
- ? 'bg-[#FF5C1A] text-white shadow-xl shadow-[#FF5C1A]/20' 
+ ? 'bg-[#FF5C1A] text-white' 
  : 'text-gray-500 hover:bg-gray-50'"
  @click="showMobileMenu = false"
  >
@@ -179,9 +180,10 @@
  leave-from-class="opacity-100"
  leave-to-class="opacity-0"
 >
+ <Teleport to="body">
  <div
  v-if="logoutModalOpen"
- class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+ class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
  @click.self="logoutModalOpen = false"
  >
  <Transition
@@ -194,7 +196,7 @@
  >
  <div
  v-if="logoutModalOpen"
- class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 sm:p-7 flex flex-col items-center text-center space-y-5"
+ class="bg-white rounded-2xl border border-gray-100 max-w-sm w-full p-6 sm:p-7 flex flex-col items-center text-center space-y-5"
  >
  <!-- Icon -->
  <div class="w-14 h-14 rounded-full bg-rose-50 flex items-center justify-center">
@@ -231,6 +233,7 @@
  </div>
  </Transition>
  </div>
+ </Teleport>
 </Transition>
 
   <!-- Route Search Modal -->

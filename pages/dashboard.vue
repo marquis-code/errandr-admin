@@ -1,124 +1,124 @@
 <template>
-  <div class="space-y-10 animate-fade-in pb-20">
+  <div class="space-y-6 animate-fade-in pb-20">
     <!-- Header Section -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-4">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
       <div class="space-y-1">
-        <h1 class="text-4xl font-bold text-gray-900 font-display">Dashboard</h1>
+        <h1 class="text-2xl font-semibold text-gray-900 font-heading tracking-tight">Dashboard</h1>
         <div class="flex items-center gap-2">
-          <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-          <p class="text-sm font-semibold text-gray-500 leading-none">All systems online</p>
+          <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+          <p class="text-xs font-medium text-gray-500 leading-none">All systems online</p>
         </div>
       </div>
       
-      <div class="flex items-center gap-6 bg-gray-50 p-3 pr-6 rounded-2xl border border-gray-100">
-        <div class="flex -space-x-3">
-          <div v-for="i in 3" :key="i" class="w-11 h-11 rounded-full border-4 border-white bg-[#FF5C1A]/10 flex items-center justify-center text-sm font-bold text-[#FF5C1A]">
-            <User class="w-5 h-5" />
+      <div class="flex items-center gap-4 bg-white p-2.5 pr-4 rounded-xl border border-gray-200 shadow-sm">
+        <div class="flex -space-x-2">
+          <div v-for="i in 3" :key="i" class="w-8 h-8 rounded-full border-2 border-white bg-[#FF5C1A]/10 flex items-center justify-center text-xs font-bold text-[#FF5C1A]">
+            <User class="w-4 h-4" />
           </div>
         </div>
         <div class="flex flex-col">
-          <span class="text-sm font-bold text-gray-900">3 Admins</span>
-          <span class="text-sm font-medium text-emerald-500 mt-1">Active Now</span>
+          <span class="text-xs font-bold text-gray-900">3 Admins</span>
+          <span class="text-[10px] font-medium text-emerald-500 mt-0.5">Active Now</span>
         </div>
       </div>
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <!-- Skeletons for Loading -->
       <template v-if="statsLoading">
-        <div v-for="i in 4" :key="`stat-loading-${i}`" class="bg-gray-50 p-8 rounded-3xl border border-gray-100 flex flex-col justify-between h-40 animate-pulse">
-          <div class="flex justify-between items-center mb-6">
-            <div class="w-14 h-14 bg-gray-200 rounded-2xl"></div>
-            <div class="w-16 h-8 bg-gray-200 rounded-xl"></div>
+        <div v-for="i in 4" :key="`stat-loading-${i}`" class="bg-white p-5 rounded-xl border border-gray-200 flex flex-col justify-between animate-pulse">
+          <div class="flex justify-between items-center mb-4">
+            <div class="w-10 h-10 bg-gray-100 rounded-lg"></div>
+            <div class="w-12 h-6 bg-gray-100 rounded-md"></div>
           </div>
           <div>
-            <div class="w-24 h-4 bg-gray-200 rounded-md mb-2"></div>
-            <div class="w-32 h-8 bg-gray-200 rounded-lg"></div>
+            <div class="w-20 h-3 bg-gray-100 rounded mb-1.5"></div>
+            <div class="w-24 h-6 bg-gray-100 rounded"></div>
           </div>
         </div>
       </template>
 
       <!-- Loaded Stats -->
       <template v-else>
-        <div v-for="stat in dashboardStats" :key="stat.label" class="bg-gray-50 p-8 rounded-3xl border border-gray-100 hover:border-gray-200 transition-colors group overflow-hidden relative">
-          <div class="flex items-center justify-between mb-8 relative">
-            <div :class="stat.bgClass" class="w-14 h-14 rounded-2xl flex items-center justify-center">
-              <component :is="stat.icon" class="w-6 h-6" />
+        <div v-for="stat in dashboardStats" :key="stat.label" class="bg-white p-5 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors group overflow-hidden relative shadow-sm">
+          <div class="flex items-center justify-between mb-4 relative">
+            <div :class="stat.bgClass" class="w-10 h-10 rounded-lg flex items-center justify-center">
+              <component :is="stat.icon" class="w-5 h-5" />
             </div>
-            <div v-if="stat.trend" :class="stat.trend > 0 ? 'text-emerald-700 bg-emerald-100 border-emerald-200' : 'text-rose-700 bg-rose-100 border-rose-200'" class="text-sm font-bold px-3 py-1.5 rounded-xl border flex items-center gap-1.5">
-              <TrendingUp v-if="stat.trend > 0" class="w-4 h-4" />
-              <TrendingDown v-else class="w-4 h-4" />
+            <div v-if="stat.trend" :class="stat.trend > 0 ? 'text-emerald-700 bg-emerald-50 border-emerald-100' : 'text-rose-700 bg-rose-50 border-rose-100'" class="text-[10px] font-bold px-2 py-1 rounded-md border flex items-center gap-1">
+              <TrendingUp v-if="stat.trend > 0" class="w-3 h-3" />
+              <TrendingDown v-else class="w-3 h-3" />
               {{ Math.abs(stat.trend) }}%
             </div>
           </div>
           
-          <div class="relative space-y-1">
-            <p class="text-sm font-semibold text-gray-500 ml-1">{{ stat.label }}</p>
-            <h3 class="text-4xl font-bold text-gray-900 font-display">{{ stat.value }}</h3>
+          <div class="relative space-y-0.5">
+            <p class="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">{{ stat.label }}</p>
+            <h3 class="text-2xl font-bold text-gray-900 font-heading">{{ stat.value }}</h3>
           </div>
         </div>
       </template>
     </div>
 
     <!-- Middle Section -->
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-10">
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
       <!-- Recent Activity -->
-      <div class="xl:col-span-2 bg-gray-50 rounded-3xl border border-gray-100 overflow-hidden flex flex-col">
-        <div class="p-8 pb-6 flex items-center justify-between border-b border-gray-200/50">
-          <div class="flex items-center gap-4">
-            <div class="w-1.5 h-6 bg-[#FF5C1A] rounded-full"></div>
+      <div class="xl:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+        <div class="p-5 flex items-center justify-between border-b border-gray-100">
+          <div class="flex items-center gap-3">
+            <div class="w-1.5 h-4 bg-[#FF5C1A] rounded-full"></div>
             <div>
-              <h3 class="font-bold text-gray-900 text-xl">Recent Orders</h3>
-              <p class="text-sm font-medium text-gray-500 mt-0.5">Latest customer purchases</p>
+              <h3 class="font-bold text-gray-900 text-sm">Recent Orders</h3>
+              <p class="text-xs font-medium text-gray-500">Latest customer purchases</p>
             </div>
           </div>
-          <NuxtLink to="/orders" class="text-sm font-bold text-[#FF5C1A] hover:bg-[#FF5C1A]/10 px-5 py-2.5 rounded-xl transition-colors">
+          <NuxtLink to="/orders" class="text-xs font-semibold text-[#FF5C1A] hover:bg-[#FF5C1A]/10 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-[#FF5C1A]/20">
             View All
           </NuxtLink>
         </div>
         
-        <div class="p-2">
+        <div class="p-0">
           <!-- Order Loading Skeleton -->
-          <div v-if="ordersLoading" class="p-6 space-y-6">
-            <div v-for="i in 4" :key="`order-loading-${i}`" class="flex items-center gap-6 animate-pulse">
-              <div class="w-14 h-14 rounded-2xl bg-gray-200" />
-              <div class="flex-1 space-y-3 py-2">
-                <div class="h-4 bg-gray-200 rounded-full w-2/3" />
-                <div class="h-3 bg-gray-200 rounded-full w-1/3" />
+          <div v-if="ordersLoading" class="p-5 space-y-4">
+            <div v-for="i in 4" :key="`order-loading-${i}`" class="flex items-center gap-4 animate-pulse">
+              <div class="w-10 h-10 rounded-lg bg-gray-100" />
+              <div class="flex-1 space-y-2 py-1">
+                <div class="h-3 bg-gray-100 rounded-full w-2/3" />
+                <div class="h-2 bg-gray-100 rounded-full w-1/3" />
               </div>
             </div>
           </div>
 
           <!-- Empty State -->
-          <div v-else-if="recentActivity.length === 0" class="py-20 text-center">
-            <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-              <ShoppingBag class="w-8 h-8 text-gray-400" />
+          <div v-else-if="recentActivity.length === 0" class="py-12 text-center">
+            <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 border border-gray-100">
+              <ShoppingBag class="w-5 h-5 text-gray-400" />
             </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-1">No Orders Yet</h3>
-            <p class="text-sm font-medium text-gray-500">When customers place orders, they will appear here.</p>
+            <h3 class="text-sm font-semibold text-gray-900 mb-1">No Orders Yet</h3>
+            <p class="text-xs text-gray-500">When customers place orders, they will appear here.</p>
           </div>
 
           <!-- Order List -->
-          <div v-else class="space-y-1 pb-4">
+          <div v-else class="divide-y divide-gray-50">
             <div v-for="activity in recentActivity" :key="activity.id" 
-              class="flex items-center gap-6 p-6 hover:bg-white rounded-2xl transition-colors cursor-default border border-transparent hover:border-gray-100">
-              <div :class="activity.iconBg" class="w-14 h-14 rounded-2xl flex-shrink-0 flex items-center justify-center border border-white/50">
-                <component :is="activity.icon" class="w-6 h-6" />
+              class="flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50/50 transition-colors cursor-default">
+              <div :class="activity.iconBg" class="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center border">
+                <component :is="activity.icon" class="w-4 h-4" />
               </div>
               <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-center mb-1">
-                  <p class="text-base text-gray-900">
-                    <span class="font-bold text-gray-900">{{ activity.user }}</span>
-                    <span class="text-gray-500 font-medium mx-1"> {{ activity.action }} </span>
-                    <span class="font-bold text-[#FF5C1A]">{{ activity.target }}</span>
+                <div class="flex justify-between items-center mb-0.5">
+                  <p class="text-sm text-gray-900 truncate pr-2">
+                    <span class="font-semibold text-gray-900">{{ activity.user }}</span>
+                    <span class="text-gray-400 text-xs mx-1"> {{ activity.action }} </span>
+                    <span class="font-semibold text-[#FF5C1A]">{{ activity.target }}</span>
                   </p>
-                  <span class="text-sm font-medium text-gray-400 shrink-0 ml-4">{{ activity.time }}</span>
+                  <span class="text-[10px] font-medium text-gray-400 shrink-0">{{ activity.time }}</span>
                 </div>
-                <div class="flex items-center gap-3">
-                  <p class="text-sm text-gray-500 font-medium">{{ activity.details }}</p>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <p class="text-xs text-gray-500">{{ activity.details }}</p>
                   <div class="w-1 h-1 rounded-full bg-gray-300"></div>
-                  <span class="text-sm font-bold text-emerald-500">Completed</span>
+                  <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 uppercase tracking-wide">Completed</span>
                 </div>
               </div>
             </div>
@@ -127,34 +127,34 @@
       </div>
 
       <!-- System Health Board -->
-      <div class="space-y-10">
+      <div class="space-y-4">
         <!-- Settings CTA -->
-        <div class="bg-gray-900 rounded-3xl p-10 text-white relative overflow-hidden group">
+        <div class="bg-gray-900 rounded-xl p-6 text-white relative overflow-hidden group shadow-sm">
           <div class="relative z-10">
-            <div class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-6">
-              <Settings class="w-7 h-7 text-white" />
+            <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center mb-4">
+              <Settings class="w-5 h-5 text-white" />
             </div>
-            <h3 class="text-2xl font-bold mb-3">Settings</h3>
-            <p class="text-gray-400 text-sm leading-relaxed mb-8 font-medium">Manage platform settings, fees, and operational hours.</p>
-            <button class="w-full py-4 bg-[#FF5C1A] text-white rounded-xl font-bold text-sm hover:bg-[#E54D12] transition-colors">
+            <h3 class="text-base font-semibold mb-1.5">Settings</h3>
+            <p class="text-gray-400 text-xs leading-relaxed mb-4">Manage platform settings, fees, and operational hours.</p>
+            <button class="w-full py-2.5 bg-[#FF5C1A] text-white rounded-lg font-medium text-xs hover:bg-[#E54D12] transition-colors">
               Manage Settings
             </button>
           </div>
         </div>
 
         <!-- Service Monitor Board -->
-        <div class="bg-gray-50 rounded-3xl border border-gray-100 p-8">
-          <div class="flex items-center justify-between mb-6 border-b border-gray-200 pb-4">
-            <h3 class="font-bold text-gray-900 text-lg">System Status</h3>
-            <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div class="p-5 flex items-center justify-between border-b border-gray-100">
+            <h3 class="font-semibold text-gray-900 text-sm">System Status</h3>
+            <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
           </div>
-          <div class="space-y-5">
+          <div class="p-5 space-y-4">
             <div v-for="service in services" :key="service.name" class="flex items-center justify-between cursor-default">
-              <div class="flex items-center gap-4">
-                <div :class="service.status === 'online' ? 'bg-emerald-500' : 'bg-amber-500'" class="w-2.5 h-2.5 rounded-full" />
-                <span class="text-sm font-semibold text-gray-700">{{ service.name }}</span>
+              <div class="flex items-center gap-3">
+                <div :class="service.status === 'online' ? 'bg-emerald-500' : 'bg-amber-500'" class="w-2 h-2 rounded-full" />
+                <span class="text-xs font-medium text-gray-700">{{ service.name }}</span>
               </div>
-              <div :class="service.status === 'online' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-amber-100 text-amber-700 border-amber-200'" class="px-3 py-1 rounded-lg border text-xs font-bold">
+              <div :class="service.status === 'online' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100'" class="px-2 py-0.5 rounded border text-[10px] font-semibold uppercase tracking-wide">
                 {{ service.status === 'online' ? 'Online' : 'Issues' }}
               </div>
             </div>
@@ -270,15 +270,11 @@ const services = [
 
 <style scoped>
 .animate-fade-in {
-  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: fadeIn 0.4s ease-out;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-.font-display {
-  font-family: 'Roobert PRO', sans-serif;
 }
 </style>

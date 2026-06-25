@@ -1,131 +1,128 @@
 <template>
-  <div class="space-y-10 animate-fade-in pb-20">
+  <div class="space-y-6 animate-fade-in pb-20">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div class="space-y-1">
-        <h1 class="text-4xl font-bold text-gray-900 font-display">Referrals</h1>
-        <p class="text-sm font-semibold text-gray-500">Manage campus ambassadors and track referral growth</p>
+        <h1 class="text-2xl font-semibold text-gray-900 font-heading tracking-tight">Facilitators Management</h1>
+        <p class="text-xs text-gray-500">Manage campus ambassadors and track referral growth</p>
       </div>
       <button @click="showAddModal = true"
-        class="flex items-center gap-2 px-6 py-3 bg-[#FF5C1A] text-white rounded-2xl font-bold text-sm hover:bg-[#E54D12] transition-colors shadow-lg shadow-[#FF5C1A]/20">
-        <UserPlus class="w-5 h-5" />
+        class="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg font-medium text-xs hover:bg-gray-800 transition-colors">
+        <UserPlus class="w-4 h-4" />
         Add Facilitator
       </button>
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <template v-if="statsLoading">
-        <div v-for="i in 4" :key="`stat-${i}`" class="bg-gray-50 p-7 rounded-3xl border border-gray-100 animate-pulse">
-          <div class="w-14 h-14 bg-gray-200 rounded-2xl mb-6"></div>
-          <div class="w-24 h-4 bg-gray-200 rounded-md mb-2"></div>
-          <div class="w-20 h-8 bg-gray-200 rounded-lg"></div>
+        <div v-for="i in 4" :key="`stat-${i}`" class="bg-white p-5 rounded-xl border border-gray-200 animate-pulse">
+          <div class="w-10 h-10 bg-gray-100 rounded-lg mb-4"></div>
+          <div class="w-20 h-3 bg-gray-100 rounded mb-2"></div>
+          <div class="w-16 h-6 bg-gray-100 rounded"></div>
         </div>
       </template>
       <template v-else>
         <div v-for="stat in statCards" :key="stat.label"
-          class="bg-gray-50 p-7 rounded-3xl border border-gray-100 hover:border-gray-200 transition-colors group">
-          <div class="flex items-center justify-between mb-6">
-            <div :class="stat.bgClass" class="w-14 h-14 rounded-2xl flex items-center justify-center">
-              <component :is="stat.icon" class="w-6 h-6" />
+          class="bg-white p-5 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors group">
+          <div class="flex items-center justify-between mb-4">
+            <div :class="stat.bgClass" class="w-10 h-10 rounded-lg flex items-center justify-center">
+              <component :is="stat.icon" class="w-5 h-5" />
             </div>
           </div>
-          <p class="text-sm font-semibold text-gray-500 mb-1">{{ stat.label }}</p>
-          <h3 class="text-3xl font-bold text-gray-900 font-display">{{ stat.value }}</h3>
+          <p class="text-xs font-medium text-gray-500 mb-1">{{ stat.label }}</p>
+          <h3 class="text-2xl font-semibold text-gray-900 font-heading">{{ stat.value }}</h3>
         </div>
       </template>
     </div>
 
     <!-- Tabs -->
-    <div class="flex items-center gap-1 bg-gray-100 p-1.5 rounded-2xl w-fit">
+    <div class="flex items-center gap-1 bg-gray-50 p-1 rounded-lg w-fit border border-gray-200">
       <button v-for="tab in tabs" :key="tab.key" @click="activeTab = tab.key"
-        class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all"
-        :class="activeTab === tab.key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
+        class="px-4 py-1.5 rounded-md text-xs font-medium transition-all"
+        :class="activeTab === tab.key ? 'bg-white text-gray-900 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'">
         {{ tab.label }}
       </button>
     </div>
 
     <!-- Facilitators Tab -->
-    <div v-if="activeTab === 'facilitators'" class="bg-gray-50 rounded-3xl border border-gray-100 overflow-hidden">
-      <div class="p-6 border-b border-gray-100 flex items-center justify-between gap-4">
-        <div class="flex items-center gap-4 flex-1">
-          <div class="relative flex-1 max-w-sm">
-            <Search class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input v-model="facilitatorSearch" type="text" placeholder="Search facilitators..."
-              class="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium focus:outline-none focus:border-[#FF5C1A]/30 focus:ring-2 focus:ring-[#FF5C1A]/10" />
-          </div>
+    <div v-if="activeTab === 'facilitators'" class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div class="p-4 border-b border-gray-200 flex items-center justify-between gap-4">
+        <div class="relative flex-1 max-w-sm">
+          <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input v-model="facilitatorSearch" type="text" placeholder="Search facilitators..."
+            class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium focus:outline-none focus:border-gray-300 focus:bg-white transition-colors" />
         </div>
       </div>
 
       <!-- Loading -->
-      <div v-if="facilitatorsLoading" class="p-8 space-y-4">
+      <div v-if="facilitatorsLoading" class="p-6 space-y-4">
         <div v-for="i in 4" :key="`fac-load-${i}`" class="flex items-center gap-4 animate-pulse">
-          <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
+          <div class="w-10 h-10 bg-gray-100 rounded-full"></div>
           <div class="flex-1 space-y-2">
-            <div class="w-40 h-4 bg-gray-200 rounded-md"></div>
-            <div class="w-28 h-3 bg-gray-200 rounded-md"></div>
+            <div class="w-32 h-3 bg-gray-100 rounded"></div>
+            <div class="w-20 h-2 bg-gray-100 rounded"></div>
           </div>
-          <div class="w-24 h-8 bg-gray-200 rounded-xl"></div>
         </div>
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="filteredFacilitators.length === 0" class="py-20 text-center">
-        <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Users class="w-8 h-8 text-gray-400" />
+      <div v-else-if="filteredFacilitators.length === 0" class="py-16 text-center">
+        <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 border border-gray-100">
+          <Users class="w-5 h-5 text-gray-400" />
         </div>
-        <h3 class="text-lg font-bold text-gray-900 mb-1">No Facilitators Found</h3>
-        <p class="text-sm font-medium text-gray-500">Add your first campus ambassador to get started.</p>
+        <h3 class="text-sm font-semibold text-gray-900 mb-1">No Facilitators Found</h3>
+        <p class="text-xs text-gray-500">Add your first campus ambassador to get started.</p>
       </div>
 
       <!-- Facilitator Cards -->
       <div v-else class="divide-y divide-gray-100">
         <div v-for="fac in filteredFacilitators" :key="fac._id"
-          class="flex items-center gap-5 px-6 py-5 hover:bg-white transition-colors group">
+          class="flex items-center gap-4 px-5 py-3 hover:bg-gray-50/50 transition-colors group">
           <!-- Avatar -->
-          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-[#7C3AED] to-[#FF5C1A] flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+          <div class="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
             {{ fac.name?.charAt(0)?.toUpperCase() }}
           </div>
 
           <!-- Info -->
           <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-1">
-              <h4 class="text-sm font-bold text-gray-900 truncate">{{ fac.name }}</h4>
-              <span :class="tierBadgeClass(fac.tier)" class="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">
+            <div class="flex items-center gap-2 mb-0.5">
+              <h4 class="text-sm font-semibold text-gray-900 truncate">{{ fac.name }}</h4>
+              <span :class="tierBadgeClass(fac.tier)" class="text-[10px] font-medium px-1.5 py-0.5 rounded border uppercase">
                 {{ tierEmoji(fac.tier) }} {{ fac.tier }}
               </span>
-              <span v-if="!fac.isActive" class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-red-100 text-red-600 uppercase">Inactive</span>
+              <span v-if="!fac.isActive" class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-red-50 text-red-600 border border-red-100 uppercase">Inactive</span>
             </div>
-            <p class="text-xs text-gray-500 font-medium truncate">{{ fac.email }}</p>
-            <p v-if="fac.skill" class="text-xs text-gray-400 font-medium mt-0.5">{{ fac.skill }}</p>
+            <p class="text-xs text-gray-500 truncate">{{ fac.email }}</p>
+            <p v-if="fac.skill" class="text-[10px] text-gray-400 mt-0.5">{{ fac.skill }}</p>
           </div>
 
           <!-- Code -->
-          <div class="hidden md:flex flex-col items-center gap-1 flex-shrink-0">
-            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Code</span>
-            <span class="text-sm font-bold text-[#FF5C1A] bg-[#FF5C1A]/10 px-3 py-1 rounded-lg font-mono">{{ fac.referralCode }}</span>
+          <div class="hidden md:flex flex-col items-center gap-0.5 flex-shrink-0 w-24">
+            <span class="text-[9px] font-medium text-gray-400 uppercase tracking-wide">Code</span>
+            <span class="text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-0.5 rounded border border-gray-200 font-mono">{{ fac.referralCode }}</span>
           </div>
 
           <!-- Referral Count -->
-          <div class="hidden md:flex flex-col items-center gap-1 flex-shrink-0 min-w-[80px]">
-            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Referrals</span>
-            <span class="text-xl font-bold text-gray-900">{{ fac.totalReferrals || 0 }}</span>
+          <div class="hidden md:flex flex-col items-center gap-0.5 flex-shrink-0 min-w-[60px]">
+            <span class="text-[9px] font-medium text-gray-400 uppercase tracking-wide">Referrals</span>
+            <span class="text-sm font-semibold text-gray-900">{{ fac.totalReferrals || 0 }}</span>
           </div>
 
           <!-- Points -->
-          <div class="hidden lg:flex flex-col items-center gap-1 flex-shrink-0 min-w-[80px]">
-            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Points</span>
-            <span class="text-xl font-bold text-gray-900">{{ (fac.pointsEarned || 0).toLocaleString() }}</span>
+          <div class="hidden lg:flex flex-col items-center gap-0.5 flex-shrink-0 min-w-[60px]">
+            <span class="text-[9px] font-medium text-gray-400 uppercase tracking-wide">Points</span>
+            <span class="text-sm font-semibold text-gray-900">{{ (fac.pointsEarned || 0).toLocaleString() }}</span>
           </div>
 
           <!-- Actions -->
-          <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button @click="resendEmail(fac)" :disabled="resendingEmail === fac._id"
-              class="p-2 hover:bg-purple-50 text-gray-400 hover:text-[#7C3AED] rounded-lg transition-colors" title="Resend welcome email">
+              class="p-1.5 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors" title="Resend welcome email">
               <Mail class="w-4 h-4" />
             </button>
-            <button v-if="fac.isActive" @click="deactivate(fac)"
-              class="p-2 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors" title="Deactivate">
+            <button v-if="fac.isActive" @click="requestDeactivate(fac)"
+              class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="Deactivate">
               <UserMinus class="w-4 h-4" />
             </button>
           </div>
@@ -134,58 +131,56 @@
     </div>
 
     <!-- Referrals Tab -->
-    <div v-if="activeTab === 'referrals'" class="bg-gray-50 rounded-3xl border border-gray-100 overflow-hidden">
-      <div class="p-6 border-b border-gray-100">
-        <div class="flex items-center gap-3">
-          <div class="w-1.5 h-6 bg-[#FF5C1A] rounded-full"></div>
-          <h3 class="font-bold text-gray-900 text-lg">All Referrals</h3>
-          <span class="text-sm font-bold text-gray-400 ml-auto">{{ referralData?.total || 0 }} total</span>
-        </div>
+    <div v-if="activeTab === 'referrals'" class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+        <h3 class="font-semibold text-gray-900 text-sm">All Referrals</h3>
+        <span class="text-xs font-medium text-gray-500">{{ referralData?.total || 0 }} total</span>
       </div>
 
       <!-- Loading -->
-      <div v-if="referralsLoading" class="p-8 space-y-4">
+      <div v-if="referralsLoading" class="p-6 space-y-4">
         <div v-for="i in 5" :key="`ref-load-${i}`" class="flex items-center gap-4 animate-pulse">
-          <div class="w-10 h-10 bg-gray-200 rounded-full"></div>
+          <div class="w-8 h-8 bg-gray-100 rounded-lg"></div>
           <div class="flex-1 space-y-2">
-            <div class="w-60 h-4 bg-gray-200 rounded-md"></div>
-            <div class="w-32 h-3 bg-gray-200 rounded-md"></div>
+            <div class="w-40 h-3 bg-gray-100 rounded"></div>
+            <div class="w-24 h-2 bg-gray-100 rounded"></div>
           </div>
         </div>
       </div>
 
       <!-- Empty -->
-      <div v-else-if="!referralData?.referrals?.length" class="py-20 text-center">
-        <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Gift class="w-8 h-8 text-gray-400" />
+      <div v-else-if="!referralData?.referrals?.length" class="py-16 text-center">
+        <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 border border-gray-100">
+          <Gift class="w-5 h-5 text-gray-400" />
         </div>
-        <h3 class="text-lg font-bold text-gray-900 mb-1">No Referrals Yet</h3>
-        <p class="text-sm font-medium text-gray-500">When users sign up with referral codes, they'll appear here.</p>
+        <h3 class="text-sm font-semibold text-gray-900 mb-1">No Referrals Yet</h3>
+        <p class="text-xs text-gray-500">When users sign up with referral codes, they'll appear here.</p>
       </div>
 
       <!-- Referral List -->
       <div v-else class="divide-y divide-gray-100">
         <div v-for="ref in referralData.referrals" :key="ref._id"
-          class="flex items-center gap-5 px-6 py-4 hover:bg-white transition-colors">
+          class="flex items-center gap-4 px-5 py-3 hover:bg-gray-50/50 transition-colors cursor-pointer"
+          @click="viewReferralDetails(ref)">
           <!-- Type Badge -->
           <div :class="referrerTypeBadge(ref.referrerType)"
-            class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
-            <span class="text-lg">{{ referrerTypeEmoji(ref.referrerType) }}</span>
+            class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 border">
+            <span class="text-sm">{{ referrerTypeEmoji(ref.referrerType) }}</span>
           </div>
 
           <!-- Info -->
           <div class="flex-1 min-w-0">
-            <p class="text-sm text-gray-900 font-medium">
-              <span class="font-bold">{{ getReferrerName(ref) }}</span>
-              <span class="text-gray-400 mx-1">→</span>
-              <span class="font-bold text-[#FF5C1A]">{{ ref.referred?.firstName }} {{ ref.referred?.lastName }}</span>
+            <p class="text-xs text-gray-900">
+              <span class="font-semibold">{{ getReferrerName(ref) }}</span>
+              <span class="text-gray-400 mx-1.5">→</span>
+              <span class="font-semibold text-gray-700">{{ ref.referred?.firstName }} {{ ref.referred?.lastName }}</span>
             </p>
-            <div class="flex items-center gap-3 mt-1">
-              <span class="text-xs text-gray-400 font-medium">{{ formatDate(ref.createdAt) }}</span>
-              <span class="text-xs text-gray-300">•</span>
-              <span class="text-xs font-bold font-mono text-gray-500">{{ ref.referralCode }}</span>
-              <span class="text-xs text-gray-300">•</span>
-              <span class="text-xs font-bold" :class="ref.referredType === 'vendor' ? 'text-emerald-600' : ref.referredType === 'errander' ? 'text-blue-600' : 'text-gray-500'">
+            <div class="flex items-center gap-2 mt-1">
+              <span class="text-[10px] text-gray-400">{{ formatDate(ref.createdAt) }}</span>
+              <span class="text-[10px] text-gray-300">•</span>
+              <span class="text-[10px] font-medium font-mono text-gray-500">{{ ref.referralCode }}</span>
+              <span class="text-[10px] text-gray-300">•</span>
+              <span class="text-[10px] font-medium" :class="ref.referredType === 'vendor' ? 'text-emerald-600' : ref.referredType === 'errander' ? 'text-blue-600' : 'text-gray-500'">
                 {{ ref.referredType }}
               </span>
             </div>
@@ -194,10 +189,10 @@
           <!-- Points -->
           <div class="hidden md:flex items-center gap-4 flex-shrink-0">
             <div class="text-right">
-              <p class="text-xs text-gray-400 font-bold uppercase">Points Awarded</p>
-              <p class="text-sm font-bold text-gray-900">+{{ ref.referrerPointsAwarded + ref.referredPointsAwarded }}</p>
+              <p class="text-[9px] text-gray-400 font-medium uppercase tracking-wide">Awarded</p>
+              <p class="text-xs font-semibold text-gray-900">+{{ ref.referrerPointsAwarded + ref.referredPointsAwarded }} pts</p>
             </div>
-            <span :class="statusBadgeClass(ref.status)" class="text-[10px] font-bold px-2.5 py-1 rounded-lg uppercase">
+            <span :class="statusBadgeClass(ref.status)" class="text-[10px] font-medium px-2 py-0.5 rounded border uppercase">
               {{ ref.status }}
             </span>
           </div>
@@ -205,157 +200,252 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="referralData?.pages > 1" class="p-4 border-t border-gray-100 flex items-center justify-center gap-2">
+      <div v-if="referralData?.pages > 1" class="p-3 border-t border-gray-200 flex items-center justify-center gap-1">
         <button v-for="p in referralData.pages" :key="p" @click="referralPage = p; fetchReferrals()"
-          class="w-9 h-9 rounded-lg text-sm font-bold transition-colors"
-          :class="referralPage === p ? 'bg-[#FF5C1A] text-white' : 'text-gray-500 hover:bg-gray-200'">
+          class="w-7 h-7 rounded text-xs font-medium transition-colors"
+          :class="referralPage === p ? 'bg-gray-900 text-white' : 'text-gray-500 hover:bg-gray-100'">
           {{ p }}
         </button>
       </div>
     </div>
 
     <!-- Leaderboard Tab -->
-    <div v-if="activeTab === 'leaderboard'" class="bg-gray-50 rounded-3xl border border-gray-100 overflow-hidden">
-      <div class="p-6 border-b border-gray-100">
-        <div class="flex items-center gap-3">
-          <div class="w-1.5 h-6 bg-[#7C3AED] rounded-full"></div>
-          <h3 class="font-bold text-gray-900 text-lg">Referral Leaderboard</h3>
-          <span class="text-xs font-bold text-gray-400 bg-gray-200 px-2 py-0.5 rounded-md ml-1">TOP 20</span>
-        </div>
+    <div v-if="activeTab === 'leaderboard'" class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div class="p-4 border-b border-gray-200 flex items-center gap-2">
+        <h3 class="font-semibold text-gray-900 text-sm">Leaderboard</h3>
+        <span class="text-[10px] font-medium text-gray-500 bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded">TOP 20</span>
       </div>
 
-      <div v-if="leaderboardLoading" class="p-8 space-y-4">
+      <div v-if="leaderboardLoading" class="p-6 space-y-4">
         <div v-for="i in 5" :key="`lb-load-${i}`" class="flex items-center gap-4 animate-pulse">
-          <div class="w-8 h-8 bg-gray-200 rounded-full"></div>
+          <div class="w-6 h-6 bg-gray-100 rounded-full"></div>
           <div class="flex-1 space-y-2">
-            <div class="w-40 h-4 bg-gray-200 rounded-md"></div>
-            <div class="w-28 h-3 bg-gray-200 rounded-md"></div>
+            <div class="w-32 h-3 bg-gray-100 rounded"></div>
           </div>
-          <div class="w-16 h-8 bg-gray-200 rounded-xl"></div>
         </div>
       </div>
 
-      <div v-else-if="leaderboard.length === 0" class="py-20 text-center">
-        <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Trophy class="w-8 h-8 text-gray-400" />
+      <div v-else-if="leaderboard.length === 0" class="py-16 text-center">
+        <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 border border-gray-100">
+          <Trophy class="w-5 h-5 text-gray-400" />
         </div>
-        <h3 class="text-lg font-bold text-gray-900 mb-1">Leaderboard Empty</h3>
-        <p class="text-sm font-medium text-gray-500">No referrals yet. The race hasn't started!</p>
+        <h3 class="text-sm font-semibold text-gray-900 mb-1">Leaderboard Empty</h3>
+        <p class="text-xs text-gray-500">No referrals yet.</p>
       </div>
 
       <div v-else class="divide-y divide-gray-100">
         <div v-for="(entry, idx) in leaderboard" :key="entry.id"
-          class="flex items-center gap-5 px-6 py-4 hover:bg-white transition-colors">
+          class="flex items-center gap-4 px-5 py-3 hover:bg-gray-50/50 transition-colors">
           <!-- Rank -->
-          <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-lg"
-            :class="idx === 0 ? 'bg-amber-100 text-amber-700' : idx === 1 ? 'bg-gray-200 text-gray-600' : idx === 2 ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-500'">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-semibold text-xs border"
+            :class="idx === 0 ? 'bg-amber-50 text-amber-700 border-amber-200' : idx === 1 ? 'bg-gray-50 text-gray-600 border-gray-200' : idx === 2 ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-white text-gray-500 border-gray-100'">
             {{ idx < 3 ? ['🥇', '🥈', '🥉'][idx] : idx + 1 }}
           </div>
 
           <!-- Info -->
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2">
-              <h4 class="text-sm font-bold text-gray-900 truncate">{{ entry.name }}</h4>
-              <span :class="tierBadgeClass(entry.tier)" class="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">
+              <h4 class="text-sm font-semibold text-gray-900 truncate">{{ entry.name }}</h4>
+              <span :class="tierBadgeClass(entry.tier)" class="text-[9px] font-medium px-1.5 py-0.5 rounded border uppercase">
                 {{ tierEmoji(entry.tier) }} {{ entry.tier }}
               </span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase"
-                :class="entry.type === 'facilitator' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'">
+              <span class="text-[9px] font-medium px-1.5 py-0.5 rounded border uppercase"
+                :class="entry.type === 'facilitator' ? 'bg-purple-50 text-purple-600 border-purple-100' : 'bg-blue-50 text-blue-600 border-blue-100'">
                 {{ entry.type }}
               </span>
             </div>
-            <p class="text-xs text-gray-400 font-medium mt-0.5">{{ entry.email }}</p>
+            <p class="text-[10px] text-gray-500 mt-0.5">{{ entry.email }}</p>
           </div>
 
           <!-- Stats -->
-          <div class="flex items-center gap-6 flex-shrink-0">
+          <div class="flex items-center gap-5 flex-shrink-0">
             <div class="text-center">
-              <p class="text-xl font-bold text-gray-900">{{ entry.referralCount }}</p>
-              <p class="text-[10px] font-bold text-gray-400 uppercase">Referrals</p>
+              <p class="text-sm font-semibold text-gray-900">{{ entry.referralCount }}</p>
+              <p class="text-[9px] font-medium text-gray-400 uppercase tracking-wide">Refs</p>
             </div>
             <div class="text-center hidden md:block">
-              <p class="text-xl font-bold text-[#FF5C1A]">{{ entry.pointsEarned.toLocaleString() }}</p>
-              <p class="text-[10px] font-bold text-gray-400 uppercase">Points</p>
+              <p class="text-sm font-semibold text-gray-700">{{ entry.pointsEarned.toLocaleString() }}</p>
+              <p class="text-[9px] font-medium text-gray-400 uppercase tracking-wide">Points</p>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Add Facilitator Modal -->
-    <Transition
-      enter-active-class="transition ease-out duration-300"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition ease-in duration-200"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
-      <div v-if="showAddModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4" @click.self="showAddModal = false">
-        <Transition
-          enter-active-class="transition ease-out duration-300"
-          enter-from-class="opacity-0 scale-95"
-          enter-to-class="opacity-100 scale-100"
-          leave-active-class="transition ease-in duration-200"
-          leave-from-class="opacity-100 scale-100"
-          leave-to-class="opacity-0 scale-95"
-        >
-          <div v-if="showAddModal" class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 space-y-6">
+    <!-- Modals -->
+    <Teleport to="body">
+      <!-- Add Facilitator Modal -->
+      <Transition
+        enter-active-class="transition ease-out duration-200"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition ease-in duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="showAddModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30 backdrop-blur-sm px-4" @click.self="showAddModal = false">
+          <div class="bg-white rounded-xl shadow-lg border border-gray-100 max-w-sm w-full p-6 space-y-5">
             <div>
-              <h2 class="text-2xl font-bold text-gray-900">Add Facilitator</h2>
-              <p class="text-sm text-gray-500 font-medium mt-1">Add a new campus ambassador</p>
+              <h2 class="text-lg font-semibold text-gray-900">Add Facilitator</h2>
+              <p class="text-xs text-gray-500 mt-0.5">Register a new campus ambassador.</p>
             </div>
 
             <form @submit.prevent="handleAddFacilitator" class="space-y-4">
               <div>
-                <label class="text-sm font-bold text-gray-700 block mb-1.5">Full Name *</label>
+                <label class="text-xs font-medium text-gray-700 block mb-1">Full Name *</label>
                 <input v-model="newFac.name" type="text" required
-                  class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:outline-none focus:border-[#FF5C1A]/30 focus:ring-2 focus:ring-[#FF5C1A]/10" placeholder="e.g. John Doe" />
+                  class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-xs focus:outline-none focus:border-gray-400 transition-colors" placeholder="e.g. John Doe" />
               </div>
               <div>
-                <label class="text-sm font-bold text-gray-700 block mb-1.5">Email *</label>
+                <label class="text-xs font-medium text-gray-700 block mb-1">Email *</label>
                 <input v-model="newFac.email" type="email" required
-                  class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:outline-none focus:border-[#FF5C1A]/30 focus:ring-2 focus:ring-[#FF5C1A]/10" placeholder="john@gmail.com" />
+                  class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-xs focus:outline-none focus:border-gray-400 transition-colors" placeholder="john@example.com" />
               </div>
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-2 gap-3">
                 <div>
-                  <label class="text-sm font-bold text-gray-700 block mb-1.5">Matric No.</label>
+                  <label class="text-xs font-medium text-gray-700 block mb-1">Matric No.</label>
                   <input v-model="newFac.matricNumber" type="text"
-                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:outline-none focus:border-[#FF5C1A]/30 focus:ring-2 focus:ring-[#FF5C1A]/10" placeholder="Optional" />
+                    class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-xs focus:outline-none focus:border-gray-400 transition-colors" placeholder="Optional" />
                 </div>
                 <div>
-                  <label class="text-sm font-bold text-gray-700 block mb-1.5">Skill</label>
+                  <label class="text-xs font-medium text-gray-700 block mb-1">Skill</label>
                   <input v-model="newFac.skill" type="text"
-                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:outline-none focus:border-[#FF5C1A]/30 focus:ring-2 focus:ring-[#FF5C1A]/10" placeholder="e.g. Graphics Design" />
+                    class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md text-xs focus:outline-none focus:border-gray-400 transition-colors" placeholder="e.g. Design" />
                 </div>
               </div>
 
-              <div class="flex items-center gap-3 p-4 bg-purple-50 border border-purple-100 rounded-2xl">
+              <div class="flex items-center gap-2 mt-2">
                 <input v-model="newFac.sendWelcomeEmail" type="checkbox" id="send-email"
-                  class="w-4 h-4 accent-[#7C3AED]" />
-                <label for="send-email" class="text-sm font-bold text-purple-800 cursor-pointer">Send welcome email with referral code</label>
+                  class="w-3.5 h-3.5 accent-gray-900 rounded border-gray-300" />
+                <label for="send-email" class="text-xs font-medium text-gray-700 cursor-pointer">Send welcome email & referral code</label>
               </div>
 
-              <div v-if="addError" class="p-3 bg-red-50 text-red-600 text-sm font-bold rounded-xl border border-red-100">
+              <div v-if="addError" class="p-2 bg-red-50 text-red-600 text-xs rounded border border-red-100">
                 {{ addError }}
               </div>
 
-              <div class="flex gap-3 pt-2">
+              <div class="flex gap-2 pt-2">
                 <button type="button" @click="showAddModal = false"
-                  class="flex-1 py-3.5 bg-gray-100 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-200 transition-colors">
+                  class="flex-1 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg font-medium text-xs hover:bg-gray-50 transition-colors">
                   Cancel
                 </button>
                 <button type="submit" :disabled="addingFac"
-                  class="flex-1 py-3.5 bg-[#FF5C1A] text-white rounded-xl font-bold text-sm hover:bg-[#E54D12] transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-                  <Loader2 v-if="addingFac" class="w-4 h-4 animate-spin" />
-                  {{ addingFac ? 'Creating...' : 'Create Facilitator' }}
+                  class="flex-1 py-2 bg-gray-900 text-white rounded-lg font-medium text-xs hover:bg-gray-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                  <Loader2 v-if="addingFac" class="w-3 h-3 animate-spin" />
+                  {{ addingFac ? 'Creating...' : 'Create' }}
                 </button>
               </div>
             </form>
           </div>
-        </Transition>
-      </div>
-    </Transition>
+        </div>
+      </Transition>
+
+      <!-- Deactivate Confirmation Modal -->
+      <Transition
+        enter-active-class="transition ease-out duration-200"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition ease-in duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="showDeactivateModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30 backdrop-blur-sm px-4" @click.self="showDeactivateModal = false">
+          <div class="bg-white rounded-xl shadow-lg border border-gray-100 max-w-sm w-full p-6 text-center space-y-4">
+            <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto border border-red-100">
+              <UserMinus class="w-5 h-5 text-red-500" />
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">Deactivate Facilitator</h3>
+              <p class="text-xs text-gray-500 mt-1">
+                Are you sure you want to deactivate <span class="font-semibold text-gray-900">{{ facToDeactivate?.name }}</span>? Their referral code will stop working immediately.
+              </p>
+            </div>
+            <div class="flex gap-2 pt-2">
+              <button @click="showDeactivateModal = false"
+                class="flex-1 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg font-medium text-xs hover:bg-gray-50 transition-colors">
+                Cancel
+              </button>
+              <button @click="confirmDeactivate"
+                class="flex-1 py-2 bg-red-600 text-white rounded-lg font-medium text-xs hover:bg-red-700 transition-colors">
+                Yes, Deactivate
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+
+      <!-- Referral Details Modal -->
+      <Transition
+        enter-active-class="transition ease-out duration-200"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition ease-in duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="showDetailsModal" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/30 backdrop-blur-sm px-4" @click.self="showDetailsModal = false">
+          <div class="bg-white rounded-xl shadow-lg border border-gray-100 max-w-md w-full overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 class="font-semibold text-gray-900 text-sm">Referral Details</h3>
+              <button @click="showDetailsModal = false" class="p-1 hover:bg-gray-100 rounded text-gray-500">
+                <X class="w-4 h-4" />
+              </button>
+            </div>
+            <div class="p-5 space-y-4" v-if="selectedReferral">
+              
+              <!-- Referrer Info -->
+              <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                <p class="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-1">Referred By</p>
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-600">
+                    {{ getReferrerName(selectedReferral).charAt(0) }}
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-900">{{ getReferrerName(selectedReferral) }}</p>
+                    <p class="text-[10px] text-gray-500 font-mono">{{ selectedReferral.referralCode }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Arrow -->
+              <div class="flex justify-center -my-1 relative z-10">
+                <div class="bg-white border border-gray-100 rounded-full p-1">
+                  <ArrowDown class="w-3 h-3 text-gray-400" />
+                </div>
+              </div>
+
+              <!-- Referred Info -->
+              <div class="bg-white border border-gray-200 p-3 rounded-lg shadow-sm">
+                <p class="text-[10px] font-medium text-gray-400 uppercase tracking-wide mb-1">New User Signed Up</p>
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="text-sm font-semibold text-gray-900">{{ selectedReferral.referred?.firstName }} {{ selectedReferral.referred?.lastName }}</p>
+                    <p class="text-xs text-gray-500">{{ selectedReferral.referred?.email }}</p>
+                  </div>
+                  <span class="text-[10px] font-medium px-1.5 py-0.5 rounded border capitalize"
+                    :class="selectedReferral.referredType === 'vendor' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-blue-50 text-blue-600 border-blue-100'">
+                    {{ selectedReferral.referredType }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Stats / Rewards -->
+              <div class="grid grid-cols-2 gap-3 pt-2">
+                <div class="border border-gray-100 rounded-lg p-3 text-center">
+                  <p class="text-[10px] font-medium text-gray-400 uppercase tracking-wide">Status</p>
+                  <p class="text-xs font-semibold capitalize mt-1" :class="{'text-emerald-600': selectedReferral.status === 'completed', 'text-amber-600': selectedReferral.status === 'pending'}">{{ selectedReferral.status }}</p>
+                </div>
+                <div class="border border-gray-100 rounded-lg p-3 text-center">
+                  <p class="text-[10px] font-medium text-gray-400 uppercase tracking-wide">Points Earned</p>
+                  <p class="text-xs font-semibold text-gray-900 mt-1">{{ selectedReferral.referrerPointsAwarded }}</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -365,11 +455,11 @@ import { referrals_api } from '@/api_factory/modules/referrals'
 import { useCustomToast } from '@/composables/core/useCustomToast'
 import {
   Gift, Users, UserPlus, UserMinus, Trophy, Search,
-  Mail, TrendingUp, Loader2, Star, Zap
+  Mail, TrendingUp, Loader2, Star, X, ArrowDown
 } from 'lucide-vue-next'
 
 definePageMeta({ layout: 'admin' })
-useHead({ title: 'Referrals - Errander Admin' })
+useHead({ title: 'Facilitators Management - Errander Admin' })
 
 const { showToast } = useCustomToast()
 
@@ -386,28 +476,37 @@ const referralData = ref<any>({})
 const leaderboard = ref<any[]>([])
 const facilitatorSearch = ref('')
 const referralPage = ref(1)
+
 const showAddModal = ref(false)
 const addingFac = ref(false)
 const addError = ref('')
 const resendingEmail = ref<string | null>(null)
+
+// Deactivate Modal state
+const showDeactivateModal = ref(false)
+const facToDeactivate = ref<any>(null)
+
+// Details Modal state
+const showDetailsModal = ref(false)
+const selectedReferral = ref<any>(null)
 
 const newFac = reactive({
   name: '', email: '', matricNumber: '', skill: '', sendWelcomeEmail: true,
 })
 
 const tabs = [
-  { key: 'facilitators', label: '🧑‍💼 Facilitators' },
-  { key: 'referrals', label: '🔗 All Referrals' },
-  { key: 'leaderboard', label: '🏆 Leaderboard' },
+  { key: 'facilitators', label: 'Facilitators' },
+  { key: 'referrals', label: 'All Referrals' },
+  { key: 'leaderboard', label: 'Leaderboard' },
 ]
 
 // ─── Computed ────────────────────────────────────────────────────
 
 const statCards = computed(() => [
-  { label: 'Total Referrals', value: stats.value.totalReferrals || 0, icon: Gift, bgClass: 'bg-orange-100 text-orange-600' },
-  { label: 'Active Facilitators', value: stats.value.activeFacilitators || 0, icon: Users, bgClass: 'bg-purple-100 text-purple-600' },
-  { label: 'This Week', value: stats.value.recentReferrals || 0, icon: TrendingUp, bgClass: 'bg-emerald-100 text-emerald-600' },
-  { label: 'Points Awarded', value: (stats.value.totalPointsAwarded || 0).toLocaleString(), icon: Star, bgClass: 'bg-amber-100 text-amber-600' },
+  { label: 'Total Referrals', value: stats.value.totalReferrals || 0, icon: Gift, bgClass: 'bg-gray-50 text-gray-600 border border-gray-100' },
+  { label: 'Active Facilitators', value: stats.value.activeFacilitators || 0, icon: Users, bgClass: 'bg-gray-50 text-gray-600 border border-gray-100' },
+  { label: 'This Week', value: stats.value.recentReferrals || 0, icon: TrendingUp, bgClass: 'bg-gray-50 text-gray-600 border border-gray-100' },
+  { label: 'Points Awarded', value: (stats.value.totalPointsAwarded || 0).toLocaleString(), icon: Star, bgClass: 'bg-gray-50 text-gray-600 border border-gray-100' },
 ])
 
 const filteredFacilitators = computed(() => {
@@ -466,7 +565,7 @@ const handleAddFacilitator = async () => {
   try {
     const res = await referrals_api.createFacilitator(newFac)
     if (res?.type === 'ERROR') throw res
-    showToast({ title: 'Success! 🎉', message: `${newFac.name} has been added as a facilitator.`, toastType: 'success', duration: 3000 })
+    showToast({ title: 'Success', message: `${newFac.name} added.`, toastType: 'success', duration: 3000 })
     showAddModal.value = false
     Object.assign(newFac, { name: '', email: '', matricNumber: '', skill: '', sendWelcomeEmail: true })
     fetchFacilitators()
@@ -480,21 +579,33 @@ const resendEmail = async (fac: any) => {
   resendingEmail.value = fac._id
   try {
     await referrals_api.resendWelcomeEmail(fac._id)
-    showToast({ title: 'Email Sent! 📧', message: `Welcome email resent to ${fac.email}`, toastType: 'success', duration: 3000 })
+    showToast({ title: 'Sent', message: `Welcome email sent to ${fac.email}`, toastType: 'success', duration: 3000 })
   } catch (e) {
     showToast({ title: 'Error', message: 'Failed to resend email', toastType: 'error', duration: 3000 })
   } finally { resendingEmail.value = null }
 }
 
-const deactivate = async (fac: any) => {
-  if (!confirm(`Deactivate ${fac.name}? Their referral code will stop working.`)) return
+const requestDeactivate = (fac: any) => {
+  facToDeactivate.value = fac
+  showDeactivateModal.value = true
+}
+
+const confirmDeactivate = async () => {
+  if (!facToDeactivate.value) return
+  const fac = facToDeactivate.value
   try {
     await referrals_api.deactivateFacilitator(fac._id)
     showToast({ title: 'Deactivated', message: `${fac.name} has been deactivated.`, toastType: 'success', duration: 3000 })
+    showDeactivateModal.value = false
     fetchFacilitators()
   } catch (e) {
     showToast({ title: 'Error', message: 'Failed to deactivate', toastType: 'error', duration: 3000 })
   }
+}
+
+const viewReferralDetails = (ref: any) => {
+  selectedReferral.value = ref
+  showDetailsModal.value = true
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────
@@ -502,27 +613,27 @@ const deactivate = async (fac: any) => {
 const tierEmoji = (tier: string) => ({ starter: '🌱', hustler: '🔥', ambassador: '💎', legend: '👑' }[tier] || '🌱')
 
 const tierBadgeClass = (tier: string) => ({
-  starter: 'bg-gray-100 text-gray-600',
-  hustler: 'bg-orange-100 text-orange-700',
-  ambassador: 'bg-purple-100 text-purple-700',
-  legend: 'bg-amber-100 text-amber-700',
-}[tier] || 'bg-gray-100 text-gray-600')
+  starter: 'bg-gray-50 text-gray-600 border-gray-200',
+  hustler: 'bg-orange-50 text-orange-700 border-orange-200',
+  ambassador: 'bg-purple-50 text-purple-700 border-purple-200',
+  legend: 'bg-amber-50 text-amber-700 border-amber-200',
+}[tier] || 'bg-gray-50 text-gray-600 border-gray-200')
 
 const statusBadgeClass = (status: string) => ({
-  pending: 'bg-amber-100 text-amber-700',
-  completed: 'bg-emerald-100 text-emerald-700',
-  rewarded: 'bg-blue-100 text-blue-700',
-}[status] || 'bg-gray-100 text-gray-600')
+  pending: 'bg-amber-50 text-amber-700 border-amber-200',
+  completed: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  rewarded: 'bg-blue-50 text-blue-700 border-blue-200',
+}[status] || 'bg-gray-50 text-gray-600 border-gray-200')
 
 const referrerTypeBadge = (type: string) => ({
-  facilitator: 'bg-purple-100 text-purple-600',
-  student: 'bg-blue-100 text-blue-600',
-  vendor: 'bg-emerald-100 text-emerald-600',
-  errander: 'bg-amber-100 text-amber-600',
-}[type] || 'bg-gray-100 text-gray-600')
+  facilitator: 'bg-purple-50 text-purple-600 border-purple-100',
+  student: 'bg-blue-50 text-blue-600 border-blue-100',
+  vendor: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+  errander: 'bg-amber-50 text-amber-600 border-amber-100',
+}[type] || 'bg-gray-50 text-gray-600 border-gray-100')
 
 const referrerTypeEmoji = (type: string) => ({
-  facilitator: '🧑‍💼', student: '🎓', vendor: '🏪', errander: '🚲'
+  facilitator: '💼', student: '🎓', vendor: '🏪', errander: '🚲'
 }[type] || '👤')
 
 const getReferrerName = (ref: any) => {
@@ -561,13 +672,10 @@ onMounted(() => {
 
 <style scoped>
 .animate-fade-in {
-  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: fadeIn 0.4s ease-out;
 }
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
-}
-.font-display {
-  font-family: 'Roobert PRO', sans-serif;
 }
 </style>

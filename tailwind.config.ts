@@ -96,9 +96,9 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-family)', 'Helvetica Neue', 'Arial', 'sans-serif'],
-        heading: ['var(--font-heading)', 'Helvetica Neue', 'Arial', 'sans-serif'],
-        body: ['var(--font-body)', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'],
+        heading: ['"Plus Jakarta Sans"', 'sans-serif'],
+        body: ['Inter', 'sans-serif'],
       },
       keyframes: {
         marquee: {

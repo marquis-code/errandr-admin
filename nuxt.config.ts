@@ -111,5 +111,13 @@ export default defineNuxtConfig({
     "@nuxtjs/seo",
   ],
 
+  googleFonts: {
+    families: {
+      Inter: [400, 500, 600, 700],
+      'Plus+Jakarta+Sans': [500, 600, 700, 800],
+    },
+    display: 'swap',
+  },
+
   compatibilityDate: "2025-11-01"
 });
