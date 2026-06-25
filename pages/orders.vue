@@ -81,19 +81,25 @@
               <td class="py-3 px-4">
                 <div class="flex items-center gap-2">
                   <div class="w-8 h-8 rounded-lg bg-[#FF5C1A]/10 flex items-center justify-center text-[#FF5C1A] text-xs font-bold border border-[#FF5C1A]/20">
-                    {{ order.user?.firstName?.[0] || '?' }}
+                    {{ (order.customer || order.user)?.firstName?.[0] || '?' }}
                   </div>
                   <div>
-                    <p class="text-xs font-semibold text-gray-900 leading-none mb-0.5">{{ order.user?.firstName }} {{ order.user?.lastName }}</p>
-                    <p class="text-[10px] font-medium text-gray-500">ID: {{ order.user?._id?.slice(-6) || 'N/A' }}</p>
+                    <p class="text-xs font-semibold text-gray-900 leading-none mb-0.5">{{ (order.customer || order.user)?.firstName }} {{ (order.customer || order.user)?.lastName }}</p>
+                    <p class="text-[10px] font-medium text-gray-500">ID: {{ (order.customer || order.user)?._id?.slice(-6) || 'N/A' }}</p>
                   </div>
                 </div>
               </td>
               <td class="py-3 px-4">
-                <span class="text-xs font-semibold text-gray-900">₦{{ Number(order.totalAmount || 0).toLocaleString() }}</span>
+                <span class="text-xs font-semibold text-gray-900">₦{{ Number(order.total || order.totalAmount || 0).toLocaleString() }}</span>
               </td>
               <td class="py-3 px-4 text-center">
-                <div class="inline-flex items-center gap-2 pr-2 py-1 pl-1 bg-white rounded-md border border-gray-200 truncate max-w-[150px]">
+                <div v-if="order.type === 'custom_errand'" class="inline-flex items-center gap-2 pr-2 py-1 pl-1 bg-white rounded-md border border-gray-200 truncate max-w-[150px]">
+                  <div class="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-emerald-600 shrink-0 bg-emerald-50 border border-emerald-100">
+                    C
+                  </div>
+                  <p class="text-[10px] font-semibold text-gray-700 truncate">Custom Errand</p>
+                </div>
+                <div v-else class="inline-flex items-center gap-2 pr-2 py-1 pl-1 bg-white rounded-md border border-gray-200 truncate max-w-[150px]">
                   <div class="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-indigo-600 shrink-0 bg-indigo-50 border border-indigo-100">
                     {{ order.vendor?.storeName?.[0] || 'V' }}
                   </div>
@@ -143,7 +149,7 @@
         </div>
 
         <!-- Details Section -->
-        <div class="p-6 space-y-6 pb-24 bg-gray-50/30">
+        <div class="py-6 space-y-6 pb-24 bg-gray-50/30 -mx-6 px-6">
           <div class="space-y-3">
             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
               Order Details
@@ -322,7 +328,7 @@
         </div>
         
         <!-- Actions Panel -->
-        <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 z-10 flex gap-3">
+        <div class="fixed bottom-0 right-0 w-full md:w-[460px] p-4 bg-white border-t border-gray-200 z-[105] flex gap-3">
           <button class="flex-1 py-3 px-4 rounded-lg text-rose-600 font-semibold text-xs bg-rose-50 hover:bg-rose-100 transition-colors flex items-center justify-center gap-2 border border-rose-100" 
             v-if="['pending', 'awaiting_payment'].includes(selectedOrder.status)">
             Cancel Order
@@ -375,9 +381,12 @@ const fetchOrders = async () => {
 const filteredOrders = computed(() => {
   return orders.value.filter(o => {
     const matchesStatus = selectedStatus.value === 'all' || o.status === selectedStatus.value;
+    const customer = o.customer || o.user;
     const matchesSearch = !searchQuery.value || 
+      (o.orderNumber && o.orderNumber.toLowerCase().includes(searchQuery.value.toLowerCase())) ||
       o._id.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      (o.user && `${o.user.firstName} ${o.user.lastName}`.toLowerCase().includes(searchQuery.value.toLowerCase()));
+      (customer && `${customer.firstName} ${customer.lastName}`.toLowerCase().includes(searchQuery.value.toLowerCase())) ||
+      (o.vendor && o.vendor.storeName && o.vendor.storeName.toLowerCase().includes(searchQuery.value.toLowerCase()));
     return matchesStatus && matchesSearch;
   });
 });

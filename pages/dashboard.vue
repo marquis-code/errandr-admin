@@ -235,16 +235,19 @@ const dashboardStats = computed(() => [
 ])
 
 const recentActivity = computed(() => {
-  return recentOrders.value.map((order: any) => ({
-    id: order._id,
-    user: `${order.user?.firstName || 'Guest'} ${order.user?.lastName || ''}`,
-    action: 'ordered for',
-    target: `₦${Number(order.totalAmount || 0).toLocaleString()}`,
-    time: formatTimeAgo(order.createdAt),
-    details: `Order #${order._id?.slice(-8) || ''} • ${order.items?.length || 0} items`,
-    icon: ShoppingBag,
-    iconBg: 'bg-blue-100 text-blue-600'
-  }))
+  return recentOrders.value.map((order: any) => {
+    const customer = order.customer || order.user;
+    return {
+      id: order._id,
+      user: `${customer?.firstName || 'Guest'} ${customer?.lastName || ''}`.trim(),
+      action: 'ordered for',
+      target: `₦${Number(order.total || order.totalAmount || 0).toLocaleString()}`,
+      time: formatTimeAgo(order.createdAt),
+      details: `Order #${order.orderNumber || order._id?.slice(-8) || ''} • ${order.items?.length || 0} items`,
+      icon: ShoppingBag,
+      iconBg: 'bg-blue-100 text-blue-600'
+    };
+  });
 })
 
 const formatTimeAgo = (dateStr: string) => {
