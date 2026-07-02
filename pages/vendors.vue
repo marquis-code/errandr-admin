@@ -335,7 +335,7 @@
         </div>
 
         <!-- Actions -->
-        <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 z-10 flex gap-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div class="border-t border-gray-100 pt-4 mt-6 flex gap-3">
           <button 
             v-if="selectedVendor.status === 'pending' || selectedVendor.status === 'suspended'"
             @click="initiateAction('approve', selectedVendor._id)"

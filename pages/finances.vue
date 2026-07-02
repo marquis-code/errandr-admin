@@ -223,7 +223,7 @@
           </div>
           
           <!-- Download action -->
-          <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 z-10">
+          <div class="sticky bottom-0 -mx-6 -mb-8 mt-6 p-4 bg-white border-t border-gray-200 z-10">
             <button class="w-full py-3 px-4 rounded-lg text-white font-semibold text-xs bg-gray-900 hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
               <Download class="w-3.5 h-3.5" /> Download Receipt
             </button>
