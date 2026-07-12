@@ -18,6 +18,12 @@ export const useUser = () => {
     sameSite: 'lax',
   });
   
+  const refreshToken = useCookie<string | null>('errandr_refresh_token', {
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+    path: '/',
+    sameSite: 'lax',
+  });
+  
   const user = useCookie<User | null>('errandr_user', {
     maxAge: 60 * 60 * 24 * 7,
     path: '/',
@@ -32,11 +38,24 @@ export const useUser = () => {
     token.value = newToken;
   };
 
+  const setRefreshToken = (newRefreshToken: string) => {
+    refreshToken.value = newRefreshToken;
+  };
+
   const logOut = () => {
     user.value = null;
     token.value = null;
+    refreshToken.value = null;
+    
+    // Use vanilla JS to remove cookies as well as fallback
+    document.cookie = 'errandr_token=; Max-Age=0; path=/;';
+    document.cookie = 'errandr_refresh_token=; Max-Age=0; path=/;';
+    document.cookie = 'errandr_user=; Max-Age=0; path=/;';
+    
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    
+    // Force a hard reload to clear all states and bypass Nuxt router middleware reactivity bugs
     window.location.href = '/';
   };
 
@@ -50,8 +69,10 @@ export const useUser = () => {
   return {
     user,
     token,
+    refreshToken,
     setUser,
     setToken,
+    setRefreshToken,
     logOut,
     isLoggedIn,
     fullName

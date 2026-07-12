@@ -75,7 +75,9 @@ instanceArray.forEach((instance) => {
     (response: CustomAxiosResponse) => {
       return response;
     },
-    (err: any) => {
+    async (err: any) => {
+      const originalRequest = err.config;
+
       if (typeof err.response === "undefined") {
         showToast({
           title: "Error",
@@ -83,26 +85,48 @@ instanceArray.forEach((instance) => {
           toastType: "error",
           duration: 3000
         });
-        return {
-          type: "ERROR",
-          ...err.response,
-        };
+        return Promise.reject(err);
       }
+
       if (err.response.status === 401) {
-        console.log(err.response.data.error)
-        logOut();
+        // Try refresh token logic
+        const { refreshToken, setToken, setRefreshToken, logOut } = useUser();
+        
+        if (refreshToken.value && !originalRequest._retry) {
+          originalRequest._retry = true;
+          try {
+            const refreshRes = await axios.post(`${$GATEWAY_ENDPOINT}/auth/refresh`, {
+              refreshToken: refreshToken.value
+            });
+            
+            if (refreshRes.data.token) {
+              setToken(refreshRes.data.token);
+              if (refreshRes.data.refreshToken) {
+                setRefreshToken(refreshRes.data.refreshToken);
+              }
+              // Update Authorization header and retry original request
+              originalRequest.headers.Authorization = `Bearer ${refreshRes.data.token}`;
+              return instance(originalRequest);
+            }
+          } catch (refreshErr) {
+            console.log('Refresh token failed:', refreshErr);
+            logOut();
+          }
+        } else {
+          logOut();
+        }
+
         showToast({
-          title: "Error",
-          message: err?.response?.data?.message || err?.response?.data?.error || "An error occured",
+          title: "Session Expired",
+          message: "Please log in again.",
           toastType: "error",
           duration: 3000
         });
-        return {
-          type: "ERROR",
-          ...err.response,
-        };
-      } else if (statusCodeStartsWith(err.response.status, 4)) {
-        if (err.response.data.message) {
+        return Promise.reject(err);
+      } 
+      
+      if (statusCodeStartsWith(err.response.status, 4) || err.response.status === 500) {
+        if (err.response.data?.message || err.response.data?.error) {
           showToast({
             title: "Error",
             message: err?.response?.data?.message || err?.response?.data?.error || "An error occured",
@@ -110,29 +134,8 @@ instanceArray.forEach((instance) => {
             duration: 3000
           });
         }
-        return {
-          type: "ERROR",
-          ...err.response,
-        };
-      } else if (err.response.status === 500) {
-        showToast({
-          title: "Error",
-          message: err?.response?.data?.message || err?.response?.data?.error || "An error occured",
-          toastType: "error",
-          duration: 3000
-        });
-        return {
-          type: "ERROR",
-          ...err.response,
-        };
-      } else if (err.response.status === 409) {
-        showToast({
-          title: "Error",
-          message: err?.response?.data?.message || err?.response?.data?.error || "An error occured",
-          toastType: "error",
-          duration: 3000
-        });
       }
+      return Promise.reject(err);
     }
   );
 });

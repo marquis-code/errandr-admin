@@ -74,6 +74,30 @@
             </div>
           </div>
 
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">platform processing fee (₦)</label>
+              <input 
+                v-model.number="form.platformProcessingFee"
+                type="number"
+                required
+                min="0"
+                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+              />
+            </div>
+            <div class="space-y-2">
+              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">platform service fee (%)</label>
+              <input 
+                v-model.number="form.platformServiceFeePercentage"
+                type="number"
+                required
+                min="0"
+                max="100"
+                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+              />
+            </div>
+          </div>
+
           <div class="pt-4 flex justify-end">
             <button 
               type="submit" 
@@ -128,6 +152,8 @@ const form = reactive({
   expressFee: 850,
   convenienceFee: 50,
   commissionPercentage: 10,
+  platformProcessingFee: 500,
+  platformServiceFeePercentage: 5,
 });
 
 const loadSettings = async () => {
@@ -139,6 +165,8 @@ const loadSettings = async () => {
       form.expressFee = data.expressFee || 850;
       form.convenienceFee = data.convenienceFee ?? 50;
       form.commissionPercentage = data.commissionPercentage ?? 10;
+      form.platformProcessingFee = data.platformProcessingFee ?? 500;
+      form.platformServiceFeePercentage = data.platformServiceFeePercentage ?? 5;
     }
   } catch (e: any) {
     console.error('Failed to load settings:', e);
@@ -158,6 +186,8 @@ const saveSettings = async () => {
       expressFee: Number(form.expressFee),
       convenienceFee: Number(form.convenienceFee),
       commissionPercentage: Number(form.commissionPercentage),
+      platformProcessingFee: Number(form.platformProcessingFee),
+      platformServiceFeePercentage: Number(form.platformServiceFeePercentage),
     });
     showToast({
       title: 'success',

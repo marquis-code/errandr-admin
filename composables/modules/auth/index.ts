@@ -5,7 +5,7 @@ import { useUser } from './user';
 import { useCustomToast } from '@/composables/core/useCustomToast';
 
 export const useAuth = () => {
-  const { setUser, setToken, logOut } = useUser();
+  const { setUser, setToken, setRefreshToken, logOut } = useUser();
   const { showToast } = useCustomToast();
   const loading = ref(false);
 
@@ -13,8 +13,20 @@ export const useAuth = () => {
     loading.value = true;
     try {
       const res = await auth_api.login(payload);
+      
+      if (res.data?.user?.role !== 'admin') {
+        showToast({
+          title: "Access Denied",
+          message: "You are not an administrator.",
+          toastType: "error",
+        });
+        // We reject so it acts like a failed login instead of redirecting
+        return Promise.reject(new Error("Not an admin"));
+      }
+
       setUser(res.data.user);
       setToken(res.data.token);
+      if (res.data.refreshToken) setRefreshToken(res.data.refreshToken);
       showToast({
         title: "Welcome Back!",
         message: "You've successfully logged in.",
@@ -36,6 +48,7 @@ export const useAuth = () => {
       const res = await auth_api.register(payload);
       setUser(res.data.user);
       setToken(res.data.token);
+      if (res.data.refreshToken) setRefreshToken(res.data.refreshToken);
       showToast({
         title: "Account Created!",
         message: "Welcome to Errander.",

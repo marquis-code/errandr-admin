@@ -275,6 +275,7 @@ const searchModalOpen = ref(false)
 const navItems = [
  { path: '/dashboard', label: 'Overview', icon: LayoutDashboard },
  { path: '/users', label: 'Users', icon: Users },
+ { path: '/dispatchers', label: 'Dispatchers', icon: ShieldCheck },
  { path: '/vendors', label: 'Vendors', icon: Store },
  { path: '/orders', label: 'Orders', icon: Package },
  { path: '/referrals', label: 'Referrals', icon: Gift },
@@ -287,6 +288,7 @@ const navItems = [
 const pageTitles: Record<string, { title: string; description: string }> = {
  '/dashboard': { title: 'Admin Overview', description: 'Platform performance and key metrics' },
  '/users': { title: 'User Management', description: 'Manage accounts and permissions' },
+ '/dispatchers': { title: 'Dispatcher Verifications', description: 'Review and approve dispatcher verifications' },
  '/vendors': { title: 'Vendor Management', description: 'Manage merchants and store settings' },
  '/orders': { title: 'Order Management', description: 'Track platform-wide order fulfillment' },
  '/referrals': { title: 'Referral System', description: 'Manage ambassadors and track referral growth' },
@@ -319,10 +321,8 @@ const isActive = (path: string) => route.path === path
 
 const confirmLogout = () => {
  if (process.client) {
- localStorage.removeItem('user')
- localStorage.removeItem('token')
- logoutModalOpen.value = false
- window.location.reload()
+  logoutModalOpen.value = false
+  logOut()
  }
 }
 

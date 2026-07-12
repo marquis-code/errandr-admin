@@ -225,7 +225,14 @@
                 <div v-for="item in selectedOrder.items" :key="item._id" class="flex items-start justify-between">
                   <div class="flex items-start gap-2">
                     <span class="text-xs font-bold text-gray-900 mt-0.5">{{ item.quantity }}x</span>
-                    <span class="text-xs font-medium text-gray-700">{{ item.name }}</span>
+                    <div class="flex flex-col">
+                      <span class="text-xs font-medium text-gray-700">{{ item.name }}</span>
+                      <div v-if="item.customizations?.length" class="mt-1 space-y-0.5">
+                        <p v-for="(custom, idx) in item.customizations" :key="idx" class="text-[10px] text-gray-500 flex items-center gap-1">
+                          <span class="text-gray-300">+</span> {{ custom.name }} <span v-if="custom.price > 0">(₦{{ custom.price?.toLocaleString() }})</span>
+                        </p>
+                      </div>
+                    </div>
                   </div>
                   <span class="text-xs font-semibold text-gray-900">₦{{ Number(item.subtotal || item.price || 0).toLocaleString() }}</span>
                 </div>
@@ -246,6 +253,17 @@
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Vendor Note -->
+          <div class="space-y-3" v-if="selectedOrder.vendorNote">
+            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+              Customer Instruction
+            </h4>
+            <div class="bg-amber-50 p-4 rounded-xl border border-amber-100 shadow-sm flex gap-3">
+              <MessageSquare class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <p class="text-xs font-medium text-amber-900 leading-relaxed">{{ selectedOrder.vendorNote }}</p>
             </div>
           </div>
 
@@ -345,7 +363,7 @@
 
 <script setup lang="ts">
 import { admin_api } from '@/api_factory/modules/admin';
-import { Package, Search, ChevronRight, Copy, MapPin, Store, Box, CreditCard, CheckCircle2, Clock } from 'lucide-vue-next';
+import { Package, Search, ChevronRight, Copy, MapPin, Store, Box, CreditCard, CheckCircle2, Clock, MessageSquare } from 'lucide-vue-next';
 import { onMounted, ref, computed } from 'vue';
 import SideDrawer from '@/components/ui/SideDrawer.vue';
 import EmptyState from '@/components/core/EmptyState.vue';
