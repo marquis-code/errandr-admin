@@ -152,6 +152,128 @@
     </div>
     </div>
     
+    <!-- All Dispatchers Tab -->
+    <div v-show="activeTab === 'all'" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-2xl border border-gray-100">
+          <p class="text-sm text-gray-500 font-medium">Total Dispatchers</p>
+          <p class="text-3xl font-bold text-gray-900 mt-2">{{ allTotal }}</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+          <h3 class="font-bold text-gray-900">All Registered Dispatchers</h3>
+        </div>
+        
+        <div v-if="allLoading && !allDispatchers.length" class="p-8 text-center text-gray-400 text-sm">
+          Loading...
+        </div>
+        
+        <div v-else-if="allDispatchers.length === 0" class="p-12 text-center">
+          <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 mx-auto text-2xl mb-4">
+            🛵
+          </div>
+          <h4 class="font-bold text-gray-900">No dispatchers found</h4>
+          <p class="text-sm text-gray-500 mt-1">There are currently no registered dispatchers.</p>
+        </div>
+
+        <div v-else class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-gray-100 bg-gray-50 text-[11px] uppercase tracking-wider text-gray-500">
+                <th class="px-6 py-4 font-bold">Dispatcher</th>
+                <th class="px-6 py-4 font-bold">School & Matric</th>
+                <th class="px-6 py-4 font-bold">Verification</th>
+                <th class="px-6 py-4 font-bold text-center">Deliveries</th>
+                <th class="px-6 py-4 font-bold text-center">Status</th>
+                <th class="px-6 py-4 font-bold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr v-for="errander in allDispatchers" :key="errander._id" class="hover:bg-gray-50/50 transition-colors">
+                <td class="px-6 py-4">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gray-100 rounded-full overflow-hidden shrink-0">
+                      <img v-if="errander.user?.avatar" :src="errander.user?.avatar" class="w-full h-full object-cover">
+                      <div v-else class="w-full h-full flex items-center justify-center text-sm font-bold text-gray-500">
+                        {{ errander.user?.firstName?.[0] }}
+                      </div>
+                    </div>
+                    <div>
+                      <h4 class="font-bold text-gray-900 text-sm">{{ errander.user?.firstName }} {{ errander.user?.lastName }}</h4>
+                      <p class="text-xs text-gray-500 mt-0.5">{{ errander.user?.email }}</p>
+                      <p class="text-xs text-gray-500">{{ errander.user?.phone }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <p class="text-sm font-bold text-gray-900">{{ errander.school || 'Not specified' }}</p>
+                  <p class="text-xs text-gray-500 mt-0.5">{{ errander.matricNumber || 'Not specified' }}</p>
+                </td>
+                <td class="px-6 py-4">
+                  <span v-if="errander.isApproved" class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg">Approved (Tier {{ errander.verificationLevel || 1 }})</span>
+                  <span v-else class="px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-bold rounded-lg">Pending (Tier {{ errander.verificationLevel || 1 }})</span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span class="font-bold text-gray-900">{{ errander.totalDeliveries || 0 }}</span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <span v-if="errander.status === 'online'" class="inline-flex items-center gap-1 text-xs font-bold text-emerald-600"><div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Online</span>
+                  <span v-else-if="errander.status === 'busy'" class="inline-flex items-center gap-1 text-xs font-bold text-amber-600"><div class="w-1.5 h-1.5 rounded-full bg-amber-500"></div>Busy</span>
+                  <span v-else class="inline-flex items-center gap-1 text-xs font-bold text-gray-500"><div class="w-1.5 h-1.5 rounded-full bg-gray-400"></div>Offline</span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button 
+                      @click="openProfileDrawer(errander)"
+                      class="px-3 py-1.5 bg-gray-100 text-gray-700 font-bold rounded-lg hover:bg-gray-200 transition-colors text-xs"
+                    >
+                      Profile
+                    </button>
+                    <button 
+                      v-if="errander.isApproved"
+                      @click="toggleSuspension(errander._id, 'suspend')" 
+                      :disabled="processing === errander._id"
+                      class="px-3 py-1.5 bg-red-50 text-red-600 font-bold rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 text-xs"
+                    >
+                      Suspend
+                    </button>
+                    <button 
+                      v-else-if="!errander.isApproved && errander.verificationStatus !== 'pending'"
+                      @click="toggleSuspension(errander._id, 'activate')" 
+                      :disabled="processing === errander._id"
+                      class="px-3 py-1.5 bg-emerald-50 text-emerald-600 font-bold rounded-lg hover:bg-emerald-100 transition-colors disabled:opacity-50 text-xs"
+                    >
+                      Activate
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div v-if="allTotalPages > 1" class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+          <button 
+            @click="allPage--" 
+            :disabled="allPage === 1"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span class="text-sm text-gray-500">Page {{ allPage }} of {{ allTotalPages }}</span>
+          <button 
+            @click="allPage++" 
+            :disabled="allPage === allTotalPages"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
     <!-- Image Modal -->
     <div v-if="selectedImage" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" @click="selectedImage = null">
       <img :src="selectedImage" class="max-w-full max-h-full rounded-xl" @click.stop>
