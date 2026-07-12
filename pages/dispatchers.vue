@@ -347,21 +347,75 @@
             </div>
           </div>
 
-          <!-- Stats -->
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
-              <p class="text-xs font-bold text-gray-500 uppercase">Deliveries</p>
-              <p class="text-2xl font-black text-gray-900 mt-1">{{ selectedProfile.totalDeliveries || 0 }}</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
-              <p class="text-xs font-bold text-gray-500 uppercase">Rating</p>
-              <div class="flex items-center gap-1 mt-1">
-                <p class="text-2xl font-black text-gray-900">{{ (selectedProfile.rating || 0).toFixed(1) }}</p>
-                <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+          <!-- Personal & Verification Info -->
+          <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3">
+            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Personal Information</h4>
+            <div class="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+              <div>
+                <p class="text-gray-500 text-xs">Phone Number</p>
+                <p class="font-bold text-gray-900">{{ selectedProfile.user?.phone || 'N/A' }}</p>
+              </div>
+              <div>
+                <p class="text-gray-500 text-xs">School</p>
+                <p class="font-bold text-gray-900">{{ selectedProfile.school || 'N/A' }}</p>
+              </div>
+              <div>
+                <p class="text-gray-500 text-xs">Matric Number</p>
+                <p class="font-bold text-gray-900">{{ selectedProfile.matricNumber || 'N/A' }}</p>
+              </div>
+              <div>
+                <p class="text-gray-500 text-xs">Verification Tier</p>
+                <p class="font-bold text-gray-900">Tier {{ selectedProfile.verificationLevel || 1 }} ({{ selectedProfile.verificationStatus || 'pending' }})</p>
               </div>
             </div>
           </div>
 
+          <!-- Stats & Wallet -->
+          <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3">
+            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Performance & Wallet</h4>
+            <div class="grid grid-cols-2 gap-y-4 gap-x-4">
+              <div>
+                <p class="text-xs font-bold text-gray-500 uppercase">Deliveries</p>
+                <p class="text-2xl font-black text-gray-900 mt-1">{{ selectedProfile.totalDeliveries || 0 }}</p>
+              </div>
+              <div>
+                <p class="text-xs font-bold text-gray-500 uppercase">Rating</p>
+                <div class="flex items-center gap-1 mt-1">
+                  <p class="text-2xl font-black text-gray-900">{{ (selectedProfile.rating || 0).toFixed(1) }}</p>
+                  <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                </div>
+              </div>
+              <div>
+                <p class="text-xs font-bold text-gray-500 uppercase">Wallet Balance</p>
+                <p class="text-lg font-black text-emerald-600 mt-1">₦{{ selectedProfile.user?.walletBalance || 0 }}</p>
+              </div>
+              <div>
+                <p class="text-xs font-bold text-gray-500 uppercase">Total Earnings</p>
+                <p class="text-lg font-black text-gray-900 mt-1">₦{{ selectedProfile.totalEarnings || 0 }}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3">
+             <div class="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+                <div>
+                  <p class="text-gray-500 text-xs">Points</p>
+                  <p class="font-bold text-gray-900">{{ selectedProfile.user?.points || 0 }} pts</p>
+                </div>
+                <div>
+                  <p class="text-gray-500 text-xs">Current Streak</p>
+                  <p class="font-bold text-gray-900">{{ selectedProfile.user?.streakCount || 0 }} 🔥</p>
+                </div>
+                <div>
+                  <p class="text-gray-500 text-xs">Referral Code</p>
+                  <p class="font-bold text-gray-900">{{ selectedProfile.user?.referralCode || 'N/A' }}</p>
+                </div>
+                <div>
+                  <p class="text-gray-500 text-xs">Device Status</p>
+                  <p class="font-bold text-gray-900 capitalize">{{ selectedProfile.status || 'Offline' }}</p>
+                </div>
+             </div>
+          </div>
           <!-- Actions -->
           <div>
             <h4 class="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Account Actions</h4>
