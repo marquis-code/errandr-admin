@@ -7,13 +7,34 @@
       </button>
     </div>
 
-    <!-- Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white p-6 rounded-2xl border border-gray-100">
-        <p class="text-sm text-gray-500 font-medium">Pending Approvals</p>
-        <p class="text-3xl font-bold text-gray-900 mt-2">{{ total }}</p>
-      </div>
+    <!-- Tabs -->
+    <div class="flex items-center gap-6 border-b border-gray-200">
+      <button 
+        @click="activeTab = 'verifications'"
+        class="pb-4 text-sm font-bold transition-colors border-b-2 relative -mb-[1px]"
+        :class="activeTab === 'verifications' ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'"
+      >
+        Pending Verifications
+        <span v-if="total > 0" class="ml-2 inline-flex items-center justify-center bg-red-500 text-white text-[10px] w-5 h-5 rounded-full">{{ total }}</span>
+      </button>
+      <button 
+        @click="activeTab = 'all'"
+        class="pb-4 text-sm font-bold transition-colors border-b-2 relative -mb-[1px]"
+        :class="activeTab === 'all' ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'"
+      >
+        All Dispatchers
+      </button>
     </div>
+
+    <!-- Verifications Tab -->
+    <div v-show="activeTab === 'verifications'" class="space-y-6">
+      <!-- Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-2xl border border-gray-100">
+          <p class="text-sm text-gray-500 font-medium">Pending Approvals</p>
+          <p class="text-3xl font-bold text-gray-900 mt-2">{{ total }}</p>
+        </div>
+      </div>
 
     <!-- Pending Table -->
     <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
@@ -173,31 +194,122 @@
         </div>
       </div>
     </div>
+
+    <!-- Profile Drawer -->
+    <div v-if="drawerOpen" class="fixed inset-0 z-50 flex justify-end">
+      <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" @click="drawerOpen = false"></div>
+      <div class="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col transform transition-transform duration-300 overflow-y-auto">
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
+          <h2 class="text-lg font-bold text-gray-900">Dispatcher Profile</h2>
+          <button @click="drawerOpen = false" class="p-2 text-gray-400 hover:text-gray-900 rounded-full hover:bg-gray-100 transition-colors">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+        
+        <div v-if="selectedProfile" class="p-6 space-y-8 flex-1">
+          <!-- Header -->
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 bg-gray-100 rounded-full overflow-hidden">
+              <img v-if="selectedProfile.user?.avatar" :src="selectedProfile.user?.avatar" class="w-full h-full object-cover">
+            </div>
+            <div>
+              <h3 class="font-bold text-xl text-gray-900">{{ selectedProfile.user?.firstName }} {{ selectedProfile.user?.lastName }}</h3>
+              <p class="text-sm text-gray-500">{{ selectedProfile.user?.email }}</p>
+              <span v-if="selectedProfile.isApproved" class="inline-flex items-center gap-1 mt-2 px-2 py-0.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-md">
+                <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Active
+              </span>
+              <span v-else class="inline-flex items-center gap-1 mt-2 px-2 py-0.5 bg-red-50 text-red-700 text-xs font-bold rounded-md">
+                <div class="w-1.5 h-1.5 rounded-full bg-red-500"></div> Suspended
+              </span>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+              <p class="text-xs font-bold text-gray-500 uppercase">Deliveries</p>
+              <p class="text-2xl font-black text-gray-900 mt-1">{{ selectedProfile.totalDeliveries || 0 }}</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+              <p class="text-xs font-bold text-gray-500 uppercase">Rating</p>
+              <div class="flex items-center gap-1 mt-1">
+                <p class="text-2xl font-black text-gray-900">{{ (selectedProfile.rating || 0).toFixed(1) }}</p>
+                <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div>
+            <h4 class="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Account Actions</h4>
+            <div class="space-y-3">
+              <button 
+                v-if="selectedProfile.isApproved"
+                @click="toggleSuspension(selectedProfile._id, 'suspend')" 
+                :disabled="processing === selectedProfile._id"
+                class="w-full flex items-center justify-between p-4 rounded-xl border border-red-100 bg-red-50 hover:bg-red-100 transition-colors text-red-700 font-bold group"
+              >
+                <span>Suspend Dispatcher</span>
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+              </button>
+              
+              <button 
+                v-else
+                @click="toggleSuspension(selectedProfile._id, 'activate')" 
+                :disabled="processing === selectedProfile._id"
+                class="w-full flex items-center justify-between p-4 rounded-xl border border-emerald-100 bg-emerald-50 hover:bg-emerald-100 transition-colors text-emerald-700 font-bold group"
+              >
+                <span>Reactivate Dispatcher</span>
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+              </button>
+            </div>
+            <p class="text-xs text-gray-500 mt-3 text-center">Suspending a dispatcher prevents them from accepting new deliveries or going online.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { GATEWAY_ENDPOINT_WITH_AUTH as api } from '@/api_factory/axios.config'
 import { useCustomToast as useToast } from '@/composables/core/useCustomToast'
 import { RefreshCw, X } from 'lucide-vue-next'
 
 definePageMeta({ layout: 'admin' })
-useHead({ title: 'Dispatchers Verification - Admin' })
+useHead({ title: 'Dispatchers Management - Admin' })
 
+// Tabs
+const activeTab = ref('verifications') // 'verifications' | 'all'
+
+// Verifications state
 const dispatchers = ref<any[]>([])
 const loading = ref(false)
-const processing = ref<string | null>(null)
 const page = ref(1)
 const total = ref(0)
 const totalPages = computed(() => Math.ceil(total.value / 10))
+
+// All dispatchers state
+const allDispatchers = ref<any[]>([])
+const allLoading = ref(false)
+const allPage = ref(1)
+const allTotal = ref(0)
+const allTotalPages = computed(() => Math.ceil(allTotal.value / 10))
+
+const processing = ref<string | null>(null)
 const { showToast } = useToast()
 const selectedImage = ref<string | null>(null)
 
+// Modals
 const approveModalOpen = ref(false)
 const rejectModalOpen = ref(false)
 const selectedDispatcher = ref<any>(null)
 const rejectionReason = ref('')
+
+// Drawer
+const drawerOpen = ref(false)
+const selectedProfile = ref<any>(null)
 
 const fetchPending = async () => {
   loading.value = true
@@ -212,8 +324,31 @@ const fetchPending = async () => {
   }
 }
 
+const fetchAll = async () => {
+  allLoading.value = true
+  try {
+    const res = await api.get(`/admin/dispatchers?page=${allPage.value}&limit=10`)
+    allDispatchers.value = res.data?.dispatchers || []
+    allTotal.value = res.data?.total || 0
+  } catch (err) {
+    showToast({ title: 'Error', message: 'Failed to fetch all dispatchers', toastType: 'error' })
+  } finally {
+    allLoading.value = false
+  }
+}
+
+// Watchers
 watch(page, fetchPending)
-onMounted(fetchPending)
+watch(allPage, fetchAll)
+watch(activeTab, (newTab) => {
+  if (newTab === 'verifications') fetchPending()
+  else if (newTab === 'all') fetchAll()
+})
+
+onMounted(() => {
+  fetchPending()
+  fetchAll()
+})
 
 const viewImage = (url: string) => {
   selectedImage.value = url
@@ -230,6 +365,36 @@ const openRejectModal = (errander: any) => {
   rejectModalOpen.value = true
 }
 
+const openProfileDrawer = async (errander: any) => {
+  processing.value = errander._id
+  try {
+    const res = await api.get(`/admin/dispatchers/${errander._id}`)
+    selectedProfile.value = res.data
+    drawerOpen.value = true
+  } catch (err) {
+    showToast({ title: 'Error', message: 'Failed to load profile', toastType: 'error' })
+  } finally {
+    processing.value = null
+  }
+}
+
+const toggleSuspension = async (id: string, action: 'suspend' | 'activate') => {
+  if (!confirm(`Are you sure you want to ${action} this dispatcher?`)) return
+  processing.value = id
+  try {
+    await api.put(`/admin/dispatchers/${id}/${action}`)
+    showToast({ title: 'Success', message: `Dispatcher ${action}d successfully`, toastType: 'success' })
+    await fetchAll()
+    // Refresh drawer data
+    const res = await api.get(`/admin/dispatchers/${id}`)
+    selectedProfile.value = res.data
+  } catch (err) {
+    showToast({ title: 'Error', message: `Failed to ${action} dispatcher`, toastType: 'error' })
+  } finally {
+    processing.value = null
+  }
+}
+
 const confirmApprove = async () => {
   if (!selectedDispatcher.value) return
   processing.value = selectedDispatcher.value._id
@@ -238,6 +403,7 @@ const confirmApprove = async () => {
     showToast({ title: 'Approved', message: 'Dispatcher verified successfully', toastType: 'success' })
     approveModalOpen.value = false
     await fetchPending()
+    if (activeTab.value === 'all') await fetchAll()
   } catch (err) {
     showToast({ title: 'Error', message: 'Failed to approve dispatcher', toastType: 'error' })
   } finally {
