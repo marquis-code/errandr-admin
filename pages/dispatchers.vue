@@ -90,14 +90,14 @@
               <td class="px-6 py-4 text-right">
                 <div class="flex items-center justify-end gap-2">
                   <button 
-                    @click="approve(errander._id)" 
+                    @click="openApproveModal(errander)" 
                     :disabled="processing === errander._id"
                     class="px-4 py-2 bg-emerald-50 text-emerald-600 font-bold rounded-lg hover:bg-emerald-100 transition-colors disabled:opacity-50 text-sm"
                   >
                     Approve
                   </button>
                   <button 
-                    @click="reject(errander._id)" 
+                    @click="openRejectModal(errander)" 
                     :disabled="processing === errander._id"
                     class="px-4 py-2 bg-red-50 text-red-600 font-bold rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 text-sm"
                   >
@@ -137,6 +137,42 @@
         <X class="w-5 h-5" />
       </button>
     </div>
+
+    <!-- Approve Modal -->
+    <div v-if="approveModalOpen" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4" @click.self="approveModalOpen = false">
+      <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl text-center">
+        <div class="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Approve Dispatcher?</h3>
+        <p class="text-sm text-gray-500 mb-6">Are you sure you want to approve <span class="font-bold text-gray-900">{{ selectedDispatcher?.user?.firstName }} {{ selectedDispatcher?.user?.lastName }}</span>? They will gain full access to deliveries.</p>
+        <div class="flex gap-3">
+          <button @click="approveModalOpen = false" class="flex-1 py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors">Cancel</button>
+          <button @click="confirmApprove" :disabled="processing === selectedDispatcher?._id" class="flex-1 py-2.5 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 transition-colors disabled:opacity-50">Approve</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reject Modal -->
+    <div v-if="rejectModalOpen" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4" @click.self="rejectModalOpen = false">
+      <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl text-left">
+        <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 mb-2 text-center">Reject Verification</h3>
+        <p class="text-sm text-gray-500 mb-4 text-center">Rejecting <span class="font-bold text-gray-900">{{ selectedDispatcher?.user?.firstName }} {{ selectedDispatcher?.user?.lastName }}</span> will block their access.</p>
+        
+        <div class="mb-6">
+          <label class="block text-xs font-bold text-gray-700 mb-2">Reason for rejection (Optional)</label>
+          <textarea v-model="rejectionReason" placeholder="e.g. ID card is blurry..." class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none transition-all shadow-sm resize-none h-24"></textarea>
+        </div>
+
+        <div class="flex gap-3">
+          <button @click="rejectModalOpen = false" class="flex-1 py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors">Cancel</button>
+          <button @click="confirmReject" :disabled="processing === selectedDispatcher?._id" class="flex-1 py-2.5 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors disabled:opacity-50">Reject</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -158,6 +194,11 @@ const totalPages = computed(() => Math.ceil(total.value / 10))
 const { showToast } = useToast()
 const selectedImage = ref<string | null>(null)
 
+const approveModalOpen = ref(false)
+const rejectModalOpen = ref(false)
+const selectedDispatcher = ref<any>(null)
+const rejectionReason = ref('')
+
 const fetchPending = async () => {
   loading.value = true
   try {
@@ -178,11 +219,24 @@ const viewImage = (url: string) => {
   selectedImage.value = url
 }
 
-const approve = async (id: string) => {
-  processing.value = id
+const openApproveModal = (errander: any) => {
+  selectedDispatcher.value = errander
+  approveModalOpen.value = true
+}
+
+const openRejectModal = (errander: any) => {
+  selectedDispatcher.value = errander
+  rejectionReason.value = ''
+  rejectModalOpen.value = true
+}
+
+const confirmApprove = async () => {
+  if (!selectedDispatcher.value) return
+  processing.value = selectedDispatcher.value._id
   try {
-    await api.put(`/admin/dispatchers/${id}/approve`)
+    await api.put(`/admin/dispatchers/${selectedDispatcher.value._id}/approve`)
     showToast({ title: 'Approved', message: 'Dispatcher verified successfully', toastType: 'success' })
+    approveModalOpen.value = false
     await fetchPending()
   } catch (err) {
     showToast({ title: 'Error', message: 'Failed to approve dispatcher', toastType: 'error' })
@@ -191,12 +245,13 @@ const approve = async (id: string) => {
   }
 }
 
-const reject = async (id: string) => {
-  if (!confirm('Are you sure you want to reject this verification?')) return
-  processing.value = id
+const confirmReject = async () => {
+  if (!selectedDispatcher.value) return
+  processing.value = selectedDispatcher.value._id
   try {
-    await api.put(`/admin/dispatchers/${id}/reject`)
+    await api.put(`/admin/dispatchers/${selectedDispatcher.value._id}/reject`, { reason: rejectionReason.value })
     showToast({ title: 'Rejected', message: 'Verification rejected', toastType: 'success' })
+    rejectModalOpen.value = false
     await fetchPending()
   } catch (err) {
     showToast({ title: 'Error', message: 'Failed to reject dispatcher', toastType: 'error' })
