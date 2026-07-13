@@ -370,6 +370,31 @@
             </div>
           </div>
 
+          <!-- Verification Documents -->
+          <div v-if="selectedProfile.idCardImage || selectedProfile.selfieImage" class="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3">
+            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Verification Documents</h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div v-if="selectedProfile.idCardImage">
+                <p class="text-gray-500 text-xs mb-1.5">ID Card</p>
+                <button @click="viewImage(selectedProfile.idCardImage)" class="w-full h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:border-[#FF5C1A] transition-colors relative group">
+                  <img :src="selectedProfile.idCardImage" class="w-full h-full object-cover" />
+                  <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span class="text-xs text-white font-bold">View Full</span>
+                  </div>
+                </button>
+              </div>
+              <div v-if="selectedProfile.selfieImage">
+                <p class="text-gray-500 text-xs mb-1.5">Selfie</p>
+                <button @click="viewImage(selectedProfile.selfieImage)" class="w-full h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:border-[#FF5C1A] transition-colors relative group">
+                  <img :src="selectedProfile.selfieImage" class="w-full h-full object-cover" />
+                  <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span class="text-xs text-white font-bold">View Full</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Stats & Wallet -->
           <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3">
             <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Performance & Wallet</h4>
