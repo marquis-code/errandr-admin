@@ -3,7 +3,7 @@ import { useUser } from "@/composables/modules/auth/user";
 import { useCustomToast } from '@/composables/core/useCustomToast'
 const { showToast } = useCustomToast();
 
-const { token, logOut } = useUser();
+// Top-level useUser call removed to avoid reactivity bugs
 
 const isDev = import.meta.env.DEV;
 const envApiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -24,16 +24,12 @@ export const GATEWAY_ENDPOINT_V2 = axios.create({
 });
 
 export const GATEWAY_ENDPOINT_WITH_AUTH = axios.create({
-  baseURL: $GATEWAY_ENDPOINT,
-  headers: {
-    Authorization: `Bearer ${token.value}`,
-  },
+  baseURL: $GATEWAY_ENDPOINT
 });
 
 export const GATEWAY_ENDPOINT_WITH_AUTH_FORM_DATA = axios.create({
   baseURL: $GATEWAY_ENDPOINT,
   headers: {
-    Authorization: `Bearer ${token.value}`,
     "Content-Type": "multipart/form-data",
   },
 });
@@ -42,10 +38,7 @@ export const GATEWAY_ENDPOINT_WITHOUT_VERSION = axios.create({
   baseURL: $GATEWAY_ENDPOINT_WITHOUT_VERSION,
 });
 export const GATEWAY_ENDPOINT_WITHOUT_VERSION_WITH_AUTH = axios.create({
-  baseURL: $GATEWAY_ENDPOINT_WITHOUT_VERSION,
-  headers: {
-    Authorization: `Bearer ${token.value}`,
-  },
+  baseURL: $GATEWAY_ENDPOINT_WITHOUT_VERSION
 });
 export const IMAGE_UPLOAD_ENDPOINT = axios.create({
   baseURL: $IMAGE_UPLOAD_ENDPOINT,
@@ -65,8 +58,19 @@ const instanceArray = [
 
 instanceArray.forEach((instance) => {
   instance.interceptors.request.use((config: any) => {
-    if (token.value) {
-      config.headers.Authorization = `Bearer ${token.value}`;
+    let currentToken = null;
+    if (typeof window !== 'undefined') {
+      const match = document.cookie.match(new RegExp('(^| )errandr_token=([^;]+)'));
+      if (match) currentToken = match[2];
+    } else {
+      try {
+        const { useCookie } = require('#app');
+        currentToken = useCookie('errandr_token').value;
+      } catch (e) {}
+    }
+    
+    if (currentToken) {
+      config.headers.Authorization = `Bearer ${currentToken}`;
     }
     return config;
   });
@@ -89,31 +93,55 @@ instanceArray.forEach((instance) => {
       }
 
       if (err.response.status === 401) {
-        // Try refresh token logic
-        const { refreshToken, setToken, setRefreshToken, logOut } = useUser();
+        const fallbackLogOut = () => {
+          if (typeof window !== 'undefined') {
+            document.cookie = 'errandr_token=; Max-Age=0; path=/;';
+            document.cookie = 'errandr_refresh_token=; Max-Age=0; path=/;';
+            document.cookie = 'errandr_user=; Max-Age=0; path=/;';
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            window.location.href = '/';
+          }
+        };
+
+        const getCookie = (name: string) => {
+          if (typeof window !== 'undefined') {
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            if (match) return match[2];
+          }
+          return null;
+        };
+
+        const setCookie = (name: string, value: string, days: number) => {
+          if (typeof window !== 'undefined') {
+            const expires = new Date(Date.now() + days * 86400 * 1000).toUTCString();
+            document.cookie = `${name}=${value}; expires=${expires}; path=/; samesite=lax`;
+          }
+        };
+
+        let currentRefreshToken = getCookie('errandr_refresh_token');
         
-        if (refreshToken.value && !originalRequest._retry) {
+        if (currentRefreshToken && !originalRequest._retry) {
           originalRequest._retry = true;
           try {
             const refreshRes = await axios.post(`${$GATEWAY_ENDPOINT}/auth/refresh`, {
-              refreshToken: refreshToken.value
+              refreshToken: currentRefreshToken
             });
             
             if (refreshRes.data.token) {
-              setToken(refreshRes.data.token);
+              setCookie('errandr_token', refreshRes.data.token, 7);
               if (refreshRes.data.refreshToken) {
-                setRefreshToken(refreshRes.data.refreshToken);
+                setCookie('errandr_refresh_token', refreshRes.data.refreshToken, 30);
               }
-              // Update Authorization header and retry original request
               originalRequest.headers.Authorization = `Bearer ${refreshRes.data.token}`;
               return instance(originalRequest);
             }
           } catch (refreshErr) {
             console.log('Refresh token failed:', refreshErr);
-            logOut();
+            fallbackLogOut();
           }
         } else {
-          logOut();
+          fallbackLogOut();
         }
 
         showToast({
