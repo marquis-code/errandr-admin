@@ -32,14 +32,28 @@ export const useUser = () => {
 
   const setUser = (userData: User) => {
     user.value = userData;
+    if (typeof window !== 'undefined') {
+      const expires = new Date(Date.now() + 7 * 86400 * 1000).toUTCString();
+      document.cookie = `errandr_user=${encodeURIComponent(JSON.stringify(userData))}; expires=${expires}; path=/; samesite=lax`;
+      localStorage.setItem('user', JSON.stringify(userData));
+    }
   };
 
   const setToken = (newToken: string) => {
     token.value = newToken;
+    if (typeof window !== 'undefined') {
+      const expires = new Date(Date.now() + 7 * 86400 * 1000).toUTCString();
+      document.cookie = `errandr_token=${newToken}; expires=${expires}; path=/; samesite=lax`;
+      localStorage.setItem('token', newToken);
+    }
   };
 
   const setRefreshToken = (newRefreshToken: string) => {
     refreshToken.value = newRefreshToken;
+    if (typeof window !== 'undefined') {
+      const expires = new Date(Date.now() + 30 * 86400 * 1000).toUTCString();
+      document.cookie = `errandr_refresh_token=${newRefreshToken}; expires=${expires}; path=/; samesite=lax`;
+    }
   };
 
   const logOut = () => {
