@@ -34,7 +34,7 @@ export const useRealtimeSocket = () => {
 
     socket.value = io(`${baseUrl}/realtime`, {
       path: '/socket.io/',
-      transports: ['websocket'],
+      transports: ['websocket', 'polling'],
       auth: authPayload,
     })
 

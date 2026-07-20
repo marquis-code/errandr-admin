@@ -2,46 +2,61 @@
  <FullScreenLoader />
  <div class="min-h-screen bg-white">
  <!-- Desktop Sidebar -->
- <aside class="hidden lg:block w-72 bg-white border-r border-gray-100 min-h-screen fixed left-0 top-0 z-50 transition-all duration-300">
+ <aside class="hidden lg:block bg-white border-r border-gray-100 min-h-screen fixed left-0 top-0 z-50 transition-all duration-300" :class="isSidebarMinimized ? 'w-20' : 'w-72'">
  <!-- Logo Section -->
- <div class="h-20 flex items-center px-8 border-b border-gray-50/50">
+ <div class="h-20 flex items-center border-b border-gray-50/50 relative" :class="isSidebarMinimized ? 'justify-center px-0' : 'px-8'">
   <div class="flex items-center gap-3 group cursor-pointer">
-  <img src="@/assets/img/logo-light.png" alt="Errander Logo" class="h-9 w-auto object-contain transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" />
+   <div v-if="isSidebarMinimized" class="w-10 h-10 bg-[#FF5C1A] rounded-md flex items-center justify-center text-white font-bold text-xl flex-shrink-0 uppercase">E</div>
+   <img v-else src="@/assets/img/logo-light.png" alt="Errander Logo" class="h-9 w-auto object-contain transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" />
   </div>
+
+  <!-- Toggle Button -->
+  <button 
+   @click="isSidebarMinimized = !isSidebarMinimized"
+   class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-sm text-gray-500 hover:text-[#FF5C1A] hover:border-[#FF5C1A] z-50 transition-colors"
+  >
+   <ChevronLeft v-if="!isSidebarMinimized" class="w-4 h-4" />
+   <ChevronRight v-else class="w-4 h-4" />
+  </button>
  </div>
  
  <!-- User Quick Info -->
- <div class="px-6 py-8">
+ <div class="py-8" :class="isSidebarMinimized ? 'px-3' : 'px-6'">
 
  <!-- Navigation -->
  <nav class="space-y-1.5">
- <div class="px-2 pb-2">
+ <div class="px-2 pb-2" v-if="!isSidebarMinimized">
  <p class="text-sm font-medium text-gray-400 tracking-[0.2em] ml-1">Main Menu</p>
  </div>
  <NuxtLink
  v-for="item in navItems"
  :key="item.path"
  :to="item.path"
- class="flex items-center px-4 py-3.5 text-sm font-medium rounded-xl transition-all duration-300 group"
- :class="isActive(item.path) 
- ? 'bg-[#FF5C1A] text-white translate-x-1' 
- : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'"
+ class="flex items-center py-3.5 text-sm font-medium rounded-xl transition-all duration-300 group"
+ :class="[
+  isActive(item.path) ? 'bg-[#FF5C1A] text-white' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900',
+  isSidebarMinimized ? 'justify-center px-0' : 'px-4',
+  isActive(item.path) && !isSidebarMinimized ? 'translate-x-1' : ''
+ ]"
+ :title="isSidebarMinimized ? item.label : ''"
  >
- <component :is="item.icon" class="w-5 h-5 mr-3 transition-transform duration-500 group-hover:scale-110" :class="isActive(item.path) ? 'text-white' : 'text-gray-400 group-hover:text-[#FF5C1A]'" />
- <span class="tracking-tight">{{ item.label }}</span>
- <ChevronRight v-if="isActive(item.path)" class="w-4 h-4 ml-auto opacity-50" />
+ <component :is="item.icon" class="w-5 h-5 transition-transform duration-500 group-hover:scale-110" :class="[isActive(item.path) ? 'text-white' : 'text-gray-400 group-hover:text-[#FF5C1A]', isSidebarMinimized ? '' : 'mr-3']" />
+ <span v-if="!isSidebarMinimized" class="tracking-tight">{{ item.label }}</span>
+ <ChevronRight v-if="isActive(item.path) && !isSidebarMinimized" class="w-4 h-4 ml-auto opacity-50" />
  </NuxtLink>
  </nav>
  </div>
 
  <!-- Logout Button -->
- <div class="absolute bottom-6 left-6 right-6">
+ <div class="absolute bottom-6 left-0 right-0" :class="isSidebarMinimized ? 'px-3' : 'px-6'">
  <button
  @click="handleLogoutClick"
- class="flex items-center w-full px-5 py-4 text-lg font-bold text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all duration-300 group"
+ class="flex items-center w-full py-4 text-lg font-bold text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all duration-300 group"
+ :class="isSidebarMinimized ? 'justify-center px-0' : 'px-5'"
+ :title="isSidebarMinimized ? 'Logout' : ''"
  >
- <LogOut class="w-5 h-5 mr-3 group-hover:rotate-12 transition-transform" />
- <span class="  text-[11px]">Logout</span>
+ <LogOut class="w-5 h-5 group-hover:rotate-12 transition-transform" :class="isSidebarMinimized ? '' : 'mr-3'" />
+ <span v-if="!isSidebarMinimized" class="text-[11px]">Logout</span>
  </button>
  </div>
  </aside>
@@ -125,7 +140,7 @@
  </Transition>
 
  <!-- Main Content -->
- <main class="flex-1 lg:ml-72 min-h-screen">
+ <main class="flex-1 min-h-screen transition-all duration-300" :class="isSidebarMinimized ? 'lg:ml-20' : 'lg:ml-72'">
  <!-- Page Header -->
  <div class="hidden lg:flex h-20 items-center justify-between px-10 border-b border-gray-100 bg-white sticky top-0 z-30 gap-6">
   <!-- Left: Page Title -->
@@ -245,6 +260,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useUser } from '@/composables/modules/auth/user'
+import { useAdminNotifications } from '@/composables/useAdminNotifications'
 import { useRouter, useRoute } from 'vue-router'
 import { 
  LayoutDashboard, 
@@ -258,19 +274,29 @@ import {
  X,
  ShieldCheck,
  ChevronRight,
+ ChevronLeft,
  Search,
  Settings,
  Gift,
- MessageSquare
+ MessageSquare,
+ Bell
 } from 'lucide-vue-next'
 import RouteSearchModal from '@/components/ui/RouteSearchModal.vue'
 
 const route = useRoute()
 const router = useRouter()
 const { user, logOut } = useUser()
+
+const { requestPermissionAndRegister, listenForNotifications } = useAdminNotifications()
+
+onMounted(() => {
+  requestPermissionAndRegister()
+  listenForNotifications()
+})
 const showMobileMenu = ref(false)
 const logoutModalOpen = ref(false)
 const searchModalOpen = ref(false)
+const isSidebarMinimized = ref(false)
 
 const navItems = [
  { path: '/dashboard', label: 'Overview', icon: LayoutDashboard },
@@ -281,6 +307,7 @@ const navItems = [
  { path: '/referrals', label: 'Referrals', icon: Gift },
  { path: '/finances', label: 'Finances', icon: Wallet },
  { path: '/chats', label: 'Support Chats', icon: MessageSquare },
+ { path: '/campaigns', label: 'Push Campaigns', icon: Bell },
  { path: '/reports', label: 'Reports', icon: FileText },
  { path: '/settings', label: 'Settings', icon: Settings }
 ]
@@ -290,10 +317,10 @@ const pageTitles: Record<string, { title: string; description: string }> = {
  '/users': { title: 'User Management', description: 'Manage accounts and permissions' },
  '/dispatchers': { title: 'Dispatcher Verifications', description: 'Review and approve dispatcher verifications' },
  '/vendors': { title: 'Vendor Management', description: 'Manage merchants and store settings' },
- '/orders': { title: 'Order Management', description: 'Track platform-wide order fulfillment' },
- '/referrals': { title: 'Referral System', description: 'Manage ambassadors and track referral growth' },
- '/finances': { title: 'Financials', description: 'Transaction history and platform revenue' },
- '/chats': { title: 'Support Chats', description: 'Manage incoming support requests' },
+ '/orders': { title: 'Order Management', description: 'Monitor and track active deliveries' },
+ '/chats': { title: 'Support Chats', description: 'Monitor and answer user questions in real-time' },
+ '/campaigns': { title: 'Push Campaigns', description: 'Manage automated push notifications sent to users' },
+ '/referrals': { title: 'Referral Program', description: 'Monitor affiliate and referral metrics' },
  '/reports': { title: 'Platform Reports', description: 'Analytical insights and system health' },
  '/settings': { title: 'System Settings', description: 'Configure platform parameters and service fees' }
 }

@@ -63,6 +63,7 @@
               <th class="px-6 py-4 font-bold">Level</th>
               <th class="px-6 py-4 font-bold text-center">ID Card</th>
               <th class="px-6 py-4 font-bold text-center">Selfie</th>
+              <th class="px-6 py-4 font-bold text-center">NIN</th>
               <th class="px-6 py-4 font-bold text-right">Actions</th>
             </tr>
           </thead>
@@ -107,6 +108,16 @@
                   </div>
                 </button>
                 <span v-else class="text-xs text-gray-400">No Image</span>
+              </td>
+              <td class="px-6 py-4 text-center">
+                <button v-if="errander.ninSlipImage" @click="viewImage(errander.ninSlipImage)" class="inline-flex w-16 h-12 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:border-[#FF5C1A] transition-colors relative group">
+                  <img :src="errander.ninSlipImage" class="w-full h-full object-cover" />
+                  <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                    <span class="text-[10px] text-white font-bold">View</span>
+                  </div>
+                </button>
+                <span v-else-if="errander.ninNumber" class="text-xs font-bold text-gray-900 border border-gray-200 px-2 py-1 rounded bg-gray-50">{{ errander.ninNumber }}</span>
+                <span v-else class="text-xs text-gray-400">N/A</span>
               </td>
               <td class="px-6 py-4 text-right">
                 <div class="flex items-center justify-end gap-2">
@@ -289,7 +300,17 @@
           <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
         </div>
         <h3 class="text-lg font-bold text-gray-900 mb-2">Approve Dispatcher?</h3>
-        <p class="text-sm text-gray-500 mb-6">Are you sure you want to approve <span class="font-bold text-gray-900">{{ selectedDispatcher?.user?.firstName }} {{ selectedDispatcher?.user?.lastName }}</span>? They will gain full access to deliveries.</p>
+        <p class="text-sm text-gray-500 mb-4">Are you sure you want to approve <span class="font-bold text-gray-900">{{ selectedDispatcher?.user?.firstName }} {{ selectedDispatcher?.user?.lastName }}</span>? They will gain full access to deliveries.</p>
+        
+        <div class="mb-6 text-left bg-gray-50 p-4 rounded-xl border border-gray-100">
+          <label class="block text-xs font-bold text-gray-700 mb-2">Select Tier to Grant</label>
+          <select v-model="selectedTier" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-emerald-500 outline-none">
+            <option :value="1">Tier 1 (Window Shopper)</option>
+            <option :value="2">Tier 2 (Basic)</option>
+            <option :value="3">Tier 3 (Pro)</option>
+          </select>
+        </div>
+
         <div class="flex gap-3">
           <button @click="approveModalOpen = false" class="flex-1 py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-colors">Cancel</button>
           <button @click="confirmApprove" :disabled="processing === selectedDispatcher?._id" class="flex-1 py-2.5 bg-emerald-500 text-white font-bold rounded-xl hover:bg-emerald-600 transition-colors disabled:opacity-50">Approve</button>
@@ -364,16 +385,38 @@
                 <p class="font-bold text-gray-900">{{ selectedProfile.matricNumber || 'N/A' }}</p>
               </div>
               <div>
-                <p class="text-gray-500 text-xs">Verification Tier</p>
-                <p class="font-bold text-gray-900">Tier {{ selectedProfile.verificationLevel || 1 }} ({{ selectedProfile.verificationStatus || 'pending' }})</p>
+                <p class="text-gray-500 text-xs mb-1">Verification Tier</p>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-gray-900 text-sm">Tier {{ selectedProfile.verificationLevel || 1 }}</span>
+                  <select 
+                    v-model="selectedProfile.verificationLevel" 
+                    @change="updateTier(selectedProfile._id, selectedProfile.verificationLevel)"
+                    class="text-xs border border-gray-200 rounded px-1 py-0.5 bg-white cursor-pointer"
+                  >
+                    <option :value="1">Tier 1</option>
+                    <option :value="2">Tier 2</option>
+                    <option :value="3">Tier 3</option>
+                  </select>
+                </div>
+                <p class="text-gray-400 text-xs mt-0.5 capitalize">Status: {{ selectedProfile.verificationStatus || 'pending' }}</p>
               </div>
             </div>
           </div>
 
           <!-- Verification Documents -->
-          <div v-if="selectedProfile.idCardImage || selectedProfile.selfieImage" class="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3">
+          <div v-if="selectedProfile.idCardImage || selectedProfile.selfieImage || selectedProfile.ninSlipImage || selectedProfile.ninNumber || selectedProfile.guarantorDetails" class="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3">
             <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Verification Documents</h4>
-            <div class="grid grid-cols-2 gap-4">
+            
+            <div v-if="selectedProfile.guarantorDetails" class="mb-4 bg-white p-3 rounded-lg border border-gray-200">
+              <p class="text-xs font-bold text-gray-900 mb-2">Guarantor Details</p>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div><span class="text-gray-500">Name:</span> {{ selectedProfile.guarantorDetails.name }}</div>
+                <div><span class="text-gray-500">Phone:</span> {{ selectedProfile.guarantorDetails.phone }}</div>
+                <div><span class="text-gray-500">Relation:</span> {{ selectedProfile.guarantorDetails.relationship }}</div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4">
               <div v-if="selectedProfile.idCardImage">
                 <p class="text-gray-500 text-xs mb-1.5">ID Card</p>
                 <button @click="viewImage(selectedProfile.idCardImage)" class="w-full h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:border-[#FF5C1A] transition-colors relative group">
@@ -391,6 +434,19 @@
                     <span class="text-xs text-white font-bold">View Full</span>
                   </div>
                 </button>
+              </div>
+              <div v-if="selectedProfile.ninSlipImage || selectedProfile.ninNumber">
+                <p class="text-gray-500 text-xs mb-1.5">NIN</p>
+                <button v-if="selectedProfile.ninSlipImage" @click="viewImage(selectedProfile.ninSlipImage)" class="w-full h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:border-[#FF5C1A] transition-colors relative group">
+                  <img :src="selectedProfile.ninSlipImage" class="w-full h-full object-cover" />
+                  <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span class="text-xs text-white font-bold">View Full</span>
+                  </div>
+                </button>
+                <div v-else class="w-full h-24 bg-gray-100 rounded-lg border border-gray-200 flex flex-col items-center justify-center p-2">
+                  <span class="text-[10px] text-gray-500 mb-1">NIN Number</span>
+                  <span class="text-sm font-bold text-gray-900 tracking-wider">{{ selectedProfile.ninNumber }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -508,6 +564,7 @@ const approveModalOpen = ref(false)
 const rejectModalOpen = ref(false)
 const selectedDispatcher = ref<any>(null)
 const rejectionReason = ref('')
+const selectedTier = ref(1)
 
 // Drawer
 const drawerOpen = ref(false)
@@ -558,6 +615,14 @@ const viewImage = (url: string) => {
 
 const openApproveModal = (errander: any) => {
   selectedDispatcher.value = errander
+  if (errander.guarantorDetails?.name) {
+    selectedTier.value = 3
+  } else if (errander.idCardImage) {
+    selectedTier.value = 2
+  } else {
+    selectedTier.value = (Number(errander.verificationLevel) || 1) + 1
+    if (selectedTier.value > 3) selectedTier.value = 3
+  }
   approveModalOpen.value = true
 }
 
@@ -601,7 +666,7 @@ const confirmApprove = async () => {
   if (!selectedDispatcher.value) return
   processing.value = selectedDispatcher.value._id
   try {
-    await api.put(`/admin/dispatchers/${selectedDispatcher.value._id}/approve`)
+    await api.put(`/admin/dispatchers/${selectedDispatcher.value._id}/approve`, { level: selectedTier.value })
     showToast({ title: 'Approved', message: 'Dispatcher verified successfully', toastType: 'success' })
     approveModalOpen.value = false
     await fetchPending()
@@ -623,6 +688,26 @@ const confirmReject = async () => {
     await fetchPending()
   } catch (err) {
     showToast({ title: 'Error', message: 'Failed to reject dispatcher', toastType: 'error' })
+  } finally {
+    processing.value = null
+  }
+}
+
+const updateTier = async (id: string, tier: number) => {
+  if (!confirm(`Are you sure you want to explicitly change this dispatcher to Tier ${tier}?`)) {
+    // Re-fetch to revert the select value visually
+    openProfileDrawer(selectedProfile.value)
+    return;
+  }
+  processing.value = id
+  try {
+    await api.put(`/admin/dispatchers/${id}/tier`, { tier: Number(tier) })
+    showToast({ title: 'Success', message: `Tier updated successfully`, toastType: 'success' })
+    const res = await api.get(`/admin/dispatchers/${id}`)
+    selectedProfile.value = res.data
+    await fetchAll()
+  } catch (err) {
+    showToast({ title: 'Error', message: `Failed to update tier`, toastType: 'error' })
   } finally {
     processing.value = null
   }

@@ -75,11 +75,11 @@ export const useAdminReports = () => {
   const loading = ref(false);
   const reports = ref<any[]>([]);
 
-  const fetchReports = async () => {
+  const fetchReports = async (page = 1, limit = 50, status?: string) => {
     loading.value = true;
     try {
-      const res = await admin_api.getReports();
-      reports.value = res.data;
+      const res = await admin_api.getReports(page, limit, status);
+      reports.value = res.data?.reports || res.data || [];
     } finally {
       loading.value = false;
     }
@@ -107,5 +107,46 @@ export const useAdminFinances = () => {
     }
   };
 
-  return { loading, stats, transactions, fetchFinances };
+  const approvePayout = async (id: string) => {
+    loading.value = true;
+    try {
+      await wallets_api.approvePayout(id);
+      useCustomToast('Payout approved successfully', 'success');
+      await fetchFinances();
+    } catch (error: any) {
+      useCustomToast(error.message || 'Failed to approve payout', 'error');
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const rejectPayout = async (id: string) => {
+    loading.value = true;
+    try {
+      await wallets_api.rejectPayout(id);
+      useCustomToast('Payout rejected successfully', 'success');
+      await fetchFinances();
+    } catch (error: any) {
+      useCustomToast(error.message || 'Failed to reject payout', 'error');
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const downloadReceipt = async (id: string) => {
+    try {
+      const res = await wallets_api.downloadReceipt(id);
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `receipt-${id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error: any) {
+      useCustomToast(error.message || 'Failed to download receipt', 'error');
+    }
+  };
+
+  return { loading, stats, transactions, fetchFinances, approvePayout, rejectPayout, downloadReceipt };
 };

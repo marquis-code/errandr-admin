@@ -221,12 +221,43 @@
               <ChevronRight class="w-4 h-4 text-gray-400" />
             </div>
           </div>
+
+          <!-- Payout Details -->
+          <div class="space-y-3" v-if="selectedTransaction.metadata?.isPayoutRequest">
+            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Payout Destination</h4>
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-medium text-gray-500">Bank Code</span>
+                <span class="text-xs font-bold text-gray-900">{{ selectedTransaction.metadata.bankCode }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-medium text-gray-500">Account Number</span>
+                <span class="text-xs font-bold text-gray-900 font-mono">{{ selectedTransaction.metadata.accountNumber }}</span>
+              </div>
+            </div>
+          </div>
           
-          <!-- Download action -->
-          <div class="sticky bottom-0 -mx-6 -mb-8 mt-6 p-4 bg-white border-t border-gray-200 z-10">
-            <button class="w-full py-3 px-4 rounded-lg text-white font-semibold text-xs bg-gray-900 hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
-              <Download class="w-3.5 h-3.5" /> Download Receipt
-            </button>
+          <!-- Actions -->
+          <div class="sticky bottom-0 -mx-6 -mb-8 mt-6 p-4 bg-white border-t border-gray-200 z-10 flex flex-col gap-2">
+            <template v-if="selectedTransaction.type === 'debit' && selectedTransaction.status === 'pending'">
+              <button 
+                @click="handleApprovePayout(selectedTransaction._id)" 
+                class="w-full py-3 px-4 rounded-lg text-white font-semibold text-xs bg-emerald-600 hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2"
+              >
+                Approve Payout
+              </button>
+              <button 
+                @click="handleRejectPayout(selectedTransaction._id)" 
+                class="w-full py-3 px-4 rounded-lg text-white font-semibold text-xs bg-rose-600 hover:bg-rose-700 transition-colors flex items-center justify-center gap-2"
+              >
+                Reject Payout
+              </button>
+            </template>
+            <template v-else>
+              <button @click="handleDownloadReceipt(selectedTransaction._id)" class="w-full py-3 px-4 rounded-lg text-white font-semibold text-xs bg-gray-900 hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
+                <Download class="w-3.5 h-3.5" /> Download Receipt
+              </button>
+            </template>
           </div>
         </div>
       </template>
@@ -249,10 +280,24 @@ definePageMeta({
 
 useHead({ title: 'Finances - Errander Admin' });
 
-const { stats, transactions, loading, fetchFinances } = useAdminFinances();
+const { stats, transactions, loading, fetchFinances, approvePayout, rejectPayout, downloadReceipt } = useAdminFinances();
 
 const searchQuery = ref('');
 const selectedTransaction = ref<any>(null);
+
+const handleApprovePayout = async (id: string) => {
+  await approvePayout(id);
+  selectedTransaction.value = null; // Close drawer after action
+};
+
+const handleRejectPayout = async (id: string) => {
+  await rejectPayout(id);
+  selectedTransaction.value = null; // Close drawer after action
+};
+
+const handleDownloadReceipt = async (id: string) => {
+  await downloadReceipt(id);
+};
 
 const netBalance = computed(() => {
   return transactions.value.reduce((acc: number, t: any) => acc + (t.type === 'credit' ? t.amount : -t.amount), 0);

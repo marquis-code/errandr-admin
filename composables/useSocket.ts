@@ -17,6 +17,7 @@ export const useSocket = (namespace: string) => {
         userId: user.value?._id,
       },
       transports: ['websocket', 'polling'],
+      reconnection: true,
     });
 
     socket.on('connect', () => {
