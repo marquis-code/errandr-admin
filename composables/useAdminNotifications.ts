@@ -19,7 +19,7 @@ export const useAdminNotifications = () => {
         await navigator.serviceWorker.ready;
         
         const currentToken = await getToken($messaging, { 
-          vapidKey: config.public.firebaseVapidKey,
+          vapidKey: config.public.firebaseVapidKey || 'BJJs2JX_V36p-9sfug38GwMMGDWSQMObywAkys73EXlJgLEsiQaF6nRMDzVVjdgDb-MHJyw3Q_atT6KaluQN41I',
           serviceWorkerRegistration: registration
         });
         
