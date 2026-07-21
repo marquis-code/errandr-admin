@@ -1,6 +1,7 @@
 <template>
   <div>
     <UiToast class="z-[9999999]" />
+    <CoreNetworkStatusBanner />
     <NuxtLayout class="z-10">
       <NuxtPage class="z-10" />
     </NuxtLayout>
