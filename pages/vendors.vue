@@ -180,6 +180,11 @@
           <h3 class="text-xl font-semibold text-gray-900 font-heading mb-1">{{ selectedVendor.storeName }}</h3>
           <p class="text-xs font-semibold text-[#FF5C1A] uppercase tracking-wide bg-[#FF5C1A]/10 px-3 py-1 rounded-full mb-4">{{ selectedVendor.category?.replace('_', ' ') || 'General' }}</p>
 
+          <div class="flex space-x-2 mt-2 mb-4 w-5/6">
+            <button @click="activeDrawerTab = 'overview'" :class="activeDrawerTab === 'overview' ? 'bg-[#FF5C1A] text-white' : 'bg-gray-100 text-gray-600'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors">Overview</button>
+            <button @click="enterEditMode" :class="activeDrawerTab === 'edit' ? 'bg-[#FF5C1A] text-white' : 'bg-gray-100 text-gray-600'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors">Edit</button>
+          </div>
+
           <div class="flex items-center justify-between w-5/6 bg-white rounded-lg border border-gray-200 divide-x divide-gray-100 shadow-sm">
             <div class="text-center flex-1 py-3">
               <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Rating</p>
@@ -198,6 +203,7 @@
         <!-- Details -->
         <div class="p-6 space-y-6 pb-24 bg-gray-50/30">
           
+          <template v-if="activeDrawerTab === 'overview'">
           <!-- Basic Info -->
           <div class="space-y-3">
             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Store Information</h4>
@@ -332,6 +338,41 @@
               </div>
             </div>
           </div>
+          </template>
+
+          <!-- Edit Tab -->
+          <template v-if="activeDrawerTab === 'edit'">
+            <form @submit.prevent="handleUpdateVendor" class="space-y-4">
+              <div class="space-y-2">
+                <label class="text-xs font-semibold text-gray-700">Store Name</label>
+                <input v-model="editVendorPayload.storeName" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+              </div>
+              <div class="space-y-2">
+                <label class="text-xs font-semibold text-gray-700">Category</label>
+                <input v-model="editVendorPayload.category" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+              </div>
+              <div class="space-y-2">
+                <label class="text-xs font-semibold text-gray-700">Business Type</label>
+                <select v-model="editVendorPayload.businessType" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <option value="physical_product">Physical Product</option>
+                  <option value="service_provider">Service Provider</option>
+                  <option value="hybrid">Hybrid</option>
+                </select>
+              </div>
+              <div class="space-y-2">
+                <label class="text-xs font-semibold text-gray-700">Status</label>
+                <select v-model="editVendorPayload.status" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="suspended">Suspended</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+              <button type="submit" :disabled="updatingVendor" class="w-full py-3 bg-[#FF5C1A] text-white rounded-xl font-bold hover:bg-[#E04D12] transition-colors disabled:opacity-50">
+                {{ updatingVendor ? 'Saving...' : 'Save Changes' }}
+              </button>
+            </form>
+          </template>
         </div>
 
         <!-- Actions -->
@@ -368,6 +409,9 @@ import StatusBadge from '@/components/ui/StatusBadge.vue';
 import ConfirmationModal from '@/components/ui/ConfirmationModal.vue';
 import SideDrawer from '@/components/ui/SideDrawer.vue';
 
+import { admin_api } from '@/api_factory/modules/admin';
+import { useCustomToast } from '@/composables/core/useCustomToast';
+
 definePageMeta({
   layout: 'admin'
 })
@@ -375,10 +419,43 @@ definePageMeta({
 useHead({ title: 'Vendors - Errander Admin' });
 
 const router = useRouter();
+const { showToast } = useCustomToast();
 const { vendors, loading, fetchVendors, approveVendor, rejectVendor } = useAdminVendors();
 const activeTab = ref('all');
 const searchQuery = ref('');
 const selectedVendor = ref<any>(null);
+
+const activeDrawerTab = ref('overview');
+const editVendorPayload = ref({ storeName: '', category: '', businessType: 'physical_product', status: 'pending' });
+const updatingVendor = ref(false);
+
+const enterEditMode = () => {
+  activeDrawerTab.value = 'edit';
+  if (selectedVendor.value) {
+    editVendorPayload.value = {
+      storeName: selectedVendor.value.storeName || '',
+      category: selectedVendor.value.category || '',
+      businessType: selectedVendor.value.businessType || 'physical_product',
+      status: selectedVendor.value.status || 'pending',
+    };
+  }
+};
+
+const handleUpdateVendor = async () => {
+  if (!selectedVendor.value) return;
+  updatingVendor.value = true;
+  try {
+    const res = await admin_api.updateVendor(selectedVendor.value._id, editVendorPayload.value);
+    showToast({ title: 'Success', message: 'Vendor updated successfully', toastType: 'success' });
+    await fetchVendors();
+    selectedVendor.value = res.data.vendor || res.data;
+  } catch (e) {
+    console.error(e);
+    showToast({ title: 'Error', message: 'Failed to update vendor', toastType: 'error' });
+  } finally {
+    updatingVendor.value = false;
+  }
+};
 
 const confirmModal = ref({
   isOpen: false,

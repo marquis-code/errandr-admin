@@ -246,6 +246,37 @@
             </template>
           </div>
 
+            <!-- Edit Tab -->
+            <template v-if="activeDrawerTab === 'edit'">
+              <form @submit.prevent="handleUpdateUser" class="space-y-4">
+                <div class="space-y-2">
+                  <label class="text-sm font-medium text-gray-700">First Name</label>
+                  <input v-model="editPayload.firstName" type="text" class="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-sm font-medium text-gray-700">Last Name</label>
+                  <input v-model="editPayload.lastName" type="text" class="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-sm font-medium text-gray-700">Phone</label>
+                  <input v-model="editPayload.phone" type="text" class="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-sm font-medium text-gray-700">Role</label>
+                  <select v-model="editPayload.role" class="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                    <option value="student">Student</option>
+                    <option value="vendor">Vendor</option>
+                    <option value="errander">Errander</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                <button type="submit" :disabled="updating" class="w-full py-3 bg-[#FF5C1A] text-white rounded-xl font-bold hover:bg-[#E04D12] transition-colors disabled:opacity-50">
+                  {{ updating ? 'Saving...' : 'Save Changes' }}
+                </button>
+              </form>
+            </template>
+          </div>
+
           <!-- Actions -->
           <div class="border-t border-gray-100 pt-4 flex gap-3">
             <button 
@@ -313,6 +344,7 @@ const drawerTabs = [
   { key: 'overview', label: 'Overview' },
   { key: 'account', label: 'Account' },
   { key: 'activity', label: 'Activity' },
+  { key: 'edit', label: 'Edit' },
 ];
 
 const confirmModal = ref({
@@ -368,6 +400,12 @@ const openUserDrawer = async (userId: string) => {
   try {
     const res = await admin_api.getUser(userId);
     selectedUser.value = res.data.user || res.data;
+    editPayload.value = {
+      firstName: selectedUser.value.firstName || '',
+      lastName: selectedUser.value.lastName || '',
+      phone: selectedUser.value.phoneNumber || selectedUser.value.phone || '',
+      role: selectedUser.value.role || 'student'
+    };
   } catch (e) {
     console.error('Failed to fetch user:', e);
     showToast({ title: 'Error', message: 'Failed to load user details', toastType: 'error' });
@@ -383,6 +421,27 @@ const closeDrawer = () => {
 };
 
 onMounted(fetchUsers);
+
+const editPayload = ref({ firstName: '', lastName: '', phone: '', role: 'student' });
+const updating = ref(false);
+
+const handleUpdateUser = async () => {
+  if (!selectedUser.value) return;
+  updating.value = true;
+  try {
+    await admin_api.updateUser(selectedUser.value._id, editPayload.value);
+    showToast({ title: 'Success', message: 'User updated successfully', toastType: 'success' });
+    await fetchUsers();
+    // Refresh user details
+    const res = await admin_api.getUser(selectedUser.value._id);
+    selectedUser.value = res.data.user || res.data;
+  } catch (e) {
+    console.error(e);
+    showToast({ title: 'Error', message: 'Failed to update user', toastType: 'error' });
+  } finally {
+    updating.value = false;
+  }
+};
 
 const initiateAction = (action: 'suspend' | 'activate', userId: string) => {
   confirmModal.value.userId = userId;

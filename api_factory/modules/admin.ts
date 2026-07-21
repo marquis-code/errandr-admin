@@ -64,4 +64,48 @@ export const admin_api = {
   updateAdvertSettings: (payload: any) => {
     return GATEWAY_ENDPOINT_WITH_AUTH.put('/settings/advert', payload);
   },
+
+  updateUser: (id: string, payload: any) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/admin/users/${id}`, payload);
+  },
+
+  updateVendor: (id: string, payload: any) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/admin/vendors/${id}`, payload);
+  },
+
+  updateDispatcher: (id: string, payload: any) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/admin/dispatchers/${id}`, payload);
+  },
+
+  suspendUser: (id: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/admin/users/${id}/suspend`);
+  },
+
+  activateUser: (id: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/admin/users/${id}/activate`);
+  },
+
+  getDispatchers: (page: number = 1, limit: number = 10) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get(`/admin/dispatchers?page=${page}&limit=${limit}`);
+  },
+
+  getDispatcher: (id: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get(`/admin/dispatchers/${id}`);
+  },
+
+  approveDispatcher: (id: string, payload?: { level: number }) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/admin/dispatchers/${id}/approve`, payload);
+  },
+
+  rejectDispatcher: (id: string, payload?: { reason: string }) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/admin/dispatchers/${id}/reject`, payload);
+  },
+
+  suspendDispatcher: (id: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/admin/dispatchers/${id}/suspend`);
+  },
+
+  activateDispatcher: (id: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/admin/dispatchers/${id}/activate`);
+  },
 };

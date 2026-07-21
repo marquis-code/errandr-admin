@@ -356,7 +356,7 @@
             <div class="w-16 h-16 bg-gray-100 rounded-full overflow-hidden">
               <img v-if="selectedProfile.user?.avatar" :src="selectedProfile.user?.avatar" class="w-full h-full object-cover">
             </div>
-            <div>
+            <div class="flex-1">
               <h3 class="font-bold text-xl text-gray-900">{{ selectedProfile.user?.firstName }} {{ selectedProfile.user?.lastName }}</h3>
               <p class="text-sm text-gray-500">{{ selectedProfile.user?.email }}</p>
               <span v-if="selectedProfile.isApproved" class="inline-flex items-center gap-1 mt-2 px-2 py-0.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-md">
@@ -368,6 +368,12 @@
             </div>
           </div>
 
+          <div class="flex space-x-2 mt-2 mb-4 w-full">
+            <button @click="activeDrawerTab = 'overview'" :class="activeDrawerTab === 'overview' ? 'bg-[#FF5C1A] text-white' : 'bg-gray-100 text-gray-600'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors">Overview</button>
+            <button @click="enterEditMode" :class="activeDrawerTab === 'edit' ? 'bg-[#FF5C1A] text-white' : 'bg-gray-100 text-gray-600'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors">Edit</button>
+          </div>
+
+          <template v-if="activeDrawerTab === 'overview'">
           <!-- Personal & Verification Info -->
           <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3">
             <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Personal Information</h4>
@@ -495,8 +501,43 @@
                   <p class="text-gray-500 text-xs">Device Status</p>
                   <p class="font-bold text-gray-900 capitalize">{{ selectedProfile.status || 'Offline' }}</p>
                 </div>
-             </div>
-          </div>
+              </div>
+           </div>
+          </template>
+
+          <!-- Edit Tab -->
+          <template v-if="activeDrawerTab === 'edit'">
+            <form @submit.prevent="handleUpdateDispatcher" class="space-y-4">
+              <div class="space-y-2">
+                <label class="text-xs font-semibold text-gray-700">School</label>
+                <select v-model="editDispatcherPayload.school" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <option value="UNILAG">UNILAG</option>
+                  <option value="CMUL">CMUL</option>
+                  <option value="YABATECH">YABATECH</option>
+                </select>
+              </div>
+              <div class="space-y-2">
+                <label class="text-xs font-semibold text-gray-700">Matric Number</label>
+                <input v-model="editDispatcherPayload.matricNumber" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+              </div>
+              <div class="space-y-2">
+                <label class="text-xs font-semibold text-gray-700">NIN Number</label>
+                <input v-model="editDispatcherPayload.ninNumber" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+              </div>
+              <div class="space-y-2">
+                <label class="text-xs font-semibold text-gray-700">Verification Level</label>
+                <select v-model="editDispatcherPayload.verificationLevel" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <option :value="1">Tier 1</option>
+                  <option :value="2">Tier 2</option>
+                  <option :value="3">Tier 3</option>
+                </select>
+              </div>
+              <button type="submit" :disabled="updatingDispatcher" class="w-full py-3 bg-[#FF5C1A] text-white rounded-xl font-bold hover:bg-[#E04D12] transition-colors disabled:opacity-50">
+                {{ updatingDispatcher ? 'Saving...' : 'Save Changes' }}
+              </button>
+            </form>
+          </template>
+
           <!-- Actions -->
           <div>
             <h4 class="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wider">Account Actions</h4>
@@ -569,6 +610,36 @@ const selectedTier = ref(1)
 // Drawer
 const drawerOpen = ref(false)
 const selectedProfile = ref<any>(null)
+const activeDrawerTab = ref('overview')
+const editDispatcherPayload = ref({ school: 'UNILAG', matricNumber: '', ninNumber: '', verificationLevel: 1 })
+const updatingDispatcher = ref(false)
+
+const enterEditMode = () => {
+  activeDrawerTab.value = 'edit';
+  if (selectedProfile.value) {
+    editDispatcherPayload.value = {
+      school: selectedProfile.value.school || 'UNILAG',
+      matricNumber: selectedProfile.value.matricNumber || '',
+      ninNumber: selectedProfile.value.ninNumber || '',
+      verificationLevel: selectedProfile.value.verificationLevel || 1,
+    };
+  }
+};
+
+const handleUpdateDispatcher = async () => {
+  if (!selectedProfile.value) return;
+  updatingDispatcher.value = true;
+  try {
+    const res = await api.put(`/admin/dispatchers/${selectedProfile.value._id}`, editDispatcherPayload.value);
+    showToast({ title: 'Success', message: 'Dispatcher updated successfully', toastType: 'success' });
+    await fetchAll();
+    selectedProfile.value = res.data.errander || res.data;
+  } catch (err) {
+    showToast({ title: 'Error', message: 'Failed to update dispatcher', toastType: 'error' });
+  } finally {
+    updatingDispatcher.value = false;
+  }
+};
 
 const fetchPending = async () => {
   loading.value = true
@@ -634,6 +705,7 @@ const openRejectModal = (errander: any) => {
 
 const openProfileDrawer = async (errander: any) => {
   processing.value = errander._id
+  activeDrawerTab.value = 'overview'
   try {
     const res = await api.get(`/admin/dispatchers/${errander._id}`)
     selectedProfile.value = res.data
