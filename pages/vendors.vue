@@ -132,26 +132,38 @@
                   >
                     <CheckCircle class="w-4 h-4" />
                   </button>
-                  <button 
-                    v-if="vendor.status !== 'suspended'" 
-                    @click="initiateAction('reject', vendor._id)" 
-                    class="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors"
-                    title="Suspend Vendor"
-                  >
-                    <XCircle class="w-4 h-4" />
-                  </button>
-                  <button 
-                    v-if="vendor.status === 'suspended'" 
-                    @click="initiateAction('approve', vendor._id)" 
-                    class="p-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
-                    title="Restore Vendor"
-                  >
-                    <RefreshCcw class="w-4 h-4" />
+                  <!-- Dropdown Trigger -->
+                  <button @click.stop="activeDropdownId = activeDropdownId === vendor._id ? null : vendor._id" class="p-2 rounded-lg bg-gray-50 text-gray-500 hover:bg-gray-100 transition-colors">
+                    <MoreVertical class="w-4 h-4" />
                   </button>
                   
-                  <button @click.stop="selectedVendor = vendor" class="p-2 rounded-lg bg-gray-100 text-gray-500 hover:bg-[#FF5C1A] hover:text-white transition-colors" title="View Details">
-                    <Eye class="w-4 h-4" />
-                  </button>
+                  <!-- Dropdown Menu -->
+                  <div v-if="activeDropdownId === vendor._id" class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                    <button @click.stop="activeDropdownId = null; selectedVendor = vendor; activeDrawerTab = 'overview'" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                      <Eye class="w-4 h-4 text-gray-400" /> View Profile
+                    </button>
+                    <button @click.stop="activeDropdownId = null; selectedVendor = vendor; activeDrawerTab = 'edit'" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                      <Edit class="w-4 h-4 text-gray-400" /> Edit Details
+                    </button>
+                    
+                    <div class="h-px w-full bg-gray-100 my-1"></div>
+                    
+                    <button 
+                      v-if="vendor.status === 'pending' || vendor.status === 'suspended'"
+                      @click.stop="activeDropdownId = null; initiateAction('approve', vendor._id)" 
+                      class="w-full text-left px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 flex items-center gap-2"
+                    >
+                      <CheckCircle class="w-4 h-4" /> {{ vendor.status === 'suspended' ? 'Restore Vendor' : 'Approve Vendor' }}
+                    </button>
+                    
+                    <button 
+                      v-if="vendor.status !== 'suspended'" 
+                      @click.stop="activeDropdownId = null; initiateAction('reject', vendor._id)" 
+                      class="w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 flex items-center gap-2"
+                    >
+                      <XCircle class="w-4 h-4" /> Suspend Vendor
+                    </button>
+                  </div>
                 </div>
               </td>
             </tr>
@@ -430,8 +442,8 @@
 
 <script setup lang="ts">
 import { useAdminVendors } from '@/composables/modules/admin';
-import { Search, Store, Eye, CheckCircle, XCircle, RefreshCcw, Star, Globe, Copy, User, Mail, Phone, GraduationCap, Banknote, AlertCircle, Percent } from 'lucide-vue-next';
-import { onMounted, ref, computed } from 'vue';
+import { Search, Store, Eye, CheckCircle, XCircle, RefreshCcw, Star, Globe, Copy, User, Mail, Phone, GraduationCap, Banknote, AlertCircle, Percent, MoreVertical, Edit } from 'lucide-vue-next';
+import { onMounted, ref, computed, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import EmptyState from '@/components/core/EmptyState.vue';
 import SkeletonTable from '@/components/ui/SkeletonTable.vue';
@@ -454,6 +466,19 @@ const { vendors, loading, fetchVendors, approveVendor, rejectVendor } = useAdmin
 const activeTab = ref('all');
 const searchQuery = ref('');
 const selectedVendor = ref<any>(null);
+const activeDrawerTab = ref('overview');
+const activeDropdownId = ref<string | null>(null);
+
+// Close dropdown when clicking outside
+const closeDropdown = () => {
+  activeDropdownId.value = null;
+};
+onMounted(() => {
+  document.addEventListener('click', closeDropdown);
+});
+onUnmounted(() => {
+  document.removeEventListener('click', closeDropdown);
+});
 
 const editVendorPayload = ref({ 
   storeName: '', 

@@ -235,29 +235,41 @@
                   <span v-else class="inline-flex items-center gap-1 text-xs font-bold text-gray-500"><div class="w-1.5 h-1.5 rounded-full bg-gray-400"></div>Offline</span>
                 </td>
                 <td class="px-6 py-4 text-right">
-                  <div class="flex items-center justify-end gap-2">
-                    <button 
-                      @click="openProfileDrawer(errander)"
-                      class="px-3 py-1.5 bg-gray-100 text-gray-700 font-bold rounded-lg hover:bg-gray-200 transition-colors text-xs"
-                    >
-                      Profile
+                  <div class="flex items-center justify-end gap-2 relative">
+                    <!-- Dropdown Trigger -->
+                    <button @click.stop="activeDropdownId = activeDropdownId === errander._id ? null : errander._id" class="p-2 rounded-lg bg-gray-50 text-gray-500 hover:bg-gray-100 transition-colors">
+                      <MoreVertical class="w-4 h-4" />
                     </button>
-                    <button 
-                      v-if="errander.isApproved"
-                      @click="toggleSuspension(errander._id, 'suspend')" 
-                      :disabled="processing === errander._id"
-                      class="px-3 py-1.5 bg-red-50 text-red-600 font-bold rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 text-xs"
-                    >
-                      Suspend
-                    </button>
-                    <button 
-                      v-else-if="!errander.isApproved && errander.verificationStatus !== 'pending'"
-                      @click="toggleSuspension(errander._id, 'activate')" 
-                      :disabled="processing === errander._id"
-                      class="px-3 py-1.5 bg-emerald-50 text-emerald-600 font-bold rounded-lg hover:bg-emerald-100 transition-colors disabled:opacity-50 text-xs"
-                    >
-                      Activate
-                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div v-if="activeDropdownId === errander._id" class="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                      <button @click.stop="activeDropdownId = null; openProfileDrawer(errander); activeDrawerTab = 'overview'" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                        <Eye class="w-4 h-4 text-gray-400" /> View Profile
+                      </button>
+                      <button @click.stop="activeDropdownId = null; openProfileDrawer(errander); enterEditMode()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                        <Edit class="w-4 h-4 text-gray-400" /> Edit Details
+                      </button>
+                      
+                      <div class="h-px w-full bg-gray-100 my-1"></div>
+                      
+                      <button 
+                        v-if="errander.isApproved"
+                        @click.stop="activeDropdownId = null; toggleSuspension(errander._id, 'suspend')" 
+                        :disabled="processing === errander._id"
+                        class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50"
+                      >
+                        <XCircle class="w-4 h-4" /> Suspend
+                      </button>
+                      
+                      <button 
+                        v-else
+                        @click.stop="activeDropdownId = null; toggleSuspension(errander._id, 'activate')" 
+                        :disabled="processing === errander._id"
+                        class="w-full text-left px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 disabled:opacity-50"
+                      >
+                        <CheckCircle class="w-4 h-4" /> Reactivate
+                      </button>
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -592,10 +604,27 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { GATEWAY_ENDPOINT_WITH_AUTH as api } from '@/api_factory/axios.config'
 import { useCustomToast as useToast } from '@/composables/core/useCustomToast'
-import { RefreshCw, X } from 'lucide-vue-next'
+import { RefreshCw, X, MoreVertical, Eye, Edit, CheckCircle, XCircle } from 'lucide-vue-next'
 
 definePageMeta({ layout: 'admin' })
 useHead({ title: 'Dispatchers Management - Admin' })
+
+// Dropdown
+const activeDropdownId = ref<string | null>(null)
+
+// Close dropdown when clicking outside
+const closeDropdown = () => {
+  activeDropdownId.value = null;
+};
+onMounted(() => {
+  document.addEventListener('click', closeDropdown);
+  fetchPending();
+  fetchAll();
+});
+import { onUnmounted } from 'vue';
+onUnmounted(() => {
+  document.removeEventListener('click', closeDropdown);
+});
 
 // Tabs
 const activeTab = ref('verifications') // 'verifications' | 'all'
@@ -700,11 +729,6 @@ watch(allPage, fetchAll)
 watch(activeTab, (newTab) => {
   if (newTab === 'verifications') fetchPending()
   else if (newTab === 'all') fetchAll()
-})
-
-onMounted(() => {
-  fetchPending()
-  fetchAll()
 })
 
 const viewImage = (url: string) => {
