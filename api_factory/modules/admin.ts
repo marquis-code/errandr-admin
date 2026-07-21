@@ -56,4 +56,12 @@ export const admin_api = {
   updateCommunicationsSettings: (payload: { emailsEnabled: boolean; pushNotificationsEnabled: boolean }) => {
     return GATEWAY_ENDPOINT_WITH_AUTH.put('/settings/communications', payload);
   },
+
+  getAdvertSettings: () => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get('/settings/advert');
+  },
+
+  updateAdvertSettings: (payload: any) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put('/settings/advert', payload);
+  },
 };

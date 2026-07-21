@@ -186,6 +186,144 @@
         </div>
       </div>
 
+      <!-- Advert Settings Card -->
+      <div class="lg:col-span-12 bg-white p-6 sm:p-8 rounded-[2rem] border border-gray-100 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 border-b border-gray-50 pb-4">
+          <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-presentation"><path d="M2 3h20"/><path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3"/><path d="m7 21 5-5 5 5"/></svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-medium text-gray-900 lowercase">advert configuration</h3>
+            <p class="text-xs font-bold text-gray-400 lowercase">control the global advert popup</p>
+          </div>
+        </div>
+
+        <form @submit.prevent="saveAdvertSettings" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-6">
+              <!-- Enabled Toggle -->
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                <div>
+                  <h4 class="text-sm font-medium text-gray-900 lowercase">enable adverts</h4>
+                  <p class="text-xs text-gray-500 lowercase mt-1">show the popup modal periodically</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" v-model="advertForm.enabled" class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#FF5C1A]/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF5C1A]"></div>
+                </label>
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <!-- Interval -->
+                <div class="space-y-2">
+                  <label class="text-xs font-medium text-gray-400 ml-1 lowercase">interval (minutes)</label>
+                  <input 
+                    v-model.number="advertForm.intervalMinutes"
+                    type="number"
+                    required
+                    min="1"
+                    class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                  />
+                </div>
+                <!-- Auto Close -->
+                <div class="space-y-2">
+                  <label class="text-xs font-medium text-gray-400 ml-1 lowercase">auto-close (seconds, 0=disable)</label>
+                  <input 
+                    v-model.number="advertForm.autoCloseSeconds"
+                    type="number"
+                    required
+                    min="0"
+                    class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                  />
+                </div>
+              </div>
+
+              <!-- Content Type -->
+              <div class="space-y-2">
+                <label class="text-xs font-medium text-gray-400 ml-1 lowercase">content type</label>
+                <div class="flex gap-4">
+                  <label class="flex-1 flex items-center gap-2 p-4 bg-gray-50 border border-gray-100 rounded-2xl cursor-pointer hover:bg-gray-100 transition-colors">
+                    <input type="radio" v-model="advertForm.contentType" value="dynamic" class="text-[#FF5C1A] focus:ring-[#FF5C1A]">
+                    <span class="text-sm font-medium lowercase">dynamic (random)</span>
+                  </label>
+                  <label class="flex-1 flex items-center gap-2 p-4 bg-gray-50 border border-gray-100 rounded-2xl cursor-pointer hover:bg-gray-100 transition-colors">
+                    <input type="radio" v-model="advertForm.contentType" value="custom" class="text-[#FF5C1A] focus:ring-[#FF5C1A]">
+                    <span class="text-sm font-medium lowercase">custom ad</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Custom Ad Form -->
+            <div class="space-y-4" :class="{ 'opacity-50 pointer-events-none': advertForm.contentType !== 'custom' }">
+              <h4 class="text-sm font-medium text-gray-900 lowercase border-b border-gray-50 pb-2">custom ad details</h4>
+              
+              <div class="space-y-2">
+                <label class="text-xs font-medium text-gray-400 ml-1 lowercase">headline</label>
+                <input 
+                  v-model="advertForm.customAd.title"
+                  type="text"
+                  placeholder="e.g. Back to School Promo!"
+                  class="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                />
+              </div>
+
+              <div class="space-y-2">
+                <label class="text-xs font-medium text-gray-400 ml-1 lowercase">description</label>
+                <textarea 
+                  v-model="advertForm.customAd.description"
+                  rows="2"
+                  placeholder="Promo description..."
+                  class="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all resize-none"
+                ></textarea>
+              </div>
+
+              <div class="space-y-2">
+                <label class="text-xs font-medium text-gray-400 ml-1 lowercase">image url</label>
+                <input 
+                  v-model="advertForm.customAd.imageUrl"
+                  type="url"
+                  placeholder="https://example.com/image.png"
+                  class="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                />
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <label class="text-xs font-medium text-gray-400 ml-1 lowercase">button text</label>
+                  <input 
+                    v-model="advertForm.customAd.ctaText"
+                    type="text"
+                    placeholder="Shop Now"
+                    class="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                  />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-medium text-gray-400 ml-1 lowercase">button link</label>
+                  <input 
+                    v-model="advertForm.customAd.ctaLink"
+                    type="text"
+                    placeholder="/errands/custom"
+                    class="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-4 flex justify-end">
+            <button 
+              type="submit" 
+              :disabled="savingAdvert"
+              class="px-6 py-4 bg-gray-900 text-white rounded-2xl text-xs font-medium lowercase hover:bg-[#FF5C1A] transition-all shadow-xl shadow-gray-100 disabled:opacity-50 flex items-center gap-2"
+            >
+              <Loader2 v-if="savingAdvert" class="w-4 h-4 animate-spin" />
+              <span>{{ savingAdvert ? 'saving...' : 'save changes' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
     </div>
   </div>
 </template>
@@ -215,13 +353,29 @@ const commsForm = reactive({
   pushNotificationsEnabled: true,
 });
 
+const advertForm = reactive({
+  enabled: true,
+  intervalMinutes: 15,
+  autoCloseSeconds: 0,
+  contentType: 'dynamic',
+  customAd: {
+    title: '',
+    description: '',
+    imageUrl: '',
+    ctaText: '',
+    ctaLink: '',
+  }
+});
+
 const savingComms = ref(false);
+const savingAdvert = ref(false);
 
 const loadSettings = async () => {
   try {
-    const [errandRes, commsRes] = await Promise.all([
+    const [errandRes, commsRes, advertRes] = await Promise.all([
       admin_api.getCustomErrandSettings(),
-      admin_api.getCommunicationsSettings()
+      admin_api.getCommunicationsSettings(),
+      admin_api.getAdvertSettings()
     ]);
     
     if (errandRes.data) {
@@ -236,6 +390,16 @@ const loadSettings = async () => {
     if (commsRes.data) {
       commsForm.emailsEnabled = commsRes.data.emailsEnabled ?? true;
       commsForm.pushNotificationsEnabled = commsRes.data.pushNotificationsEnabled ?? true;
+    }
+
+    if (advertRes.data) {
+      advertForm.enabled = advertRes.data.enabled ?? true;
+      advertForm.intervalMinutes = advertRes.data.intervalMinutes ?? 15;
+      advertForm.autoCloseSeconds = advertRes.data.autoCloseSeconds ?? 0;
+      advertForm.contentType = advertRes.data.contentType || 'dynamic';
+      if (advertRes.data.customAd) {
+        advertForm.customAd = { ...advertForm.customAd, ...advertRes.data.customAd };
+      }
     }
   } catch (e: any) {
     console.error('Failed to load settings:', e);
@@ -296,6 +460,33 @@ const saveCommunicationsSettings = async () => {
     });
   } finally {
     savingComms.value = false;
+  }
+};
+
+const saveAdvertSettings = async () => {
+  savingAdvert.value = true;
+  try {
+    await admin_api.updateAdvertSettings({
+      enabled: advertForm.enabled,
+      intervalMinutes: advertForm.intervalMinutes,
+      autoCloseSeconds: advertForm.autoCloseSeconds,
+      contentType: advertForm.contentType,
+      customAd: advertForm.customAd,
+    });
+    showToast({
+      title: 'success',
+      message: 'advert configuration updated!',
+      toastType: 'success',
+    });
+  } catch (e: any) {
+    console.error('Failed to save advert settings:', e);
+    showToast({
+      title: 'error',
+      message: e.response?.data?.message || 'failed to save advert configuration.',
+      toastType: 'error',
+    });
+  } finally {
+    savingAdvert.value = false;
   }
 };
 
