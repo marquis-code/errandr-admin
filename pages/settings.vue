@@ -111,24 +111,78 @@
         </form>
       </div>
 
-      <!-- Info/Explanation Card (5 Columns) -->
-      <div class="lg:col-span-5 bg-white p-6 sm:p-8 rounded-[2rem] border border-gray-100 shadow-sm space-y-6">
-        <h3 class="text-sm font-medium text-gray-900 border-b border-gray-50 pb-4 lowercase">university logistics notes</h3>
-        
-        <div class="space-y-4 text-xs font-medium text-gray-500 leading-relaxed lowercase">
-          <div class="p-4 bg-emerald-50 text-emerald-800 rounded-2xl border border-emerald-100 space-y-1">
-            <p class="font-medium text-emerald-950">real-time updates</p>
-            <p>changes are updated dynamically. when a student opens the errand request form, the baseline pricing matches these parameters instantly.</p>
+    <!-- Info/Explanation Card (5 Columns) -->
+      <div class="lg:col-span-5 space-y-8">
+        <div class="bg-white p-6 sm:p-8 rounded-[2rem] border border-gray-100 shadow-sm space-y-6">
+          <h3 class="text-sm font-medium text-gray-900 border-b border-gray-50 pb-4 lowercase">university logistics notes</h3>
+          
+          <div class="space-y-4 text-xs font-medium text-gray-500 leading-relaxed lowercase">
+            <div class="p-4 bg-emerald-50 text-emerald-800 rounded-2xl border border-emerald-100 space-y-1">
+              <p class="font-medium text-emerald-950">real-time updates</p>
+              <p>changes are updated dynamically. when a student opens the errand request form, the baseline pricing matches these parameters instantly.</p>
+            </div>
+
+            <div class="space-y-2">
+              <p class="font-medium text-gray-900">how this operates in a university system:</p>
+              <ul class="list-disc pl-4 space-y-1.5">
+                <li>standard fee is charged for routine pickups (e.g. laundry, off-campus print shops).</li>
+                <li>express fee applies to time-sensitive tasks (e.g. food delivery or rush submissions).</li>
+                <li>administrative staff can surge the base fee during heavy rain, exams peak times, or night shifts to incentivize campus erranders (riders).</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Communications Settings Card -->
+        <div class="bg-white p-6 sm:p-8 rounded-[2rem] border border-gray-100 shadow-sm space-y-6">
+          <div class="flex items-center gap-3 border-b border-gray-50 pb-4">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-900 lowercase">communications</h3>
+              <p class="text-xs font-bold text-gray-400 lowercase">toggle email and push notifications</p>
+            </div>
           </div>
 
-          <div class="space-y-2">
-            <p class="font-medium text-gray-900">how this operates in a university system:</p>
-            <ul class="list-disc pl-4 space-y-1.5">
-              <li>standard fee is charged for routine pickups (e.g. laundry, off-campus print shops).</li>
-              <li>express fee applies to time-sensitive tasks (e.g. food delivery or rush submissions).</li>
-              <li>administrative staff can surge the base fee during heavy rain, exams peak times, or night shifts to incentivize campus erranders (riders).</li>
-            </ul>
-          </div>
+          <form @submit.prevent="saveCommunicationsSettings" class="space-y-6">
+            <div class="space-y-4">
+              <!-- Email Toggle -->
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                <div>
+                  <h4 class="text-sm font-medium text-gray-900 lowercase">email notifications</h4>
+                  <p class="text-xs text-gray-500 lowercase mt-1">enable or disable all system emails</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" v-model="commsForm.emailsEnabled" class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#FF5C1A]/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF5C1A]"></div>
+                </label>
+              </div>
+
+              <!-- Push Toggle -->
+              <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                <div>
+                  <h4 class="text-sm font-medium text-gray-900 lowercase">push notifications</h4>
+                  <p class="text-xs text-gray-500 lowercase mt-1">enable or disable all fcm push messages</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" v-model="commsForm.pushNotificationsEnabled" class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#FF5C1A]/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF5C1A]"></div>
+                </label>
+              </div>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+              <button 
+                type="submit" 
+                :disabled="savingComms"
+                class="px-6 py-4 bg-gray-900 text-white rounded-2xl text-xs font-medium lowercase hover:bg-[#FF5C1A] transition-all shadow-xl shadow-gray-100 disabled:opacity-50 flex items-center gap-2"
+              >
+                <Loader2 v-if="savingComms" class="w-4 h-4 animate-spin" />
+                <span>{{ savingComms ? 'saving...' : 'save changes' }}</span>
+              </button>
+            </div>
+          </form>
         </div>
       </div>
 
@@ -156,23 +210,38 @@ const form = reactive({
   platformServiceFeePercentage: 5,
 });
 
+const commsForm = reactive({
+  emailsEnabled: true,
+  pushNotificationsEnabled: true,
+});
+
+const savingComms = ref(false);
+
 const loadSettings = async () => {
   try {
-    const res = await admin_api.getCustomErrandSettings();
-    const data = res.data;
-    if (data) {
-      form.baseFee = data.baseFee || 450;
-      form.expressFee = data.expressFee || 850;
-      form.convenienceFee = data.convenienceFee ?? 50;
-      form.commissionPercentage = data.commissionPercentage ?? 10;
-      form.platformProcessingFee = data.platformProcessingFee ?? 500;
-      form.platformServiceFeePercentage = data.platformServiceFeePercentage ?? 5;
+    const [errandRes, commsRes] = await Promise.all([
+      admin_api.getCustomErrandSettings(),
+      admin_api.getCommunicationsSettings()
+    ]);
+    
+    if (errandRes.data) {
+      form.baseFee = errandRes.data.baseFee || 450;
+      form.expressFee = errandRes.data.expressFee || 850;
+      form.convenienceFee = errandRes.data.convenienceFee ?? 50;
+      form.commissionPercentage = errandRes.data.commissionPercentage ?? 10;
+      form.platformProcessingFee = errandRes.data.platformProcessingFee ?? 500;
+      form.platformServiceFeePercentage = errandRes.data.platformServiceFeePercentage ?? 5;
+    }
+
+    if (commsRes.data) {
+      commsForm.emailsEnabled = commsRes.data.emailsEnabled ?? true;
+      commsForm.pushNotificationsEnabled = commsRes.data.pushNotificationsEnabled ?? true;
     }
   } catch (e: any) {
     console.error('Failed to load settings:', e);
     showToast({
       title: 'error',
-      message: 'failed to load errand settings.',
+      message: 'failed to load system settings.',
       toastType: 'error',
     });
   }
@@ -181,7 +250,7 @@ const loadSettings = async () => {
 const saveSettings = async () => {
   saving.value = true;
   try {
-    const res = await admin_api.updateCustomErrandSettings({
+    await admin_api.updateCustomErrandSettings({
       baseFee: Number(form.baseFee),
       expressFee: Number(form.expressFee),
       convenienceFee: Number(form.convenienceFee),
@@ -203,6 +272,30 @@ const saveSettings = async () => {
     });
   } finally {
     saving.value = false;
+  }
+};
+
+const saveCommunicationsSettings = async () => {
+  savingComms.value = true;
+  try {
+    await admin_api.updateCommunicationsSettings({
+      emailsEnabled: commsForm.emailsEnabled,
+      pushNotificationsEnabled: commsForm.pushNotificationsEnabled,
+    });
+    showToast({
+      title: 'success',
+      message: 'communications settings updated!',
+      toastType: 'success',
+    });
+  } catch (e: any) {
+    console.error('Failed to save communications settings:', e);
+    showToast({
+      title: 'error',
+      message: e.response?.data?.message || 'failed to save communications settings.',
+      toastType: 'error',
+    });
+  } finally {
+    savingComms.value = false;
   }
 };
 

@@ -48,4 +48,12 @@ export const admin_api = {
   updateCustomErrandSettings: (payload: { baseFee: number; expressFee: number; convenienceFee?: number; commissionPercentage?: number }) => {
     return GATEWAY_ENDPOINT_WITH_AUTH.put('/settings/errands/custom', payload);
   },
+
+  getCommunicationsSettings: () => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get('/settings/communications');
+  },
+
+  updateCommunicationsSettings: (payload: { emailsEnabled: boolean; pushNotificationsEnabled: boolean }) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put('/settings/communications', payload);
+  },
 };
