@@ -508,29 +508,47 @@
           <!-- Edit Tab -->
           <template v-if="activeDrawerTab === 'edit'">
             <form @submit.prevent="handleUpdateDispatcher" class="space-y-4">
-              <div class="space-y-2">
-                <label class="text-xs font-semibold text-gray-700">School</label>
-                <select v-model="editDispatcherPayload.school" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
-                  <option value="UNILAG">UNILAG</option>
-                  <option value="CMUL">CMUL</option>
-                  <option value="YABATECH">YABATECH</option>
-                </select>
-              </div>
-              <div class="space-y-2">
-                <label class="text-xs font-semibold text-gray-700">Matric Number</label>
-                <input v-model="editDispatcherPayload.matricNumber" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
-              </div>
-              <div class="space-y-2">
-                <label class="text-xs font-semibold text-gray-700">NIN Number</label>
-                <input v-model="editDispatcherPayload.ninNumber" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
-              </div>
-              <div class="space-y-2">
-                <label class="text-xs font-semibold text-gray-700">Verification Level</label>
-                <select v-model="editDispatcherPayload.verificationLevel" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
-                  <option :value="1">Tier 1</option>
-                  <option :value="2">Tier 2</option>
-                  <option :value="3">Tier 3</option>
-                </select>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold text-gray-700">School</label>
+                  <select v-model="editDispatcherPayload.school" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                    <option value="UNILAG">UNILAG</option>
+                    <option value="CMUL">CMUL</option>
+                    <option value="YABATECH">YABATECH</option>
+                  </select>
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold text-gray-700">Matric Number</label>
+                  <input v-model="editDispatcherPayload.matricNumber" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold text-gray-700">NIN Number</label>
+                  <input v-model="editDispatcherPayload.ninNumber" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold text-gray-700">Verification Level</label>
+                  <select v-model="editDispatcherPayload.verificationLevel" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                    <option :value="1">Tier 1</option>
+                    <option :value="2">Tier 2</option>
+                    <option :value="3">Tier 3</option>
+                  </select>
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold text-gray-700">Verification Status</label>
+                  <select v-model="editDispatcherPayload.verificationStatus" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold text-gray-700">Status</label>
+                  <select v-model="editDispatcherPayload.status" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                    <option value="offline">Offline</option>
+                    <option value="online">Online</option>
+                    <option value="busy">Busy</option>
+                  </select>
+                </div>
               </div>
               <button type="submit" :disabled="updatingDispatcher" class="w-full py-3 bg-[#FF5C1A] text-white rounded-xl font-bold hover:bg-[#E04D12] transition-colors disabled:opacity-50">
                 {{ updatingDispatcher ? 'Saving...' : 'Save Changes' }}
@@ -611,7 +629,14 @@ const selectedTier = ref(1)
 const drawerOpen = ref(false)
 const selectedProfile = ref<any>(null)
 const activeDrawerTab = ref('overview')
-const editDispatcherPayload = ref({ school: 'UNILAG', matricNumber: '', ninNumber: '', verificationLevel: 1 })
+const editDispatcherPayload = ref({ 
+  school: 'UNILAG', 
+  matricNumber: '', 
+  ninNumber: '', 
+  verificationLevel: 1,
+  verificationStatus: 'pending',
+  status: 'offline'
+})
 const updatingDispatcher = ref(false)
 
 const enterEditMode = () => {
@@ -622,6 +647,8 @@ const enterEditMode = () => {
       matricNumber: selectedProfile.value.matricNumber || '',
       ninNumber: selectedProfile.value.ninNumber || '',
       verificationLevel: selectedProfile.value.verificationLevel || 1,
+      verificationStatus: selectedProfile.value.verificationStatus || 'pending',
+      status: selectedProfile.value.status || 'offline'
     };
   }
 };

@@ -244,8 +244,6 @@
                 </div>
               </div>
             </template>
-          </div>
-
             <!-- Edit Tab -->
             <template v-if="activeDrawerTab === 'edit'">
               <form @submit.prevent="handleUpdateUser" class="space-y-4">

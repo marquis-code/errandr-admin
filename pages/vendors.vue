@@ -343,30 +343,60 @@
           <!-- Edit Tab -->
           <template v-if="activeDrawerTab === 'edit'">
             <form @submit.prevent="handleUpdateVendor" class="space-y-4">
-              <div class="space-y-2">
-                <label class="text-xs font-semibold text-gray-700">Store Name</label>
-                <input v-model="editVendorPayload.storeName" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
-              </div>
-              <div class="space-y-2">
-                <label class="text-xs font-semibold text-gray-700">Category</label>
-                <input v-model="editVendorPayload.category" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
-              </div>
-              <div class="space-y-2">
-                <label class="text-xs font-semibold text-gray-700">Business Type</label>
-                <select v-model="editVendorPayload.businessType" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
-                  <option value="physical_product">Physical Product</option>
-                  <option value="service_provider">Service Provider</option>
-                  <option value="hybrid">Hybrid</option>
-                </select>
-              </div>
-              <div class="space-y-2">
-                <label class="text-xs font-semibold text-gray-700">Status</label>
-                <select v-model="editVendorPayload.status" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="suspended">Suspended</option>
-                  <option value="rejected">Rejected</option>
-                </select>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2 col-span-2">
+                  <label class="text-xs font-semibold text-gray-700">Store Name</label>
+                  <input v-model="editVendorPayload.storeName" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                </div>
+                <div class="space-y-2 col-span-2">
+                  <label class="text-xs font-semibold text-gray-700">Description</label>
+                  <textarea v-model="editVendorPayload.description" rows="2" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20"></textarea>
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold text-gray-700">Subdomain</label>
+                  <input v-model="editVendorPayload.subdomain" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold text-gray-700">Category</label>
+                  <input v-model="editVendorPayload.category" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold text-gray-700">Business Type</label>
+                  <select v-model="editVendorPayload.businessType" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                    <option value="physical_product">Physical Product</option>
+                    <option value="service_provider">Service Provider</option>
+                    <option value="hybrid">Hybrid</option>
+                  </select>
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold text-gray-700">Service Location</label>
+                  <input v-model="editVendorPayload.serviceLocation" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold text-gray-700">Base Delivery Fee</label>
+                  <input v-model="editVendorPayload.baseDeliveryFee" type="number" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold text-gray-700">Packaging Fee</label>
+                  <input v-model="editVendorPayload.packagingFee" type="number" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold text-gray-700">Min Order</label>
+                  <input v-model="editVendorPayload.minimumOrder" type="number" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold text-gray-700">Prep Time (mins)</label>
+                  <input v-model="editVendorPayload.preparationTime" type="number" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                </div>
+                <div class="space-y-2">
+                  <label class="text-xs font-semibold text-gray-700">Status</label>
+                  <select v-model="editVendorPayload.status" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="suspended">Suspended</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                </div>
               </div>
               <button type="submit" :disabled="updatingVendor" class="w-full py-3 bg-[#FF5C1A] text-white rounded-xl font-bold hover:bg-[#E04D12] transition-colors disabled:opacity-50">
                 {{ updatingVendor ? 'Saving...' : 'Save Changes' }}
@@ -425,8 +455,19 @@ const activeTab = ref('all');
 const searchQuery = ref('');
 const selectedVendor = ref<any>(null);
 
-const activeDrawerTab = ref('overview');
-const editVendorPayload = ref({ storeName: '', category: '', businessType: 'physical_product', status: 'pending' });
+const editVendorPayload = ref({ 
+  storeName: '', 
+  description: '',
+  subdomain: '',
+  category: '', 
+  businessType: 'physical_product', 
+  serviceLocation: '',
+  baseDeliveryFee: 0,
+  packagingFee: 0,
+  minimumOrder: 0,
+  preparationTime: 0,
+  status: 'pending' 
+});
 const updatingVendor = ref(false);
 
 const enterEditMode = () => {
@@ -434,8 +475,15 @@ const enterEditMode = () => {
   if (selectedVendor.value) {
     editVendorPayload.value = {
       storeName: selectedVendor.value.storeName || '',
+      description: selectedVendor.value.description || '',
+      subdomain: selectedVendor.value.subdomain || '',
       category: selectedVendor.value.category || '',
       businessType: selectedVendor.value.businessType || 'physical_product',
+      serviceLocation: selectedVendor.value.serviceLocation || '',
+      baseDeliveryFee: selectedVendor.value.baseDeliveryFee || selectedVendor.value.deliveryFee || 0,
+      packagingFee: selectedVendor.value.packagingFee || 0,
+      minimumOrder: selectedVendor.value.minimumOrder || 0,
+      preparationTime: selectedVendor.value.preparationTime || 0,
       status: selectedVendor.value.status || 'pending',
     };
   }
