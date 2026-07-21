@@ -47,9 +47,24 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-3 p-4 bg-orange-50 rounded-xl border border-orange-100">
-            <input type="checkbox" id="isActive" v-model="form.isActive" class="w-5 h-5 text-[#FF5C1A] rounded focus:ring-[#FF5C1A] cursor-pointer" />
-            <label for="isActive" class="font-medium text-gray-800 cursor-pointer select-none">Campaign is Active</label>
+          <div class="flex flex-col gap-3 p-4 bg-orange-50 rounded-xl border border-orange-100">
+            <div class="flex items-center gap-3">
+              <input type="checkbox" id="isActive" v-model="form.isActive" class="w-5 h-5 text-[#FF5C1A] rounded focus:ring-[#FF5C1A] cursor-pointer" />
+              <label for="isActive" class="font-medium text-gray-800 cursor-pointer select-none">Campaign is Active</label>
+            </div>
+            
+            <div class="h-px bg-orange-200/50 w-full my-1"></div>
+            
+            <div class="flex items-center gap-6">
+              <div class="flex items-center gap-3">
+                <input type="checkbox" id="sendPush" v-model="form.sendPush" class="w-5 h-5 text-[#FF5C1A] rounded focus:ring-[#FF5C1A] cursor-pointer" />
+                <label for="sendPush" class="font-medium text-gray-800 cursor-pointer select-none">Send Push Notifications</label>
+              </div>
+              <div class="flex items-center gap-3">
+                <input type="checkbox" id="sendEmail" v-model="form.sendEmail" class="w-5 h-5 text-[#FF5C1A] rounded focus:ring-[#FF5C1A] cursor-pointer" />
+                <label for="sendEmail" class="font-medium text-gray-800 cursor-pointer select-none">Send Emails</label>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -94,7 +109,9 @@ const form = ref({
   targetAudience: 'student',
   intervalValue: 6,
   intervalUnit: 'hours',
-  isActive: true
+  isActive: true,
+  sendPush: true,
+  sendEmail: false
 })
 
 watch(() => props.campaign, (val) => {
@@ -105,10 +122,12 @@ watch(() => props.campaign, (val) => {
       targetAudience: val.targetAudience,
       intervalValue: val.intervalValue || 6,
       intervalUnit: val.intervalUnit || 'hours',
-      isActive: val.isActive
+      isActive: val.isActive,
+      sendPush: val.sendPush !== undefined ? val.sendPush : true,
+      sendEmail: val.sendEmail || false
     }
   } else {
-    form.value = { title: '', body: '', targetAudience: 'student', intervalValue: 6, intervalUnit: 'hours', isActive: true }
+    form.value = { title: '', body: '', targetAudience: 'student', intervalValue: 6, intervalUnit: 'hours', isActive: true, sendPush: true, sendEmail: false }
   }
 }, { immediate: true })
 

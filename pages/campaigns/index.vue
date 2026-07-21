@@ -25,6 +25,7 @@
             <tr class="bg-gray-50/80 border-b border-gray-100 text-sm font-semibold text-gray-600">
               <th class="py-4 px-6 whitespace-nowrap">Campaign Title</th>
               <th class="py-4 px-6 whitespace-nowrap">Audience</th>
+              <th class="py-4 px-6 whitespace-nowrap">Channels</th>
               <th class="py-4 px-6 whitespace-nowrap">Interval</th>
               <th class="py-4 px-6 whitespace-nowrap">Status</th>
               <th class="py-4 px-6 text-right whitespace-nowrap">Actions</th>
@@ -40,6 +41,13 @@
                 <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold uppercase tracking-wider">
                   {{ c.targetAudience }}
                 </span>
+              </td>
+              <td class="py-4 px-6">
+                <div class="flex flex-wrap gap-2">
+                  <span v-if="c.sendPush !== false" class="px-2 py-1 bg-indigo-50 text-indigo-700 rounded text-xs font-semibold">Push</span>
+                  <span v-if="c.sendEmail" class="px-2 py-1 bg-orange-50 text-[#FF5C1A] rounded text-xs font-semibold">Email</span>
+                  <span v-if="c.sendPush === false && !c.sendEmail" class="px-2 py-1 bg-gray-100 text-gray-500 rounded text-xs font-semibold">None</span>
+                </div>
               </td>
               <td class="py-4 px-6">
                 <div class="flex items-center gap-1 text-gray-600">
@@ -68,7 +76,7 @@
               </td>
             </tr>
             <tr v-if="campaigns.length === 0">
-              <td colspan="5" class="py-10 text-center text-gray-500">No push campaigns found.</td>
+              <td colspan="6" class="py-10 text-center text-gray-500">No push campaigns found.</td>
             </tr>
           </tbody>
         </table>
