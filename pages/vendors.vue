@@ -9,7 +9,7 @@
           v-model="searchQuery"
           type="text" 
           placeholder="Search by store name or category..." 
-          class="w-full pl-14 pr-14 py-3.5 bg-white hover:bg-gray-50 transition-colors border border-gray-100 rounded-xl text-sm font-semibold focus:outline-none focus:ring-4 focus:ring-[#FF5C1A]/5 focus:border-[#FF5C1A]/20 placeholder:text-gray-400 shadow-sm"
+          class="w-full pl-14 pr-14 py-3.5 bg-white hover:bg-gray-50 transition-colors border border-gray-100 rounded-xl text-base font-semibold focus:outline-none focus:ring-4 focus:ring-[#FF5C1A]/5 focus:border-[#FF5C1A]/20 placeholder:text-gray-400 shadow-sm"
         />
       </div>
       
@@ -358,23 +358,23 @@
               <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-2 col-span-2">
                   <label class="text-xs font-semibold text-gray-700">Store Name</label>
-                  <input v-model="editVendorPayload.storeName" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.storeName" type="text" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2 col-span-2">
                   <label class="text-xs font-semibold text-gray-700">Description</label>
-                  <textarea v-model="editVendorPayload.description" rows="2" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20"></textarea>
+                  <textarea v-model="editVendorPayload.description" rows="2" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20"></textarea>
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Subdomain</label>
-                  <input v-model="editVendorPayload.subdomain" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.subdomain" type="text" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Category</label>
-                  <input v-model="editVendorPayload.category" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.category" type="text" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Business Type</label>
-                  <select v-model="editVendorPayload.businessType" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <select v-model="editVendorPayload.businessType" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
                     <option value="physical_product">Physical Product</option>
                     <option value="service_provider">Service Provider</option>
                     <option value="hybrid">Hybrid</option>
@@ -382,27 +382,27 @@
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Service Location</label>
-                  <input v-model="editVendorPayload.serviceLocation" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.serviceLocation" type="text" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Base Delivery Fee</label>
-                  <input v-model="editVendorPayload.baseDeliveryFee" type="number" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.baseDeliveryFee" type="number" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Packaging Fee</label>
-                  <input v-model="editVendorPayload.packagingFee" type="number" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.packagingFee" type="number" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Min Order</label>
-                  <input v-model="editVendorPayload.minimumOrder" type="number" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.minimumOrder" type="number" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Prep Time (mins)</label>
-                  <input v-model="editVendorPayload.preparationTime" type="number" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.preparationTime" type="number" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Status</label>
-                  <select v-model="editVendorPayload.status" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <select v-model="editVendorPayload.status" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
                     <option value="pending">Pending</option>
                     <option value="approved">Approved</option>
                     <option value="suspended">Suspended</option>

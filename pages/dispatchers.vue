@@ -316,7 +316,7 @@
         
         <div class="mb-6 text-left bg-gray-50 p-4 rounded-xl border border-gray-100">
           <label class="block text-xs font-bold text-gray-700 mb-2">Select Tier to Grant</label>
-          <select v-model="selectedTier" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-emerald-500 outline-none">
+          <select v-model="selectedTier" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-base focus:ring-1 focus:ring-emerald-500 outline-none">
             <option :value="1">Tier 1 (Window Shopper)</option>
             <option :value="2">Tier 2 (Basic)</option>
             <option :value="3">Tier 3 (Pro)</option>
@@ -341,7 +341,7 @@
         
         <div class="mb-6">
           <label class="block text-xs font-bold text-gray-700 mb-2">Reason for rejection (Optional)</label>
-          <textarea v-model="rejectionReason" placeholder="e.g. ID card is blurry..." class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none transition-all shadow-sm resize-none h-24"></textarea>
+          <textarea v-model="rejectionReason" placeholder="e.g. ID card is blurry..." class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-base focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none transition-all shadow-sm resize-none h-24"></textarea>
         </div>
 
         <div class="flex gap-3">
@@ -409,7 +409,7 @@
                   <select 
                     v-model="selectedProfile.verificationLevel" 
                     @change="updateTier(selectedProfile._id, selectedProfile.verificationLevel)"
-                    class="text-xs border border-gray-200 rounded px-1 py-0.5 bg-white cursor-pointer"
+                    class="text-base border border-gray-200 rounded px-1 py-0.5 bg-white cursor-pointer"
                   >
                     <option :value="1">Tier 1</option>
                     <option :value="2">Tier 2</option>
@@ -523,7 +523,7 @@
               <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">School</label>
-                  <select v-model="editDispatcherPayload.school" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <select v-model="editDispatcherPayload.school" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
                     <option value="UNILAG">UNILAG</option>
                     <option value="CMUL">CMUL</option>
                     <option value="YABATECH">YABATECH</option>
@@ -531,15 +531,15 @@
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Matric Number</label>
-                  <input v-model="editDispatcherPayload.matricNumber" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editDispatcherPayload.matricNumber" type="text" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">NIN Number</label>
-                  <input v-model="editDispatcherPayload.ninNumber" type="text" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editDispatcherPayload.ninNumber" type="text" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Verification Level</label>
-                  <select v-model="editDispatcherPayload.verificationLevel" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <select v-model="editDispatcherPayload.verificationLevel" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
                     <option :value="1">Tier 1</option>
                     <option :value="2">Tier 2</option>
                     <option :value="3">Tier 3</option>
@@ -547,7 +547,7 @@
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Verification Status</label>
-                  <select v-model="editDispatcherPayload.verificationStatus" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <select v-model="editDispatcherPayload.verificationStatus" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
                     <option value="pending">Pending</option>
                     <option value="approved">Approved</option>
                     <option value="rejected">Rejected</option>
@@ -555,7 +555,7 @@
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Status</label>
-                  <select v-model="editDispatcherPayload.status" class="w-full p-3 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <select v-model="editDispatcherPayload.status" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
                     <option value="offline">Offline</option>
                     <option value="online">Online</option>
                     <option value="busy">Busy</option>

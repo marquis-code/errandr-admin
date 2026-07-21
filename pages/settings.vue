@@ -35,7 +35,7 @@
                 type="number"
                 required
                 min="0"
-                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
               />
             </div>
             <div class="space-y-2">
@@ -45,7 +45,7 @@
                 type="number"
                 required
                 min="0"
-                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
               />
             </div>
           </div>
@@ -58,7 +58,7 @@
                 type="number"
                 required
                 min="0"
-                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
               />
             </div>
             <div class="space-y-2">
@@ -69,7 +69,7 @@
                 required
                 min="0"
                 max="100"
-                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
               />
             </div>
           </div>
@@ -82,7 +82,7 @@
                 type="number"
                 required
                 min="0"
-                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
               />
             </div>
             <div class="space-y-2">
@@ -93,7 +93,7 @@
                 required
                 min="0"
                 max="100"
-                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
               />
             </div>
           </div>
@@ -222,7 +222,7 @@
                     type="number"
                     required
                     min="1"
-                    class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                    class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
                   />
                 </div>
                 <!-- Auto Close -->
@@ -233,7 +233,7 @@
                     type="number"
                     required
                     min="0"
-                    class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                    class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
                   />
                 </div>
               </div>
@@ -264,7 +264,7 @@
                   v-model="advertForm.customAd.title"
                   type="text"
                   placeholder="e.g. Back to School Promo!"
-                  class="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                  class="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
                 />
               </div>
 
@@ -274,7 +274,7 @@
                   v-model="advertForm.customAd.description"
                   rows="2"
                   placeholder="Promo description..."
-                  class="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all resize-none"
+                  class="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all resize-none"
                 ></textarea>
               </div>
 
@@ -284,7 +284,7 @@
                   v-model="advertForm.customAd.imageUrl"
                   type="url"
                   placeholder="https://example.com/image.png"
-                  class="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                  class="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
                 />
               </div>
 
@@ -295,7 +295,7 @@
                     v-model="advertForm.customAd.ctaText"
                     type="text"
                     placeholder="Shop Now"
-                    class="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                    class="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
                   />
                 </div>
                 <div class="space-y-2">
@@ -304,7 +304,7 @@
                     v-model="advertForm.customAd.ctaLink"
                     type="text"
                     placeholder="/errands/custom"
-                    class="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+                    class="w-full px-5 py-3 bg-gray-50 border border-gray-100 rounded-xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
                   />
                 </div>
               </div>

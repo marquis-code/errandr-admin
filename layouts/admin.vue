@@ -159,7 +159,7 @@
     <input
      type="text"
      placeholder="Search routes... (type a page name)"
-     class="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm font-medium text-gray-800 focus:outline-none focus:border-[#FF5C1A]/30 focus:bg-white focus:ring-2 focus:ring-[#FF5C1A]/10 placeholder:text-gray-400 transition-all cursor-pointer"
+     class="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-base font-medium text-gray-800 focus:outline-none focus:border-[#FF5C1A]/30 focus:bg-white focus:ring-2 focus:ring-[#FF5C1A]/10 placeholder:text-gray-400 transition-all cursor-pointer"
      readonly
      @click="searchModalOpen = true"
     />

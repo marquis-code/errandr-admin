@@ -32,7 +32,7 @@
               v-model="searchQuery"
               type="text"
               placeholder="Search for routes or pages..."
-              class="w-full pl-12 pr-4 py-4 bg-transparent text-sm font-semibold text-gray-900 focus:outline-none placeholder:text-gray-400"
+              class="w-full pl-12 pr-4 py-4 bg-transparent text-base font-semibold text-gray-900 focus:outline-none placeholder:text-gray-400"
               @keydown.down.prevent="selectNext"
               @keydown.up.prevent="selectPrev"
               @keydown.enter.prevent="navigate"

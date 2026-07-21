@@ -134,7 +134,7 @@
             <textarea 
               v-model="adminMessage" 
               placeholder="Write your response..." 
-              class="w-full h-24 p-3 rounded-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] transition-all text-xs font-medium resize-none placeholder:text-gray-400" 
+              class="w-full h-24 p-3 rounded-lg bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] transition-all text-base font-medium resize-none placeholder:text-gray-400" 
             />
             <div class="flex gap-2">
               <button 

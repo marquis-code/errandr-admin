@@ -51,7 +51,7 @@
         <div class="relative flex-1 max-w-sm">
           <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input v-model="facilitatorSearch" type="text" placeholder="Search facilitators..."
-            class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-lg text-xs font-medium focus:outline-none focus:border-gray-300 focus:bg-white transition-colors" />
+            class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-lg text-base font-medium focus:outline-none focus:border-gray-300 focus:bg-white transition-colors" />
         </div>
       </div>
 
@@ -295,23 +295,23 @@
               <div>
                 <label class="text-xs font-medium text-gray-700 block mb-1">Full Name *</label>
                 <input v-model="newFac.name" type="text" required
-                  class="w-full px-3 py-2 bg-white border border-gray-100 rounded-md text-xs focus:outline-none focus:border-gray-400 transition-colors" placeholder="e.g. John Doe" />
+                  class="w-full px-3 py-2 bg-white border border-gray-100 rounded-md text-base focus:outline-none focus:border-gray-400 transition-colors" placeholder="e.g. John Doe" />
               </div>
               <div>
                 <label class="text-xs font-medium text-gray-700 block mb-1">Email *</label>
                 <input v-model="newFac.email" type="email" required
-                  class="w-full px-3 py-2 bg-white border border-gray-100 rounded-md text-xs focus:outline-none focus:border-gray-400 transition-colors" placeholder="john@example.com" />
+                  class="w-full px-3 py-2 bg-white border border-gray-100 rounded-md text-base focus:outline-none focus:border-gray-400 transition-colors" placeholder="john@example.com" />
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div>
                   <label class="text-xs font-medium text-gray-700 block mb-1">Matric No.</label>
                   <input v-model="newFac.matricNumber" type="text"
-                    class="w-full px-3 py-2 bg-white border border-gray-100 rounded-md text-xs focus:outline-none focus:border-gray-400 transition-colors" placeholder="Optional" />
+                    class="w-full px-3 py-2 bg-white border border-gray-100 rounded-md text-base focus:outline-none focus:border-gray-400 transition-colors" placeholder="Optional" />
                 </div>
                 <div>
                   <label class="text-xs font-medium text-gray-700 block mb-1">Skill</label>
                   <input v-model="newFac.skill" type="text"
-                    class="w-full px-3 py-2 bg-white border border-gray-100 rounded-md text-xs focus:outline-none focus:border-gray-400 transition-colors" placeholder="e.g. Design" />
+                    class="w-full px-3 py-2 bg-white border border-gray-100 rounded-md text-base focus:outline-none focus:border-gray-400 transition-colors" placeholder="e.g. Design" />
                 </div>
               </div>
 
