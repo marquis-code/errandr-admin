@@ -65,6 +65,14 @@ export const admin_api = {
     return GATEWAY_ENDPOINT_WITH_AUTH.put('/settings/advert', payload);
   },
 
+  getExamBrethrenSettings: () => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get('/settings/exam-brethren/public');
+  },
+
+  updateExamBrethrenSettings: (payload: { isActive: boolean }) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put('/settings/exam-brethren', payload);
+  },
+
   updateUser: (id: string, payload: any) => {
     return GATEWAY_ENDPOINT_WITH_AUTH.put(`/admin/users/${id}`, payload);
   },

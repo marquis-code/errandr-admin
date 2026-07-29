@@ -1,5 +1,6 @@
 <template>
-  <Transition
+  <Teleport to="body">
+    <Transition
     enter-active-class="transition ease-out duration-200"
     enter-from-class="opacity-0"
     enter-to-class="opacity-100"
@@ -69,7 +70,8 @@
         </div>
       </Transition>
     </div>
-  </Transition>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">

@@ -60,7 +60,7 @@
                     v-model="searchQuery"
                     type="text"
                     placeholder="Search"
-                    class="w-full pl-10 pr-3 py-2.5 bg-white border-[0.5px] border-gray-200 rounded-lg focus:border-[#3BAB22] focus:ring-1 focus:ring-[#3BAB22] outline-none text-base placeholder-gray-400"
+                    class="w-full pl-10 pr-3 py-2.5 bg-white border-[0.5px] border-gray-100 rounded-lg focus:border-[#3BAB22] focus:ring-1 focus:ring-[#3BAB22] outline-none text-base placeholder-gray-400"
                     @click.stop
                   />
                 </div>

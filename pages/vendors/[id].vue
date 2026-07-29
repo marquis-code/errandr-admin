@@ -37,7 +37,7 @@
     <!-- Content -->
     <div v-else-if="vendor" class="space-y-6">
       <!-- Profile Header Card -->
-      <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex items-center gap-6">
+      <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-6">
         <div class="w-20 h-20 rounded-2xl bg-[#FF5C1A]/10 flex items-center justify-center text-[#FF5C1A] border border-[#FF5C1A]/20 shrink-0">
           <Store class="w-8 h-8" />
         </div>
@@ -73,7 +73,7 @@
       </div>
 
       <!-- Tabs Content -->
-      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 min-h-[300px]">
+      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 min-h-[300px]">
         <!-- Overview Tab -->
         <div v-if="activeTab === 'overview'" class="space-y-8">
           

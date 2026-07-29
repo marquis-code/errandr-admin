@@ -13,7 +13,7 @@
   <!-- Toggle Button -->
   <button 
    @click="isSidebarMinimized = !isSidebarMinimized"
-   class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-sm text-gray-500 hover:text-[#FF5C1A] hover:border-[#FF5C1A] z-50 transition-colors"
+   class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white border border-gray-100 rounded-full flex items-center justify-center shadow-sm text-gray-500 hover:text-[#FF5C1A] hover:border-[#FF5C1A] z-50 transition-colors"
   >
    <ChevronLeft v-if="!isSidebarMinimized" class="w-4 h-4" />
    <ChevronRight v-else class="w-4 h-4" />
@@ -163,7 +163,7 @@
      readonly
      @click="searchModalOpen = true"
     />
-    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-300 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 tracking-widest">⌘K</span>
+    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-300 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-100 tracking-widest">⌘K</span>
    </div>
   </div>
 
@@ -187,15 +187,15 @@
  </div>
  </main>
 
- <Transition
- enter-active-class="transition ease-out duration-300"
- enter-from-class="opacity-0"
- enter-to-class="opacity-100"
- leave-active-class="transition ease-in duration-200"
- leave-from-class="opacity-100"
- leave-to-class="opacity-0"
->
  <Teleport to="body">
+  <Transition
+  enter-active-class="transition ease-out duration-300"
+  enter-from-class="opacity-0"
+  enter-to-class="opacity-100"
+  leave-active-class="transition ease-in duration-200"
+  leave-from-class="opacity-100"
+  leave-to-class="opacity-0"
+ >
  <div
  v-if="logoutModalOpen"
  class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
@@ -248,8 +248,8 @@
  </div>
  </Transition>
  </div>
+ </Transition>
  </Teleport>
-</Transition>
 
   <!-- Route Search Modal -->
   <RouteSearchModal :isOpen="searchModalOpen" @close="searchModalOpen = false" />

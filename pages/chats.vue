@@ -3,7 +3,7 @@
     <!-- Left Sidebar -->
     <div 
       :class="[
-        'w-full md:w-[35%] lg:w-[30%] max-w-[420px] min-w-[320px] flex-col bg-white border-r border-gray-200 flex-shrink-0 transition-all',
+        'w-full md:w-[35%] lg:w-[30%] max-w-[420px] min-w-[320px] flex-col bg-white border-r border-gray-100 flex-shrink-0 transition-all',
         activeChat ? 'hidden md:flex' : 'flex'
       ]"
     >
@@ -25,7 +25,7 @@
       </div>
 
       <!-- Search -->
-      <div class="p-2 bg-white border-b border-gray-200">
+      <div class="p-2 bg-white border-b border-gray-100">
         <div class="bg-[#F0F2F5] rounded-lg flex items-center px-4 py-1.5 transition-all border border-transparent focus-within:bg-white focus-within:border-[#FF5C1A]/50">
           <Search class="w-4 h-4 text-[#54656F] mr-3" />
           <input 

@@ -11,8 +11,8 @@
  class="w-full pl-11 pr-14 py-2.5 bg-gray-50/70 hover:bg-gray-100 transition-colors border-none rounded-xl text-base font-medium focus:outline-none focus:bg-white focus:ring-2 focus:ring-parentPrimary/20"
  />
  <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
- <kbd class="px-1.5 py-0.5 text-sm font-bold bg-white text-gray-400 rounded-md border border-gray-200">⌘</kbd>
- <kbd class="px-1.5 py-0.5 text-sm font-bold bg-white text-gray-400 rounded-md border border-gray-200">K</kbd>
+ <kbd class="px-1.5 py-0.5 text-sm font-bold bg-white text-gray-400 rounded-md border border-gray-100">⌘</kbd>
+ <kbd class="px-1.5 py-0.5 text-sm font-bold bg-white text-gray-400 rounded-md border border-gray-100">K</kbd>
  </div>
  </div>
  <div class="flex items-center gap-4">
@@ -30,7 +30,7 @@
  </div>
  
  <div class="flex items-center gap-4">
- <button class="flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-full text-sm font-medium text-gray-700 transition-colors border border-gray-200">
+ <button class="flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-full text-sm font-medium text-gray-700 transition-colors border border-gray-100">
  <ListFilter class="w-4 h-4" />
  Filters
  </button>
@@ -156,7 +156,7 @@
  <textarea 
  v-model="adminNote" 
  rows="3" 
- class="w-full p-4 text-base bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-parentPrimary/20 focus:bg-white transition-colors" 
+ class="w-full p-4 text-base bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-parentPrimary/20 focus:bg-white transition-colors" 
  placeholder="Add internal resolution note or response..."
  ></textarea>
  

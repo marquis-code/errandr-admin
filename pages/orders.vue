@@ -8,11 +8,11 @@
           v-model="searchQuery"
           type="text" 
           placeholder="Search by Order ID, Customer, or Vendor..." 
-          class="w-full pl-10 pr-4 py-2.5 bg-white hover:bg-gray-50 transition-colors border border-gray-200 rounded-lg text-base font-medium focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] placeholder:text-gray-400 shadow-sm"
+          class="w-full pl-10 pr-4 py-2.5 bg-white hover:bg-gray-50 transition-colors border border-gray-100 rounded-lg text-base font-medium focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] placeholder:text-gray-400 shadow-sm"
         />
       </div>
       
-      <div class="flex items-center gap-3 px-4 py-2 bg-white rounded-lg border border-gray-200 shrink-0 shadow-sm">
+      <div class="flex items-center gap-3 px-4 py-2 bg-white rounded-lg border border-gray-100 shrink-0 shadow-sm">
         <div class="w-8 h-8 rounded-lg bg-[#FF5C1A]/10 flex items-center justify-center">
           <Package class="w-4 h-4 text-[#FF5C1A]" />
         </div>
@@ -32,13 +32,13 @@
         </div>
       </div>
       
-      <div class="flex overflow-x-auto pb-2 hide-scrollbar gap-1 bg-gray-50 p-1 rounded-lg w-fit border border-gray-200">
+      <div class="flex overflow-x-auto pb-2 hide-scrollbar gap-1 bg-gray-50 p-1 rounded-lg w-fit border border-gray-100">
         <button 
           v-for="status in statuses" 
           :key="status"
           @click="selectedStatus = status"
           class="px-4 py-1.5 rounded-md text-xs font-medium transition-all whitespace-nowrap shrink-0"
-          :class="selectedStatus === status ? 'bg-white text-gray-900 shadow-sm border border-gray-200/50' : 'text-gray-500 hover:text-gray-700'"
+          :class="selectedStatus === status ? 'bg-white text-gray-900 shadow-sm border border-gray-100/50' : 'text-gray-500 hover:text-gray-700'"
         >
           <span class="capitalize">{{ status }}</span>
         </button>
@@ -46,7 +46,7 @@
     </div>
 
     <!-- Table Section -->
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden min-h-[400px] shadow-sm">
+    <div class="bg-white rounded-xl border border-gray-100 overflow-hidden min-h-[400px] shadow-sm">
       <div v-if="loading" class="p-5">
         <SkeletonTable :rows="10" :cols="6" />
       </div>
@@ -61,7 +61,7 @@
       <div v-else class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="border-b border-gray-200 bg-gray-50/50">
+            <tr class="border-b border-gray-100 bg-gray-50/50">
               <th class="py-3 px-5 font-semibold text-gray-500 text-[11px] uppercase tracking-wide whitespace-nowrap">Date</th>
               <th class="py-3 px-4 font-semibold text-gray-500 text-[11px] uppercase tracking-wide whitespace-nowrap">Customer</th>
               <th class="py-3 px-4 font-semibold text-gray-500 text-[11px] uppercase tracking-wide whitespace-nowrap">Amount</th>
@@ -93,13 +93,13 @@
                 <span class="text-xs font-semibold text-gray-900">₦{{ Number(order.total || order.totalAmount || 0).toLocaleString() }}</span>
               </td>
               <td class="py-3 px-4 text-center">
-                <div v-if="order.type === 'custom_errand'" class="inline-flex items-center gap-2 pr-2 py-1 pl-1 bg-white rounded-md border border-gray-200 truncate max-w-[150px]">
+                <div v-if="order.type === 'custom_errand'" class="inline-flex items-center gap-2 pr-2 py-1 pl-1 bg-white rounded-md border border-gray-100 truncate max-w-[150px]">
                   <div class="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-emerald-600 shrink-0 bg-emerald-50 border border-emerald-100">
                     C
                   </div>
                   <p class="text-[10px] font-semibold text-gray-700 truncate">Custom Errand</p>
                 </div>
-                <div v-else class="inline-flex items-center gap-2 pr-2 py-1 pl-1 bg-white rounded-md border border-gray-200 truncate max-w-[150px]">
+                <div v-else class="inline-flex items-center gap-2 pr-2 py-1 pl-1 bg-white rounded-md border border-gray-100 truncate max-w-[150px]">
                   <div class="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-indigo-600 shrink-0 bg-indigo-50 border border-indigo-100">
                     {{ order.vendor?.storeName?.[0] || 'V' }}
                   </div>
@@ -112,7 +112,7 @@
                 </div>
               </td>
               <td class="py-3 px-5 text-right">
-                <div class="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-200 text-gray-500 group-hover:bg-gray-100 transition-colors">
+                <div class="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-100 text-gray-500 group-hover:bg-gray-100 transition-colors">
                   <ChevronRight class="w-4 h-4" />
                 </div>
               </td>
@@ -136,7 +136,7 @@
           <h3 class="text-lg font-semibold text-gray-900 font-heading">{{ selectedOrder.customer?.firstName || selectedOrder.user?.firstName }} {{ selectedOrder.customer?.lastName || selectedOrder.user?.lastName }}</h3>
           <p class="text-xs font-medium text-gray-500 mb-4">{{ selectedOrder.customer?.email || selectedOrder.user?.email }}</p>
           
-          <div class="flex items-center justify-between w-4/5 bg-white rounded-lg border border-gray-200 divide-x divide-gray-100 shadow-sm">
+          <div class="flex items-center justify-between w-4/5 bg-white rounded-lg border border-gray-100 divide-x divide-gray-100 shadow-sm">
             <div class="text-center flex-1 py-3">
               <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Total</p>
               <p class="text-sm font-bold text-gray-900">₦{{ Number(selectedOrder.total || selectedOrder.totalAmount || 0).toLocaleString() }}</p>
@@ -154,7 +154,7 @@
             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
               Order Details
             </h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-semibold text-gray-500">Order ID / No.</span>
                 <span class="text-xs font-semibold text-gray-900 break-all font-mono">{{ selectedOrder.orderNumber || selectedOrder._id }}</span>
@@ -184,7 +184,7 @@
             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
               Errand Specifics
             </h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-4">
               <div class="flex items-start gap-3">
                 <MapPin class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
                 <div>
@@ -215,7 +215,7 @@
             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
               Items & Vendor
             </h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-4">
               <div class="flex items-center gap-2 pb-3 border-b border-gray-100" v-if="selectedOrder.vendor">
                 <Store class="w-4 h-4 text-gray-500" />
                 <span class="text-xs font-semibold text-gray-900">{{ selectedOrder.vendor.storeName }}</span>
@@ -271,7 +271,7 @@
             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
               Pricing Breakdown
             </h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
               <div class="flex justify-between items-center text-xs">
                 <span class="text-gray-500 font-semibold">Subtotal</span>
                 <span class="text-gray-900 font-semibold">₦{{ Number(selectedOrder.subtotal || 0).toLocaleString() }}</span>
@@ -300,7 +300,7 @@
             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
               Payment & Delivery
             </h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
               <div class="flex justify-between items-center">
                 <span class="text-xs font-semibold text-gray-500 flex items-center gap-1.5"><CreditCard class="w-3.5 h-3.5" /> Payment</span>
                 <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md" 
@@ -325,12 +325,12 @@
             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
               Order Timeline
             </h4>
-            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm relative pl-6">
+            <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm relative pl-6">
               <div class="absolute top-8 bottom-8 left-[31px] w-px bg-gray-200"></div>
               <div class="space-y-6">
                 <div v-for="(hist, idx) in selectedOrder.statusHistory" :key="hist._id || idx" class="flex items-start gap-4 relative z-10">
                   <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 bg-white border-2"
-                    :class="idx === selectedOrder.statusHistory.length - 1 ? 'border-[#FF5C1A] text-[#FF5C1A]' : 'border-gray-200 text-gray-400'">
+                    :class="idx === selectedOrder.statusHistory.length - 1 ? 'border-[#FF5C1A] text-[#FF5C1A]' : 'border-gray-100 text-gray-400'">
                     <CheckCircle2 class="w-3.5 h-3.5" v-if="idx < selectedOrder.statusHistory.length - 1" />
                     <div class="w-2 h-2 rounded-full bg-[#FF5C1A]" v-else />
                   </div>
@@ -346,7 +346,7 @@
         </div>
         
         <!-- Actions Panel -->
-        <div class="fixed bottom-0 right-0 w-full md:w-[460px] p-4 bg-white border-t border-gray-200 z-[105] flex gap-3">
+        <div class="fixed bottom-0 right-0 w-full md:w-[460px] p-4 bg-white border-t border-gray-100 z-[105] flex gap-3">
           <button class="flex-1 py-3 px-4 rounded-lg text-rose-600 font-semibold text-xs bg-rose-50 hover:bg-rose-100 transition-colors flex items-center justify-center gap-2 border border-rose-100" 
             v-if="['pending', 'awaiting_payment'].includes(selectedOrder.status)">
             Cancel Order

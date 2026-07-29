@@ -10,7 +10,7 @@
         </div>
       </div>
       
-      <div class="flex items-center gap-4 bg-white p-2.5 pr-4 rounded-xl border border-gray-200 shadow-sm">
+      <div class="flex items-center gap-4 bg-white p-2.5 pr-4 rounded-xl border border-gray-100 shadow-sm">
         <div class="flex -space-x-2">
           <div v-for="i in 3" :key="i" class="w-8 h-8 rounded-full border-2 border-white bg-[#FF5C1A]/10 flex items-center justify-center text-xs font-bold text-[#FF5C1A]">
             <User class="w-4 h-4" />
@@ -27,7 +27,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <!-- Skeletons for Loading -->
       <template v-if="statsLoading">
-        <div v-for="i in 4" :key="`stat-loading-${i}`" class="bg-white p-5 rounded-xl border border-gray-200 flex flex-col justify-between animate-pulse">
+        <div v-for="i in 4" :key="`stat-loading-${i}`" class="bg-white p-5 rounded-xl border border-gray-100 flex flex-col justify-between animate-pulse">
           <div class="flex justify-between items-center mb-4">
             <div class="w-10 h-10 bg-gray-100 rounded-lg"></div>
             <div class="w-12 h-6 bg-gray-100 rounded-md"></div>
@@ -41,7 +41,7 @@
 
       <!-- Loaded Stats -->
       <template v-else>
-        <div v-for="stat in dashboardStats" :key="stat.label" class="bg-white p-5 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors group overflow-hidden relative shadow-sm">
+        <div v-for="stat in dashboardStats" :key="stat.label" class="bg-white p-5 rounded-xl border border-gray-100 hover:border-gray-300 transition-colors group overflow-hidden relative shadow-sm">
           <div class="flex items-center justify-between mb-4 relative">
             <div :class="stat.bgClass" class="w-10 h-10 rounded-lg flex items-center justify-center">
               <component :is="stat.icon" class="w-5 h-5" />
@@ -64,7 +64,7 @@
     <!-- Middle Section -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
       <!-- Recent Activity -->
-      <div class="xl:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+      <div class="xl:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
         <div class="p-5 flex items-center justify-between border-b border-gray-100">
           <div class="flex items-center gap-3">
             <div class="w-1.5 h-4 bg-[#FF5C1A] rounded-full"></div>
@@ -143,7 +143,7 @@
         </div>
 
         <!-- Service Monitor Board -->
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
           <div class="p-5 flex items-center justify-between border-b border-gray-100">
             <h3 class="font-semibold text-gray-900 text-sm">System Status</h3>
             <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>

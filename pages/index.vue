@@ -6,7 +6,7 @@
       <div class="w-full">
         <!-- Header -->
         <div class="text-center mb-10">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-[1.5rem] bg-gray-900/10 text-gray-900 mb-6 shadow-inner border border-gray-200">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-[1.5rem] bg-gray-900/10 text-gray-900 mb-6 shadow-inner border border-gray-100">
             <ShieldCheck class="w-8 h-8" />
           </div>
           <h1 class="text-3xl font-medium text-gray-900 tracking-tight mb-2">Admin Login</h1>
@@ -53,7 +53,7 @@
         </form>
 
         <!-- Footer -->
-        <div class="mt-10 text-center pt-8 border-t border-gray-200">
+        <div class="mt-10 text-center pt-8 border-t border-gray-100">
           <p class="text-xs font-mono text-gray-400 font-medium uppercase tracking-wider">
             Authorized personnel only. Sessions are monitored.
           </p>

@@ -12,6 +12,7 @@ export const useAuth = () => {
   const login = async (payload: any) => {
     loading.value = true;
     try {
+      // payload.role = 'admin'; // Removed to avoid backend DTO validation error
       const res = await auth_api.login(payload);
       
       if (res.data?.user?.role !== 'admin') {

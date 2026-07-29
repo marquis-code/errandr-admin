@@ -65,7 +65,7 @@
       <div v-else class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="border-b border-gray-200 bg-gray-50/50">
+            <tr class="border-b border-gray-100 bg-gray-50/50">
               <th class="py-4 px-6 font-semibold text-gray-600 text-sm whitespace-nowrap">Store Name</th>
               <th class="py-4 px-4 font-semibold text-gray-600 text-sm whitespace-nowrap">Type & Category</th>
               <th class="py-4 px-4 font-semibold text-gray-600 text-sm whitespace-nowrap">Stats</th>
@@ -188,7 +188,7 @@
       <template v-if="selectedVendor">
         <!-- Header -->
         <div class="flex flex-col items-center justify-center pt-8 pb-6 border-b border-gray-100 bg-white">
-          <img :src="selectedVendor.logo || 'https://via.placeholder.com/150'" alt="Store Logo" class="w-20 h-20 rounded-2xl object-cover shadow-sm mb-4 border border-gray-200" />
+          <img :src="selectedVendor.logo || 'https://via.placeholder.com/150'" alt="Store Logo" class="w-20 h-20 rounded-2xl object-cover shadow-sm mb-4 border border-gray-100" />
           <h3 class="text-xl font-semibold text-gray-900 font-heading mb-1">{{ selectedVendor.storeName }}</h3>
           <p class="text-xs font-semibold text-[#FF5C1A] uppercase tracking-wide bg-[#FF5C1A]/10 px-3 py-1 rounded-full mb-4">{{ selectedVendor.category?.replace('_', ' ') || 'General' }}</p>
 
@@ -197,7 +197,7 @@
             <button @click="enterEditMode" :class="activeDrawerTab === 'edit' ? 'bg-[#FF5C1A] text-white' : 'bg-gray-100 text-gray-600'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors">Edit</button>
           </div>
 
-          <div class="flex items-center justify-between w-5/6 bg-white rounded-lg border border-gray-200 divide-x divide-gray-100 shadow-sm">
+          <div class="flex items-center justify-between w-5/6 bg-white rounded-lg border border-gray-100 divide-x divide-gray-100 shadow-sm">
             <div class="text-center flex-1 py-3">
               <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Rating</p>
               <div class="flex items-center justify-center gap-1">
@@ -219,7 +219,7 @@
           <!-- Basic Info -->
           <div class="space-y-3">
             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Store Information</h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-4">
               <div class="flex items-start gap-3">
                 <Store class="w-4 h-4 text-gray-400 mt-0.5" />
                 <div class="flex-1">
@@ -241,7 +241,7 @@
           <!-- Owner Details -->
           <div class="space-y-3">
             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Owner Profile</h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-4">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
                   <User class="w-4 h-4 text-gray-400" />
@@ -275,7 +275,7 @@
           <!-- Logistics & Fees -->
           <div class="space-y-3">
             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Logistics & Config</h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-semibold text-gray-500">Business Type</span>
                 <span class="text-xs font-bold text-gray-900 capitalize">{{ selectedVendor.businessType?.replace('_', ' ') }}</span>
@@ -316,7 +316,7 @@
           <!-- Bank Details -->
           <div class="space-y-3" v-if="selectedVendor.bankDetails">
             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Payout Details</h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
+            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
               <div class="flex items-start gap-3">
                 <Banknote class="w-4 h-4 text-gray-400 mt-0.5" />
                 <div class="flex-1">
@@ -331,7 +331,7 @@
           <!-- Business Hours -->
           <div class="space-y-3" v-if="selectedVendor.businessHours?.length">
             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Business Hours</h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-2">
+            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-2">
               <div v-for="hours in selectedVendor.businessHours" :key="hours._id" class="flex items-center justify-between text-xs">
                 <span class="font-semibold text-gray-600 capitalize w-24">{{ hours.day }}</span>
                 <span v-if="hours.isClosed" class="font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-md text-[10px] uppercase">Closed</span>
@@ -358,23 +358,23 @@
               <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-2 col-span-2">
                   <label class="text-xs font-semibold text-gray-700">Store Name</label>
-                  <input v-model="editVendorPayload.storeName" type="text" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.storeName" type="text" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2 col-span-2">
                   <label class="text-xs font-semibold text-gray-700">Description</label>
-                  <textarea v-model="editVendorPayload.description" rows="2" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20"></textarea>
+                  <textarea v-model="editVendorPayload.description" rows="2" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20"></textarea>
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Subdomain</label>
-                  <input v-model="editVendorPayload.subdomain" type="text" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.subdomain" type="text" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Category</label>
-                  <input v-model="editVendorPayload.category" type="text" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.category" type="text" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Business Type</label>
-                  <select v-model="editVendorPayload.businessType" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <select v-model="editVendorPayload.businessType" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
                     <option value="physical_product">Physical Product</option>
                     <option value="service_provider">Service Provider</option>
                     <option value="hybrid">Hybrid</option>
@@ -382,27 +382,27 @@
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Service Location</label>
-                  <input v-model="editVendorPayload.serviceLocation" type="text" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.serviceLocation" type="text" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Base Delivery Fee</label>
-                  <input v-model="editVendorPayload.baseDeliveryFee" type="number" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.baseDeliveryFee" type="number" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Packaging Fee</label>
-                  <input v-model="editVendorPayload.packagingFee" type="number" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.packagingFee" type="number" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Min Order</label>
-                  <input v-model="editVendorPayload.minimumOrder" type="number" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.minimumOrder" type="number" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Prep Time (mins)</label>
-                  <input v-model="editVendorPayload.preparationTime" type="number" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editVendorPayload.preparationTime" type="number" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Status</label>
-                  <select v-model="editVendorPayload.status" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <select v-model="editVendorPayload.status" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
                     <option value="pending">Pending</option>
                     <option value="approved">Approved</option>
                     <option value="suspended">Suspended</option>

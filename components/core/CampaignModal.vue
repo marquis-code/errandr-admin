@@ -17,18 +17,18 @@
         <div class="p-6 overflow-y-auto flex-1 space-y-5">
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">Campaign Title (Supports Emojis)</label>
-            <input v-model="form.title" type="text" placeholder="e.g. Hungry? 🍕" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] transition-all" />
+            <input v-model="form.title" type="text" placeholder="e.g. Hungry? 🍕" class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] transition-all" />
           </div>
 
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-1">Message Body</label>
-            <textarea v-model="form.body" rows="3" placeholder="Enter the notification message..." class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] transition-all resize-none"></textarea>
+            <textarea v-model="form.body" rows="3" placeholder="Enter the notification message..." class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] transition-all resize-none"></textarea>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Target Audience</label>
-              <select v-model="form.targetAudience" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] transition-all appearance-none">
+              <select v-model="form.targetAudience" class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] transition-all appearance-none">
                 <option value="student">Students (App)</option>
                 <option value="vendor">Vendors</option>
                 <option value="all">Everyone</option>
@@ -37,8 +37,8 @@
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Interval Value</label>
               <div class="flex gap-2">
-                <input v-model.number="form.intervalValue" type="number" min="1" class="w-2/3 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] transition-all" />
-                <select v-model="form.intervalUnit" class="w-1/3 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] transition-all appearance-none">
+                <input v-model.number="form.intervalValue" type="number" min="1" class="w-2/3 px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] transition-all" />
+                <select v-model="form.intervalUnit" class="w-1/3 px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] transition-all appearance-none">
                   <option value="seconds">Sec</option>
                   <option value="minutes">Min</option>
                   <option value="hours">Hrs</option>

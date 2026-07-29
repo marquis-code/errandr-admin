@@ -98,6 +98,20 @@
             </div>
           </div>
 
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">food markup (%)</label>
+              <input 
+                v-model.number="form.foodMarkupPercentage"
+                type="number"
+                required
+                min="0"
+                max="100"
+                class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+              />
+            </div>
+          </div>
+
           <div class="pt-4 flex justify-end">
             <button 
               type="submit" 
@@ -324,6 +338,46 @@
         </form>
       </div>
 
+      <!-- Exam Brethren Campaign Card -->
+      <div class="lg:col-span-12 bg-white p-6 sm:p-8 rounded-[2rem] border border-gray-100 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 border-b border-gray-50 pb-4">
+          <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-medium text-gray-900 lowercase">exam brethren campaign</h3>
+            <p class="text-xs font-bold text-gray-400 lowercase">toggle night owl free delivery and brethren split discounts</p>
+          </div>
+        </div>
+
+        <form @submit.prevent="saveExamBrethrenSettings" class="space-y-6">
+          <div class="space-y-6">
+            <!-- Enabled Toggle -->
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+              <div>
+                <h4 class="text-sm font-medium text-gray-900 lowercase">enable campaign</h4>
+                <p class="text-xs text-gray-500 lowercase mt-1">activates free delivery (10pm-2am) and 10% group discounts</p>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" v-model="examBrethrenForm.isActive" class="sr-only peer">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[#FF5C1A]/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF5C1A]"></div>
+              </label>
+            </div>
+          </div>
+
+          <div class="pt-4 flex justify-end">
+            <button 
+              type="submit" 
+              :disabled="savingExamBrethren"
+              class="px-6 py-4 bg-gray-900 text-white rounded-2xl text-xs font-medium lowercase hover:bg-[#FF5C1A] transition-all shadow-xl shadow-gray-100 disabled:opacity-50 flex items-center gap-2"
+            >
+              <Loader2 v-if="savingExamBrethren" class="w-4 h-4 animate-spin" />
+              <span>{{ savingExamBrethren ? 'saving...' : 'save changes' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
     </div>
   </div>
 </template>
@@ -346,6 +400,7 @@ const form = reactive({
   commissionPercentage: 10,
   platformProcessingFee: 500,
   platformServiceFeePercentage: 5,
+  foodMarkupPercentage: 5,
 });
 
 const commsForm = reactive({
@@ -367,15 +422,21 @@ const advertForm = reactive({
   }
 });
 
+const examBrethrenForm = reactive({
+  isActive: false,
+});
+
 const savingComms = ref(false);
 const savingAdvert = ref(false);
+const savingExamBrethren = ref(false);
 
 const loadSettings = async () => {
   try {
-    const [errandRes, commsRes, advertRes] = await Promise.all([
+    const [errandRes, commsRes, advertRes, examBrethrenRes] = await Promise.all([
       admin_api.getCustomErrandSettings(),
       admin_api.getCommunicationsSettings(),
-      admin_api.getAdvertSettings()
+      admin_api.getAdvertSettings(),
+      admin_api.getExamBrethrenSettings()
     ]);
     
     if (errandRes.data) {
@@ -385,6 +446,7 @@ const loadSettings = async () => {
       form.commissionPercentage = errandRes.data.commissionPercentage ?? 10;
       form.platformProcessingFee = errandRes.data.platformProcessingFee ?? 500;
       form.platformServiceFeePercentage = errandRes.data.platformServiceFeePercentage ?? 5;
+      form.foodMarkupPercentage = errandRes.data.foodMarkupPercentage ?? 5;
     }
 
     if (commsRes.data) {
@@ -400,6 +462,10 @@ const loadSettings = async () => {
       if (advertRes.data.customAd) {
         advertForm.customAd = { ...advertForm.customAd, ...advertRes.data.customAd };
       }
+    }
+    
+    if (examBrethrenRes.data) {
+      examBrethrenForm.isActive = examBrethrenRes.data.isActive ?? false;
     }
   } catch (e: any) {
     console.error('Failed to load settings:', e);
@@ -421,6 +487,7 @@ const saveSettings = async () => {
       commissionPercentage: Number(form.commissionPercentage),
       platformProcessingFee: Number(form.platformProcessingFee),
       platformServiceFeePercentage: Number(form.platformServiceFeePercentage),
+      foodMarkupPercentage: Number(form.foodMarkupPercentage),
     });
     showToast({
       title: 'success',
@@ -487,6 +554,29 @@ const saveAdvertSettings = async () => {
     });
   } finally {
     savingAdvert.value = false;
+  }
+};
+
+const saveExamBrethrenSettings = async () => {
+  savingExamBrethren.value = true;
+  try {
+    await admin_api.updateExamBrethrenSettings({
+      isActive: examBrethrenForm.isActive,
+    });
+    showToast({
+      title: 'success',
+      message: 'exam brethren campaign status updated!',
+      toastType: 'success',
+    });
+  } catch (e: any) {
+    console.error('Failed to save exam brethren settings:', e);
+    showToast({
+      title: 'error',
+      message: e.response?.data?.message || 'failed to save exam brethren settings.',
+      toastType: 'error',
+    });
+  } finally {
+    savingExamBrethren.value = false;
   }
 };
 

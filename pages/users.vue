@@ -249,19 +249,19 @@
               <form @submit.prevent="handleUpdateUser" class="space-y-4">
                 <div class="space-y-2">
                   <label class="text-sm font-medium text-gray-700">First Name</label>
-                  <input v-model="editPayload.firstName" type="text" class="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editPayload.firstName" type="text" class="w-full p-3 bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-sm font-medium text-gray-700">Last Name</label>
-                  <input v-model="editPayload.lastName" type="text" class="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editPayload.lastName" type="text" class="w-full p-3 bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-sm font-medium text-gray-700">Phone</label>
-                  <input v-model="editPayload.phone" type="text" class="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editPayload.phone" type="text" class="w-full p-3 bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-sm font-medium text-gray-700">Role</label>
-                  <select v-model="editPayload.role" class="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <select v-model="editPayload.role" class="w-full p-3 bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
                     <option value="student">Student</option>
                     <option value="vendor">Vendor</option>
                     <option value="errander">Errander</option>

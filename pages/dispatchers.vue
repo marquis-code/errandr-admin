@@ -8,7 +8,7 @@
     </div>
 
     <!-- Tabs -->
-    <div class="flex items-center gap-6 border-b border-gray-200">
+    <div class="flex items-center gap-6 border-b border-gray-100">
       <button 
         @click="activeTab = 'verifications'"
         class="pb-4 text-sm font-bold transition-colors border-b-2 relative -mb-[1px]"
@@ -92,7 +92,7 @@
                 <span class="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs font-bold rounded-lg">Tier {{ errander.verificationLevel || 1 }}</span>
               </td>
               <td class="px-6 py-4 text-center">
-                <button v-if="errander.idCardImage" @click="viewImage(errander.idCardImage)" class="inline-flex w-16 h-12 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:border-[#FF5C1A] transition-colors relative group">
+                <button v-if="errander.idCardImage" @click="viewImage(errander.idCardImage)" class="inline-flex w-16 h-12 bg-gray-100 rounded-lg overflow-hidden border border-gray-100 hover:border-[#FF5C1A] transition-colors relative group">
                   <img :src="errander.idCardImage" class="w-full h-full object-cover" />
                   <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
                     <span class="text-[10px] text-white font-bold">View</span>
@@ -101,7 +101,7 @@
                 <span v-else class="text-xs text-gray-400">No Image</span>
               </td>
               <td class="px-6 py-4 text-center">
-                <button v-if="errander.selfieImage" @click="viewImage(errander.selfieImage)" class="inline-flex w-12 h-12 bg-gray-100 rounded-full overflow-hidden border border-gray-200 hover:border-[#FF5C1A] transition-colors relative group">
+                <button v-if="errander.selfieImage" @click="viewImage(errander.selfieImage)" class="inline-flex w-12 h-12 bg-gray-100 rounded-full overflow-hidden border border-gray-100 hover:border-[#FF5C1A] transition-colors relative group">
                   <img :src="errander.selfieImage" class="w-full h-full object-cover" />
                   <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
                     <span class="text-[10px] text-white font-bold">View</span>
@@ -110,13 +110,13 @@
                 <span v-else class="text-xs text-gray-400">No Image</span>
               </td>
               <td class="px-6 py-4 text-center">
-                <button v-if="errander.ninSlipImage" @click="viewImage(errander.ninSlipImage)" class="inline-flex w-16 h-12 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:border-[#FF5C1A] transition-colors relative group">
+                <button v-if="errander.ninSlipImage" @click="viewImage(errander.ninSlipImage)" class="inline-flex w-16 h-12 bg-gray-100 rounded-lg overflow-hidden border border-gray-100 hover:border-[#FF5C1A] transition-colors relative group">
                   <img :src="errander.ninSlipImage" class="w-full h-full object-cover" />
                   <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
                     <span class="text-[10px] text-white font-bold">View</span>
                   </div>
                 </button>
-                <span v-else-if="errander.ninNumber" class="text-xs font-bold text-gray-900 border border-gray-200 px-2 py-1 rounded bg-gray-50">{{ errander.ninNumber }}</span>
+                <span v-else-if="errander.ninNumber" class="text-xs font-bold text-gray-900 border border-gray-100 px-2 py-1 rounded bg-gray-50">{{ errander.ninNumber }}</span>
                 <span v-else class="text-xs text-gray-400">N/A</span>
               </td>
               <td class="px-6 py-4 text-right">
@@ -147,7 +147,7 @@
         <button 
           @click="page--" 
           :disabled="page === 1"
-          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-100 rounded-lg hover:bg-gray-50 disabled:opacity-50"
         >
           Previous
         </button>
@@ -155,7 +155,7 @@
         <button 
           @click="page++" 
           :disabled="page === totalPages"
-          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-100 rounded-lg hover:bg-gray-50 disabled:opacity-50"
         >
           Next
         </button>
@@ -282,7 +282,7 @@
           <button 
             @click="allPage--" 
             :disabled="allPage === 1"
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-100 rounded-lg hover:bg-gray-50 disabled:opacity-50"
           >
             Previous
           </button>
@@ -290,7 +290,7 @@
           <button 
             @click="allPage++" 
             :disabled="allPage === allTotalPages"
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-100 rounded-lg hover:bg-gray-50 disabled:opacity-50"
           >
             Next
           </button>
@@ -316,7 +316,7 @@
         
         <div class="mb-6 text-left bg-gray-50 p-4 rounded-xl border border-gray-100">
           <label class="block text-xs font-bold text-gray-700 mb-2">Select Tier to Grant</label>
-          <select v-model="selectedTier" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-base focus:ring-1 focus:ring-emerald-500 outline-none">
+          <select v-model="selectedTier" class="w-full px-3 py-2 bg-white border border-gray-100 rounded-lg text-base focus:ring-1 focus:ring-emerald-500 outline-none">
             <option :value="1">Tier 1 (Window Shopper)</option>
             <option :value="2">Tier 2 (Basic)</option>
             <option :value="3">Tier 3 (Pro)</option>
@@ -341,7 +341,7 @@
         
         <div class="mb-6">
           <label class="block text-xs font-bold text-gray-700 mb-2">Reason for rejection (Optional)</label>
-          <textarea v-model="rejectionReason" placeholder="e.g. ID card is blurry..." class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-base focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none transition-all shadow-sm resize-none h-24"></textarea>
+          <textarea v-model="rejectionReason" placeholder="e.g. ID card is blurry..." class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-base focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none transition-all shadow-sm resize-none h-24"></textarea>
         </div>
 
         <div class="flex gap-3">
@@ -409,7 +409,7 @@
                   <select 
                     v-model="selectedProfile.verificationLevel" 
                     @change="updateTier(selectedProfile._id, selectedProfile.verificationLevel)"
-                    class="text-base border border-gray-200 rounded px-1 py-0.5 bg-white cursor-pointer"
+                    class="text-base border border-gray-100 rounded px-1 py-0.5 bg-white cursor-pointer"
                   >
                     <option :value="1">Tier 1</option>
                     <option :value="2">Tier 2</option>
@@ -425,7 +425,7 @@
           <div v-if="selectedProfile.idCardImage || selectedProfile.selfieImage || selectedProfile.ninSlipImage || selectedProfile.ninNumber || selectedProfile.guarantorDetails" class="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-3">
             <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Verification Documents</h4>
             
-            <div v-if="selectedProfile.guarantorDetails" class="mb-4 bg-white p-3 rounded-lg border border-gray-200">
+            <div v-if="selectedProfile.guarantorDetails" class="mb-4 bg-white p-3 rounded-lg border border-gray-100">
               <p class="text-xs font-bold text-gray-900 mb-2">Guarantor Details</p>
               <div class="grid grid-cols-2 gap-2 text-xs">
                 <div><span class="text-gray-500">Name:</span> {{ selectedProfile.guarantorDetails.name }}</div>
@@ -437,7 +437,7 @@
             <div class="grid grid-cols-3 gap-4">
               <div v-if="selectedProfile.idCardImage">
                 <p class="text-gray-500 text-xs mb-1.5">ID Card</p>
-                <button @click="viewImage(selectedProfile.idCardImage)" class="w-full h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:border-[#FF5C1A] transition-colors relative group">
+                <button @click="viewImage(selectedProfile.idCardImage)" class="w-full h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-100 hover:border-[#FF5C1A] transition-colors relative group">
                   <img :src="selectedProfile.idCardImage" class="w-full h-full object-cover" />
                   <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <span class="text-xs text-white font-bold">View Full</span>
@@ -446,7 +446,7 @@
               </div>
               <div v-if="selectedProfile.selfieImage">
                 <p class="text-gray-500 text-xs mb-1.5">Selfie</p>
-                <button @click="viewImage(selectedProfile.selfieImage)" class="w-full h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:border-[#FF5C1A] transition-colors relative group">
+                <button @click="viewImage(selectedProfile.selfieImage)" class="w-full h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-100 hover:border-[#FF5C1A] transition-colors relative group">
                   <img :src="selectedProfile.selfieImage" class="w-full h-full object-cover" />
                   <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <span class="text-xs text-white font-bold">View Full</span>
@@ -455,13 +455,13 @@
               </div>
               <div v-if="selectedProfile.ninSlipImage || selectedProfile.ninNumber">
                 <p class="text-gray-500 text-xs mb-1.5">NIN</p>
-                <button v-if="selectedProfile.ninSlipImage" @click="viewImage(selectedProfile.ninSlipImage)" class="w-full h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:border-[#FF5C1A] transition-colors relative group">
+                <button v-if="selectedProfile.ninSlipImage" @click="viewImage(selectedProfile.ninSlipImage)" class="w-full h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-100 hover:border-[#FF5C1A] transition-colors relative group">
                   <img :src="selectedProfile.ninSlipImage" class="w-full h-full object-cover" />
                   <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <span class="text-xs text-white font-bold">View Full</span>
                   </div>
                 </button>
-                <div v-else class="w-full h-24 bg-gray-100 rounded-lg border border-gray-200 flex flex-col items-center justify-center p-2">
+                <div v-else class="w-full h-24 bg-gray-100 rounded-lg border border-gray-100 flex flex-col items-center justify-center p-2">
                   <span class="text-[10px] text-gray-500 mb-1">NIN Number</span>
                   <span class="text-sm font-bold text-gray-900 tracking-wider">{{ selectedProfile.ninNumber }}</span>
                 </div>
@@ -523,7 +523,7 @@
               <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">School</label>
-                  <select v-model="editDispatcherPayload.school" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <select v-model="editDispatcherPayload.school" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
                     <option value="UNILAG">UNILAG</option>
                     <option value="CMUL">CMUL</option>
                     <option value="YABATECH">YABATECH</option>
@@ -531,15 +531,15 @@
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Matric Number</label>
-                  <input v-model="editDispatcherPayload.matricNumber" type="text" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editDispatcherPayload.matricNumber" type="text" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">NIN Number</label>
-                  <input v-model="editDispatcherPayload.ninNumber" type="text" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                  <input v-model="editDispatcherPayload.ninNumber" type="text" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Verification Level</label>
-                  <select v-model="editDispatcherPayload.verificationLevel" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <select v-model="editDispatcherPayload.verificationLevel" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
                     <option :value="1">Tier 1</option>
                     <option :value="2">Tier 2</option>
                     <option :value="3">Tier 3</option>
@@ -547,7 +547,7 @@
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Verification Status</label>
-                  <select v-model="editDispatcherPayload.verificationStatus" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <select v-model="editDispatcherPayload.verificationStatus" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
                     <option value="pending">Pending</option>
                     <option value="approved">Approved</option>
                     <option value="rejected">Rejected</option>
@@ -555,7 +555,7 @@
                 </div>
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Status</label>
-                  <select v-model="editDispatcherPayload.status" class="w-full p-3 text-base bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                  <select v-model="editDispatcherPayload.status" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
                     <option value="offline">Offline</option>
                     <option value="online">Online</option>
                     <option value="busy">Busy</option>

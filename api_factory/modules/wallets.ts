@@ -6,7 +6,7 @@ export const wallets_api = {
   },
 
   getTransactions: () => {
-    return GATEWAY_ENDPOINT_WITH_AUTH.get('/wallets/transactions');
+    return GATEWAY_ENDPOINT_WITH_AUTH.get('/wallets/all');
   },
 
   updatePreferences: (payload: { preference: string; bankDetails?: any }) => {
