@@ -74,18 +74,23 @@ export const useAdminVendors = () => {
 export const useAdminReports = () => {
   const loading = ref(false);
   const reports = ref<any[]>([]);
+  const total = ref(0);
+  const stats = ref<any>({ pending: 0, investigating: 0, resolved: 0, dismissed: 0 });
 
   const fetchReports = async (page = 1, limit = 50, status?: string) => {
     loading.value = true;
     try {
       const res = await admin_api.getReports(page, limit, status);
-      reports.value = res.data?.reports || res.data || [];
+      const data = res.data;
+      reports.value = data?.reports || (Array.isArray(data) ? data : []);
+      total.value = data?.total || reports.value.length;
+      if (data?.stats) stats.value = data.stats;
     } finally {
       loading.value = false;
     }
   };
 
-  return { loading, reports, fetchReports };
+  return { loading, reports, total, stats, fetchReports };
 };
 
 export const useAdminFinances = () => {

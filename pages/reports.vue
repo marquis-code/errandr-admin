@@ -20,6 +20,26 @@
       </div>
     </div>
 
+    <!-- Stats Summary -->
+    <div v-if="!loading" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">total</p>
+        <p class="text-2xl font-semibold text-gray-900 mt-1">{{ total }}</p>
+      </div>
+      <div class="bg-amber-50 rounded-xl p-4 border border-amber-100 shadow-sm">
+        <p class="text-[10px] font-bold text-amber-500 uppercase tracking-wide">open</p>
+        <p class="text-2xl font-semibold text-amber-700 mt-1">{{ stats.pending }}</p>
+      </div>
+      <div class="bg-blue-50 rounded-xl p-4 border border-blue-100 shadow-sm">
+        <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wide">reviewing</p>
+        <p class="text-2xl font-semibold text-blue-700 mt-1">{{ stats.investigating }}</p>
+      </div>
+      <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-100 shadow-sm">
+        <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-wide">resolved</p>
+        <p class="text-2xl font-semibold text-emerald-700 mt-1">{{ stats.resolved }}</p>
+      </div>
+    </div>
+
     <!-- Loading State -->
     <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div v-for="i in 4" :key="`report-loading-${i}`" class="bg-white rounded-xl p-5 border border-gray-100 animate-pulse h-40 shadow-sm">
@@ -173,7 +193,7 @@ definePageMeta({
 
 useHead({ title: 'Reports - Errander Admin' });
 
-const { reports, loading, fetchReports } = useAdminReports();
+const { reports, loading, fetchReports, total, stats } = useAdminReports();
 const activeTab = ref('all');
 const selectedReport = ref<any>(null);
 const adminMessage = ref('');
