@@ -135,26 +135,50 @@
             </div>
           </div>
 
-          <!-- Runner Commission -->
+          <!-- Runner Commission (Normal) -->
           <div class="space-y-2">
             <div class="flex items-center gap-2">
-              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">runner commission (%)</label>
+              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">runner commission (₦) [food/products]</label>
               <button @click="showInfo('commission')" class="w-4 h-4 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-[#FF5C1A]/10 hover:text-[#FF5C1A] transition-colors">
                 <Info class="w-3 h-3" />
               </button>
             </div>
             <input 
-              v-model.number="form.commissionPercentage"
-              type="number" required min="0" max="100"
+              v-model.number="form.commissionFlatFee"
+              type="number" required min="0"
               class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
             />
-            <p v-if="form.commissionPercentage !== originalForm.commissionPercentage" class="text-[10px] font-medium text-amber-600 bg-amber-50 px-3 py-1.5 rounded-xl flex items-center gap-1">
+            <p v-if="form.commissionFlatFee !== originalForm.commissionFlatFee" class="text-[10px] font-medium text-amber-600 bg-amber-50 px-3 py-1.5 rounded-xl flex items-center gap-1">
               <AlertTriangle class="w-3 h-3" />
-              changing from {{ originalForm.commissionPercentage }}% → {{ form.commissionPercentage }}%. at {{ form.commissionPercentage }}%, a ₦{{ form.baseFee }} delivery earns erranders ₦{{ Math.round(form.baseFee * form.commissionPercentage / 100) }} and the rider keeps ₦{{ Math.round(form.baseFee * (100 - form.commissionPercentage) / 100) }}.
+              changing from ₦{{ originalForm.commissionFlatFee }} → ₦{{ form.commissionFlatFee }}. at ₦{{ form.commissionFlatFee }}, a ₦{{ form.baseFee }} delivery earns erranders ₦{{ form.commissionFlatFee }} and the rider keeps ₦{{ form.baseFee - form.commissionFlatFee }}.
             </p>
             <div v-if="activeInfo === 'commission'" class="p-3 bg-blue-50 text-blue-800 rounded-xl text-[11px] font-medium leading-relaxed space-y-1 border border-blue-100">
               <p class="font-semibold">what is this?</p>
-              <p>the percentage of the delivery fee that erranders takes as commission. the rest goes to the rider. e.g. at 10%, a ₦450 delivery gives ₦45 to the platform and ₦405 to the rider. increasing this boosts revenue but may reduce rider satisfaction.</p>
+              <p>the flat fee that erranders takes as commission for standard vendor orders. the rest goes to the rider.</p>
+              <button @click="activeInfo = ''" class="text-blue-500 underline">dismiss</button>
+            </div>
+          </div>
+
+          <!-- Runner Commission (Custom) -->
+          <div class="space-y-2">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">custom errand commission (%)</label>
+              <button @click="showInfo('customCommission')" class="w-4 h-4 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-[#FF5C1A]/10 hover:text-[#FF5C1A] transition-colors">
+                <Info class="w-3 h-3" />
+              </button>
+            </div>
+            <input 
+              v-model.number="form.customErrandCommissionPercentage"
+              type="number" required min="0" max="100"
+              class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+            />
+            <p v-if="form.customErrandCommissionPercentage !== originalForm.customErrandCommissionPercentage" class="text-[10px] font-medium text-amber-600 bg-amber-50 px-3 py-1.5 rounded-xl flex items-center gap-1">
+              <AlertTriangle class="w-3 h-3" />
+              changing from {{ originalForm.customErrandCommissionPercentage }}% → {{ form.customErrandCommissionPercentage }}%.
+            </p>
+            <div v-if="activeInfo === 'customCommission'" class="p-3 bg-blue-50 text-blue-800 rounded-xl text-[11px] font-medium leading-relaxed space-y-1 border border-blue-100">
+              <p class="font-semibold">what is this?</p>
+              <p>the percentage of the delivery fee that erranders takes as commission specifically for Custom Errands. the rest goes to the rider.</p>
               <button @click="activeInfo = ''" class="text-blue-500 underline">dismiss</button>
             </div>
           </div>
@@ -272,7 +296,7 @@
           </div>
           <div class="bg-white/5 rounded-2xl p-4 border border-white/10">
             <p class="text-[10px] text-gray-400 uppercase tracking-wider">delivery commission</p>
-            <p class="text-xl font-semibold mt-1">₦{{ Math.round(form.baseFee * form.commissionPercentage / 100) }}</p>
+            <p class="text-xl font-semibold mt-1">₦{{ form.commissionFlatFee }}</p>
           </div>
           <div class="bg-white/5 rounded-2xl p-4 border border-white/10">
             <p class="text-[10px] text-gray-400 uppercase tracking-wider">processing fee</p>
@@ -603,7 +627,8 @@ const form = reactive({
   baseFee: 450,
   expressFee: 850,
   convenienceFee: 50,
-  commissionPercentage: 10,
+  commissionFlatFee: 50,
+  customErrandCommissionPercentage: 20,
   platformProcessingFee: 500,
   platformServiceFeePercentage: 5,
   foodMarkupPercentage: 5,
@@ -636,7 +661,7 @@ const examBrethrenForm = reactive({
 
 // ─── Revenue Calculator ────────────────
 const estimatedRevenue = computed(() => {
-  return form.convenienceFee + Math.round(form.baseFee * form.commissionPercentage / 100) + form.platformProcessingFee;
+  return form.convenienceFee + form.commissionFlatFee + form.platformProcessingFee;
 });
 
 // ─── Confirmation Modal ────────────────
@@ -656,7 +681,8 @@ const confirmSave = (type: string) => {
     if (form.baseFee !== originalForm.baseFee) confirmModal.changes.push(`standard base fee: <strong>₦${originalForm.baseFee}</strong> → <strong>₦${form.baseFee}</strong>`);
     if (form.expressFee !== originalForm.expressFee) confirmModal.changes.push(`express base fee: <strong>₦${originalForm.expressFee}</strong> → <strong>₦${form.expressFee}</strong>`);
     if (form.convenienceFee !== originalForm.convenienceFee) confirmModal.changes.push(`convenience fee: <strong>₦${originalForm.convenienceFee}</strong> → <strong>₦${form.convenienceFee}</strong>`);
-    if (form.commissionPercentage !== originalForm.commissionPercentage) confirmModal.changes.push(`runner commission: <strong>${originalForm.commissionPercentage}%</strong> → <strong>${form.commissionPercentage}%</strong>`);
+    if (form.commissionFlatFee !== originalForm.commissionFlatFee) confirmModal.changes.push(`runner commission (food): <strong>₦${originalForm.commissionFlatFee}</strong> → <strong>₦${form.commissionFlatFee}</strong>`);
+    if (form.customErrandCommissionPercentage !== originalForm.customErrandCommissionPercentage) confirmModal.changes.push(`runner commission (custom): <strong>${originalForm.customErrandCommissionPercentage}%</strong> → <strong>${form.customErrandCommissionPercentage}%</strong>`);
     if (form.platformProcessingFee !== originalForm.platformProcessingFee) confirmModal.changes.push(`processing fee: <strong>₦${originalForm.platformProcessingFee}</strong> → <strong>₦${form.platformProcessingFee}</strong>`);
     if (form.platformServiceFeePercentage !== originalForm.platformServiceFeePercentage) confirmModal.changes.push(`service fee: <strong>${originalForm.platformServiceFeePercentage}%</strong> → <strong>${form.platformServiceFeePercentage}%</strong>`);
     if (form.foodMarkupPercentage !== originalForm.foodMarkupPercentage) confirmModal.changes.push(`food markup: <strong>${originalForm.foodMarkupPercentage}%</strong> → <strong>${form.foodMarkupPercentage}%</strong>`);
@@ -704,7 +730,7 @@ const loadSettings = async () => {
       form.baseFee = errandRes.data.baseFee || 450;
       form.expressFee = errandRes.data.expressFee || 850;
       form.convenienceFee = errandRes.data.convenienceFee ?? 50;
-      form.commissionPercentage = errandRes.data.commissionPercentage ?? 10;
+      form.commissionFlatFee = errandRes.data.commissionFlatFee ?? 50;
       form.platformProcessingFee = errandRes.data.platformProcessingFee ?? 500;
       form.platformServiceFeePercentage = errandRes.data.platformServiceFeePercentage ?? 5;
       form.foodMarkupPercentage = errandRes.data.foodMarkupPercentage ?? 5;
@@ -744,7 +770,8 @@ const saveSettings = async () => {
       baseFee: Number(form.baseFee),
       expressFee: Number(form.expressFee),
       convenienceFee: Number(form.convenienceFee),
-      commissionPercentage: Number(form.commissionPercentage),
+      commissionFlatFee: Number(form.commissionFlatFee),
+      customErrandCommissionPercentage: Number(form.customErrandCommissionPercentage),
       platformProcessingFee: Number(form.platformProcessingFee),
       platformServiceFeePercentage: Number(form.platformServiceFeePercentage),
       foodMarkupPercentage: Number(form.foodMarkupPercentage),

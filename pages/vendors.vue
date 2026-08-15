@@ -163,6 +163,24 @@
                     >
                       <XCircle class="w-4 h-4" /> Suspend Vendor
                     </button>
+
+                    <button 
+                      @click.stop="activeDropdownId = null; initiateAction('toggleVisibility', vendor._id, vendor.isVisible !== false ? false : true)" 
+                      class="w-full text-left px-4 py-2 text-sm text-amber-600 hover:bg-amber-50 flex items-center gap-2"
+                    >
+                      <EyeOff v-if="vendor.isVisible !== false" class="w-4 h-4" /> 
+                      <Eye v-else class="w-4 h-4" /> 
+                      {{ vendor.isVisible !== false ? 'Hide from Website' : 'Show on Website' }}
+                    </button>
+
+                    <div class="h-px w-full bg-gray-100 my-1"></div>
+
+                    <button 
+                      @click.stop="activeDropdownId = null; initiateAction('delete', vendor._id)" 
+                      class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                    >
+                      <Trash2 class="w-4 h-4" /> Delete Permanently
+                    </button>
                   </div>
                 </div>
               </td>
@@ -179,6 +197,7 @@
       :message="confirmModal.message"
       :type="confirmModal.type"
       :confirmText="confirmModal.confirmText"
+      :isLoading="isProcessingAction"
       @cancel="confirmModal.isOpen = false"
       @confirm="executeAction"
     />
@@ -442,7 +461,7 @@
 
 <script setup lang="ts">
 import { useAdminVendors } from '@/composables/modules/admin';
-import { Search, Store, Eye, CheckCircle, XCircle, RefreshCcw, Star, Globe, Copy, User, Mail, Phone, GraduationCap, Banknote, AlertCircle, Percent, MoreVertical, Edit } from 'lucide-vue-next';
+import { Search, Store, Eye, EyeOff, Trash2, CheckCircle, XCircle, RefreshCcw, Star, Globe, Copy, User, Mail, Phone, GraduationCap, Banknote, AlertCircle, Percent, MoreVertical, Edit, Loader2 } from 'lucide-vue-next';
 import { onMounted, ref, computed, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import EmptyState from '@/components/core/EmptyState.vue';
@@ -462,7 +481,7 @@ useHead({ title: 'Vendors - Errander Admin' });
 
 const router = useRouter();
 const { showToast } = useCustomToast();
-const { vendors, loading, fetchVendors, approveVendor, rejectVendor } = useAdminVendors();
+const { vendors, loading, fetchVendors, approveVendor, rejectVendor, toggleVendorVisibility, deleteVendor } = useAdminVendors();
 const activeTab = ref('all');
 const searchQuery = ref('');
 const selectedVendor = ref<any>(null);
@@ -537,7 +556,8 @@ const confirmModal = ref({
   type: 'danger',
   confirmText: 'Confirm',
   actionType: '',
-  vendorId: ''
+  vendorId: '',
+  payload: null as any
 });
 
 const tabs = [
@@ -566,9 +586,10 @@ const emptyStateDescription = computed(() => {
 
 onMounted(fetchVendors);
 
-const initiateAction = (action: 'approve' | 'reject', vendorId: string) => {
+const initiateAction = (action: 'approve' | 'reject' | 'delete' | 'toggleVisibility', vendorId: string, payload?: any) => {
   confirmModal.value.vendorId = vendorId;
   confirmModal.value.actionType = action;
+  confirmModal.value.payload = payload;
   confirmModal.value.isOpen = true;
   
   if (action === 'approve') {
@@ -576,22 +597,51 @@ const initiateAction = (action: 'approve' | 'reject', vendorId: string) => {
     confirmModal.value.message = 'Are you sure you want to approve this vendor application? They will be able to start selling.';
     confirmModal.value.type = 'success';
     confirmModal.value.confirmText = 'Approve';
-  } else {
+  } else if (action === 'reject') {
     confirmModal.value.title = 'Suspend/Reject Vendor';
     confirmModal.value.message = 'Are you sure you want to reject or suspend this vendor? Their store will be hidden.';
     confirmModal.value.type = 'danger';
     confirmModal.value.confirmText = 'Suspend';
+  } else if (action === 'delete') {
+    confirmModal.value.title = 'Delete Vendor Permanently';
+    confirmModal.value.message = 'Are you sure you want to permanently delete this vendor? This action cannot be undone.';
+    confirmModal.value.type = 'danger';
+    confirmModal.value.confirmText = 'Delete';
+  } else if (action === 'toggleVisibility') {
+    confirmModal.value.title = payload ? 'Show Vendor' : 'Hide Vendor';
+    confirmModal.value.message = payload 
+      ? 'Are you sure you want to make this vendor visible on the website again?'
+      : 'Are you sure you want to hide this vendor from the website? Customers will no longer see them.';
+    confirmModal.value.type = 'warning';
+    confirmModal.value.confirmText = payload ? 'Show' : 'Hide';
   }
 };
 
+const isProcessingAction = ref(false);
+
 const executeAction = async () => {
+  isProcessingAction.value = true;
   confirmModal.value.isOpen = false;
-  const { actionType, vendorId } = confirmModal.value;
+  const { actionType, vendorId, payload } = confirmModal.value;
   
-  if (actionType === 'approve') {
-    await approveVendor(vendorId);
-  } else {
-    await rejectVendor(vendorId);
+  try {
+    if (actionType === 'approve') {
+      await approveVendor(vendorId);
+    } else if (actionType === 'reject') {
+      await rejectVendor(vendorId);
+    } else if (actionType === 'delete') {
+      await deleteVendor(vendorId);
+      if (selectedVendor.value?._id === vendorId) {
+        selectedVendor.value = null;
+      }
+    } else if (actionType === 'toggleVisibility') {
+      await toggleVendorVisibility(vendorId, payload);
+      if (selectedVendor.value?._id === vendorId) {
+        selectedVendor.value.isVisible = payload;
+      }
+    }
+  } finally {
+    isProcessingAction.value = false;
   }
 };
 </script>

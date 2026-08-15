@@ -25,7 +25,12 @@
           v-if="isOpen"
           class="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 flex flex-col items-center text-center space-y-4"
         >
-          <div class="w-12 h-12 rounded-full flex items-center justify-center" :class="type === 'danger' ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-500'">
+          <div class="w-12 h-12 rounded-full flex items-center justify-center" :class="{
+            'bg-rose-50 text-rose-500': type === 'danger',
+            'bg-emerald-50 text-emerald-500': type === 'success',
+            'bg-amber-50 text-amber-500': type === 'warning',
+            'bg-blue-50 text-blue-500': type === 'info'
+          }">
             <component :is="icon" class="w-6 h-6" />
           </div>
 
@@ -43,10 +48,18 @@
             </button>
             <button
               @click="$emit('confirm')"
-              class="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-colors"
-              :class="type === 'danger' ? 'bg-rose-500 hover:bg-rose-600' : 'bg-emerald-500 hover:bg-emerald-600'"
+              :disabled="isLoading"
+              class="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-colors flex items-center justify-center gap-2"
+              :class="{
+                'bg-rose-500 hover:bg-rose-600': type === 'danger',
+                'bg-emerald-500 hover:bg-emerald-600': type === 'success',
+                'bg-amber-500 hover:bg-amber-600': type === 'warning',
+                'bg-blue-500 hover:bg-blue-600': type === 'info',
+                'opacity-50 cursor-not-allowed': isLoading
+              }"
             >
-              {{ confirmText }}
+              <Loader2 v-if="isLoading" class="w-4 h-4 animate-spin" />
+              {{ isLoading ? 'Processing...' : confirmText }}
             </button>
           </div>
         </div>
@@ -58,7 +71,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { AlertTriangle, Info, CheckCircle, XCircle } from 'lucide-vue-next';
+import { AlertTriangle, Info, CheckCircle, XCircle, Loader2 } from 'lucide-vue-next';
 
 const props = defineProps({
   isOpen: {
@@ -83,7 +96,11 @@ const props = defineProps({
   },
   type: {
     type: String,
-    default: 'danger', // 'danger' or 'success' or 'info'
+    default: 'danger', // 'danger' or 'success' or 'info' or 'warning'
+  },
+  isLoading: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -92,6 +109,7 @@ defineEmits(['confirm', 'cancel']);
 const icon = computed(() => {
   if (props.type === 'danger') return AlertTriangle;
   if (props.type === 'success') return CheckCircle;
+  if (props.type === 'warning') return AlertTriangle;
   return Info;
 });
 </script>

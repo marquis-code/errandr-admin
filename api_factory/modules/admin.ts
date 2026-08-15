@@ -37,6 +37,14 @@ export const admin_api = {
     return GATEWAY_ENDPOINT_WITH_AUTH.put(`/admin/vendors/${id}/reject`);
   },
 
+  toggleVendorVisibility: (id: string, payload: { isVisible: boolean }) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/admin/vendors/${id}/visibility`, payload);
+  },
+
+  deleteVendor: (id: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.delete(`/admin/vendors/${id}`);
+  },
+
   getRecentOrders: (limit: number = 10) => {
     return GATEWAY_ENDPOINT_WITH_AUTH.get(`/admin/orders/recent?limit=${limit}`);
   },

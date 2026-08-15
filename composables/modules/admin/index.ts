@@ -68,7 +68,27 @@ export const useAdminVendors = () => {
     } catch (e) {}
   };
 
-  return { loading, vendors, fetchVendors, approveVendor, rejectVendor };
+  const toggleVendorVisibility = async (id: string, isVisible: boolean) => {
+    try {
+      await admin_api.toggleVendorVisibility(id, { isVisible });
+      showToast({ title: "Success", message: `Vendor is now ${isVisible ? 'visible' : 'hidden'}`, toastType: "success" });
+      await fetchVendors();
+    } catch (e: any) {
+      showToast({ title: "Error", message: e.response?.data?.message || "Failed to toggle visibility", toastType: "error" });
+    }
+  };
+
+  const deleteVendor = async (id: string) => {
+    try {
+      await admin_api.deleteVendor(id);
+      showToast({ title: "Success", message: "Vendor deleted permanently", toastType: "success" });
+      await fetchVendors();
+    } catch (e: any) {
+      showToast({ title: "Error", message: e.response?.data?.message || "Failed to delete vendor", toastType: "error" });
+    }
+  };
+
+  return { loading, vendors, fetchVendors, approveVendor, rejectVendor, toggleVendorVisibility, deleteVendor };
 };
 
 export const useAdminReports = () => {
