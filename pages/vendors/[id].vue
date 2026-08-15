@@ -131,6 +131,11 @@
             <p class="text-sm text-gray-500 max-w-sm">This vendor hasn't uploaded any verification documents yet.</p>
           </div>
         </div>
+
+        <!-- Menu Tab -->
+        <div v-if="activeTab === 'menu'" class="space-y-6">
+          <VendorMenuManager :vendorId="vendorId" />
+        </div>
       </div>
     </div>
 
@@ -161,6 +166,7 @@ import { admin_api } from '@/api_factory/modules/admin';
 import { ArrowLeft, Store, Copy, Calendar, CheckCircle, XCircle, FileText } from 'lucide-vue-next';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 import ConfirmationModal from '@/components/ui/ConfirmationModal.vue';
+import VendorMenuManager from '@/components/vendors/VendorMenuManager.vue';
 import { useCustomToast } from '@/composables/core/useCustomToast';
 
 definePageMeta({
@@ -177,6 +183,7 @@ const loading = ref(true);
 
 const tabs = [
   { key: 'overview', label: 'Overview & Details' },
+  { key: 'menu', label: 'Menu & Combos' },
   { key: 'documents', label: 'Verification Documents' }
 ];
 const activeTab = ref('overview');
