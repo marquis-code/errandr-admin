@@ -20,4 +20,20 @@ export const wallets_api = {
   getGlobalStats: () => {
     return GATEWAY_ENDPOINT_WITH_AUTH.get('/wallets/global-stats');
   },
+
+  approvePayout: (id: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/wallets/transactions/${id}/approve`);
+  },
+  
+  rejectPayout: (id: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/wallets/transactions/${id}/reject`);
+  },
+
+  markPayoutAsPaid: (id: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/wallets/transactions/${id}/mark-paid`);
+  },
+  
+  downloadReceipt: (id: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get(`/wallets/transactions/${id}/receipt`, { responseType: 'blob' });
+  }
 };

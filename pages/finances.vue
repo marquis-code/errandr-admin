@@ -58,7 +58,7 @@
             </div>
             <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Platform Earnings</p>
             <h2 class="text-xl font-bold text-[#FF5C1A] tabular-nums">₦{{ (stats?.totalCommissions || 0).toLocaleString() }}</h2>
-            <span class="text-[10px] font-semibold text-gray-500 mt-1 block">5% commission</span>
+            <span class="text-[10px] font-semibold text-gray-500 mt-1 block">Total platform service fees</span>
           </div>
 
           <!-- Net Balance Card -->
@@ -244,7 +244,13 @@
                 @click="handleApprovePayout(selectedTransaction._id)" 
                 class="w-full py-3 px-4 rounded-lg text-white font-semibold text-xs bg-emerald-600 hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2"
               >
-                Approve Payout
+                Approve (Auto Payout)
+              </button>
+              <button 
+                @click="handleMarkAsPaid(selectedTransaction._id)" 
+                class="w-full py-3 px-4 rounded-lg text-emerald-700 font-semibold text-xs bg-emerald-50 hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2 border border-emerald-200"
+              >
+                Mark as Paid Manually
               </button>
               <button 
                 @click="handleRejectPayout(selectedTransaction._id)" 
@@ -280,13 +286,18 @@ definePageMeta({
 
 useHead({ title: 'Finances - Errander Admin' });
 
-const { stats, transactions, loading, fetchFinances, approvePayout, rejectPayout, downloadReceipt } = useAdminFinances();
+const { stats, transactions, loading, fetchFinances, approvePayout, rejectPayout, markPayoutAsPaid, downloadReceipt } = useAdminFinances();
 
 const searchQuery = ref('');
 const selectedTransaction = ref<any>(null);
 
 const handleApprovePayout = async (id: string) => {
   await approvePayout(id);
+  selectedTransaction.value = null; // Close drawer after action
+};
+
+const handleMarkAsPaid = async (id: string) => {
+  await markPayoutAsPaid(id);
   selectedTransaction.value = null; // Close drawer after action
 };
 

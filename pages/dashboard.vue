@@ -61,6 +61,11 @@
       </template>
     </div>
 
+    <!-- Revenue Chart Section -->
+    <div class="w-full">
+      <RevenueChart :data="chartData" />
+    </div>
+
     <!-- Middle Section -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
       <!-- Recent Activity -->
@@ -182,7 +187,9 @@ useHead({
   title: 'Dashboard - Errander Admin'
 })
 
-const { stats, loading: statsLoading, fetchStats } = useAdminStats()
+import RevenueChart from '@/components/core/RevenueChart.vue'
+
+const { stats, chartData, loading: statsLoading, fetchStats } = useAdminStats()
 const ordersLoading = ref(true)
 const recentOrders = ref<any[]>([])
 

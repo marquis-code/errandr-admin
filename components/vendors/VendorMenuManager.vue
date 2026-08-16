@@ -37,6 +37,10 @@
             <button @click="resetUsedOrders" class="ml-auto text-xs text-indigo-500 hover:underline font-medium">Reset</button>
           </div>
         </div>
+        <div class="col-span-2 md:col-span-4">
+          <label class="text-xs font-semibold text-gray-600 block mb-1">Description (Optional)</label>
+          <input type="text" v-model="promoForm.description" @blur="savePromo" placeholder="e.g. Special promo combo for students..." class="w-full border border-indigo-200 rounded-lg p-2 text-sm outline-none focus:border-indigo-400 bg-white" />
+        </div>
       </div>
       <div v-if="promoForm.enabled && promoForm.usedOrders >= promoForm.maxOrders" class="mt-3 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-600 font-medium">
         ⚠️ All promo slots have been used. Students will now pay normally.
@@ -223,7 +227,8 @@ const promoForm = ref({
   budgetPerOrder: 0,
   maxOrders: 0,
   usedOrders: 0,
-  label: ''
+  label: '',
+  description: ''
 });
 
 const fetchVendorPromo = async () => {
@@ -236,7 +241,8 @@ const fetchVendorPromo = async () => {
         budgetPerOrder: vendor.prepaidPromo.budgetPerOrder || 0,
         maxOrders: vendor.prepaidPromo.maxOrders || 0,
         usedOrders: vendor.prepaidPromo.usedOrders || 0,
-        label: vendor.prepaidPromo.label || ''
+        label: vendor.prepaidPromo.label || '',
+        description: vendor.prepaidPromo.description || ''
       };
     }
   } catch (err) {

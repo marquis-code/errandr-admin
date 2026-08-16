@@ -5,6 +5,10 @@ export const admin_api = {
     return GATEWAY_ENDPOINT_WITH_AUTH.get('/admin/stats');
   },
 
+  getChartData: (days: number = 30) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get(`/admin/chart-data?days=${days}`);
+  },
+
   getUsers: () => {
     return GATEWAY_ENDPOINT_WITH_AUTH.get('/admin/users');
   },

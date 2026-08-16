@@ -145,6 +145,9 @@
                     <button @click.stop="activeDropdownId = null; selectedVendor = vendor; activeDrawerTab = 'edit'" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
                       <Edit class="w-4 h-4 text-gray-400" /> Edit Details
                     </button>
+                    <NuxtLink :to="`/vendors/${vendor._id}`" class="w-full text-left px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 flex items-center gap-2 font-medium">
+                      <LayoutList class="w-4 h-4 text-indigo-500" /> Manage Menu & Promos
+                    </NuxtLink>
                     
                     <div class="h-px w-full bg-gray-100 my-1"></div>
                     
@@ -203,7 +206,7 @@
     />
 
     <!-- Vendor Details Side Drawer -->
-    <SideDrawer :isOpen="!!selectedVendor" @close="selectedVendor = null">
+    <SideDrawer :isOpen="!!selectedVendor" size="full" @close="selectedVendor = null">
       <template v-if="selectedVendor">
         <!-- Header -->
         <div class="flex flex-col items-center justify-center pt-8 pb-6 border-b border-gray-100 bg-white">
@@ -213,6 +216,7 @@
 
           <div class="flex space-x-2 mt-2 mb-4 w-5/6">
             <button @click="activeDrawerTab = 'overview'" :class="activeDrawerTab === 'overview' ? 'bg-[#FF5C1A] text-white' : 'bg-gray-100 text-gray-600'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors">Overview</button>
+            <button @click="activeDrawerTab = 'menu'" :class="activeDrawerTab === 'menu' ? 'bg-[#FF5C1A] text-white' : 'bg-gray-100 text-gray-600'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors">Menu</button>
             <button @click="enterEditMode" :class="activeDrawerTab === 'edit' ? 'bg-[#FF5C1A] text-white' : 'bg-gray-100 text-gray-600'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors">Edit</button>
           </div>
 
@@ -371,6 +375,10 @@
           </div>
           </template>
 
+          <template v-if="activeDrawerTab === 'menu'">
+            <VendorMenuManager :vendorId="selectedVendor._id" />
+          </template>
+
           <!-- Edit Tab -->
           <template v-if="activeDrawerTab === 'edit'">
             <form @submit.prevent="handleUpdateVendor" class="space-y-4">
@@ -461,9 +469,11 @@
 
 <script setup lang="ts">
 import { useAdminVendors } from '@/composables/modules/admin';
-import { Search, Store, Eye, EyeOff, Trash2, CheckCircle, XCircle, RefreshCcw, Star, Globe, Copy, User, Mail, Phone, GraduationCap, Banknote, AlertCircle, Percent, MoreVertical, Edit, Loader2 } from 'lucide-vue-next';
+import { Search, Store, Eye, EyeOff, Trash2, CheckCircle, XCircle, RefreshCcw, Star, Globe, Copy, User, Mail, Phone, GraduationCap, Banknote, AlertCircle, Percent, MoreVertical, Edit, Loader2, LayoutList } from 'lucide-vue-next';
 import { onMounted, ref, computed, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
+import VendorMenuManager from "@/components/vendors/VendorMenuManager.vue";
+
 import EmptyState from '@/components/core/EmptyState.vue';
 import SkeletonTable from '@/components/ui/SkeletonTable.vue';
 import StatusBadge from '@/components/ui/StatusBadge.vue';

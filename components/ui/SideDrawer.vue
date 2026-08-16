@@ -7,7 +7,8 @@
     <Transition name="drawer-slide">
       <div 
         v-if="isOpen" 
-        class="fixed right-0 top-0 bottom-0 z-[101] w-full md:w-[460px] bg-white shadow-2xl overflow-y-auto flex flex-col"
+        class="fixed right-0 top-0 bottom-0 z-[101] bg-white shadow-2xl overflow-y-auto flex flex-col"
+        :class="size === 'full' ? 'w-full' : 'w-full md:w-[460px]'"
       >
         <!-- Header -->
         <div class="flex items-center justify-end p-6 pb-2">
@@ -29,7 +30,12 @@
 import { X } from 'lucide-vue-next';
 import { onUnmounted, watch } from 'vue';
 
-const props = defineProps<{ isOpen: boolean }>();
+const props = withDefaults(defineProps<{ 
+  isOpen: boolean;
+  size?: 'default' | 'full';
+}>(), {
+  size: 'default'
+});
 const emit = defineEmits(['close']);
 
 const close = () => {

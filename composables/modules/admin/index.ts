@@ -6,18 +6,23 @@ import { useCustomToast } from "@/composables/core/useCustomToast";
 export const useAdminStats = () => {
   const loading = ref(false);
   const stats = ref<any>(null);
+  const chartData = ref<any[]>([]);
 
   const fetchStats = async () => {
     loading.value = true;
     try {
-      const res = await admin_api.getDashboardStats();
+      const [res, chartRes] = await Promise.all([
+        admin_api.getDashboardStats(),
+        admin_api.getChartData(30)
+      ]);
       stats.value = res.data;
+      chartData.value = chartRes.data;
     } finally {
       loading.value = false;
     }
   };
 
-  return { loading, stats, fetchStats };
+  return { loading, stats, chartData, fetchStats };
 };
 
 export const useAdminUsers = () => {
@@ -121,11 +126,15 @@ export const useAdminFinances = () => {
   const fetchFinances = async () => {
     loading.value = true;
     try {
-      const [statsRes, txRes] = await Promise.all([
+      const [statsRes, txRes, dashboardStatsRes] = await Promise.all([
         wallets_api.getGlobalStats(),
-        wallets_api.getTransactions()
+        wallets_api.getTransactions(),
+        admin_api.getDashboardStats()
       ]);
-      stats.value = statsRes.data;
+      stats.value = {
+        ...statsRes.data,
+        totalCommissions: dashboardStatsRes.data.totalRevenue || 0
+      };
       transactions.value = txRes.data;
     } finally {
       loading.value = false;
@@ -133,32 +142,35 @@ export const useAdminFinances = () => {
   };
 
   const approvePayout = async (id: string) => {
+    const { showToast } = useCustomToast();
     loading.value = true;
     try {
       await wallets_api.approvePayout(id);
-      useCustomToast('Payout approved successfully', 'success');
+      showToast({ title: 'Success', message: 'Payout approved successfully', toastType: 'success' });
       await fetchFinances();
     } catch (error: any) {
-      useCustomToast(error.message || 'Failed to approve payout', 'error');
+      showToast({ title: 'Error', message: error.message || 'Failed to approve payout', toastType: 'error' });
     } finally {
       loading.value = false;
     }
   };
 
   const rejectPayout = async (id: string) => {
+    const { showToast } = useCustomToast();
     loading.value = true;
     try {
       await wallets_api.rejectPayout(id);
-      useCustomToast('Payout rejected successfully', 'success');
+      showToast({ title: 'Success', message: 'Payout rejected successfully', toastType: 'success' });
       await fetchFinances();
     } catch (error: any) {
-      useCustomToast(error.message || 'Failed to reject payout', 'error');
+      showToast({ title: 'Error', message: error.message || 'Failed to reject payout', toastType: 'error' });
     } finally {
       loading.value = false;
     }
   };
 
   const downloadReceipt = async (id: string) => {
+    const { showToast } = useCustomToast();
     try {
       const res = await wallets_api.downloadReceipt(id);
       const url = window.URL.createObjectURL(new Blob([res.data]));
@@ -169,9 +181,23 @@ export const useAdminFinances = () => {
       link.click();
       document.body.removeChild(link);
     } catch (error: any) {
-      useCustomToast(error.message || 'Failed to download receipt', 'error');
+      showToast({ title: 'Error', message: error.message || 'Failed to download receipt', toastType: 'error' });
     }
   };
 
-  return { loading, stats, transactions, fetchFinances, approvePayout, rejectPayout, downloadReceipt };
+  const markPayoutAsPaid = async (id: string) => {
+    const { showToast } = useCustomToast();
+    loading.value = true;
+    try {
+      await wallets_api.markPayoutAsPaid(id);
+      showToast({ title: 'Success', message: 'Payout marked as paid manually', toastType: 'success' });
+      await fetchFinances();
+    } catch (error: any) {
+      showToast({ title: 'Error', message: error.message || 'Failed to update payout', toastType: 'error' });
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  return { loading, stats, transactions, fetchFinances, approvePayout, rejectPayout, markPayoutAsPaid, downloadReceipt };
 };
