@@ -427,7 +427,27 @@
                   <label class="text-xs font-semibold text-gray-700">Prep Time (mins)</label>
                   <input v-model="editVendorPayload.preparationTime" type="number" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
                 </div>
-                <div class="space-y-2">
+                
+                <!-- Business Hours Editor -->
+                <div class="col-span-2 space-y-4 pt-4 border-t border-gray-100">
+                  <h4 class="text-xs font-bold text-gray-900">Weekly Schedule</h4>
+                  <div class="space-y-2">
+                    <div v-for="bh in editVendorPayload.businessHours" :key="bh.day" class="p-3 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3" :class="bh.isClosed ? 'border-transparent bg-gray-50' : 'border-gray-200 bg-white'">
+                      <div class="flex items-center gap-3">
+                        <input type="checkbox" :checked="!bh.isClosed" @change="bh.isClosed = !($event.target as HTMLInputElement).checked" class="w-4 h-4 rounded border-gray-300 text-[#FF5C1A] focus:ring-[#FF5C1A]" />
+                        <span class="text-xs font-bold text-gray-900 capitalize w-20">{{ bh.day }}</span>
+                      </div>
+                      
+                      <div class="flex items-center gap-2 transition-opacity duration-300" :class="bh.isClosed ? 'opacity-30 pointer-events-none' : 'opacity-100'">
+                        <input type="time" v-model="bh.open" :disabled="bh.isClosed" class="text-sm font-bold px-3 py-2 bg-gray-50 rounded-lg border-transparent focus:bg-white focus:border-gray-200 focus:ring-0 outline-none w-28" />
+                        <span class="text-gray-400 font-bold text-xs">to</span>
+                        <input type="time" v-model="bh.close" :disabled="bh.isClosed" class="text-sm font-bold px-3 py-2 bg-gray-50 rounded-lg border-transparent focus:bg-white focus:border-gray-200 focus:ring-0 outline-none w-28" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-span-2 pt-4">
                   <label class="text-xs font-semibold text-gray-700">Status</label>
                   <select v-model="editVendorPayload.status" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
                     <option value="pending">Pending</option>
@@ -520,7 +540,8 @@ const editVendorPayload = ref({
   packagingFee: 0,
   minimumOrder: 0,
   preparationTime: 0,
-  status: 'pending' 
+  status: 'pending',
+  businessHours: [] as any[]
 });
 const updatingVendor = ref(false);
 
@@ -539,6 +560,17 @@ const enterEditMode = () => {
       minimumOrder: selectedVendor.value.minimumOrder || 0,
       preparationTime: selectedVendor.value.preparationTime || 0,
       status: selectedVendor.value.status || 'pending',
+      businessHours: selectedVendor.value.businessHours && selectedVendor.value.businessHours.length > 0 
+        ? JSON.parse(JSON.stringify(selectedVendor.value.businessHours)) 
+        : [
+            { day: 'monday', open: '08:00', close: '21:00', isClosed: false },
+            { day: 'tuesday', open: '08:00', close: '21:00', isClosed: false },
+            { day: 'wednesday', open: '08:00', close: '21:00', isClosed: false },
+            { day: 'thursday', open: '08:00', close: '21:00', isClosed: false },
+            { day: 'friday', open: '08:00', close: '21:00', isClosed: false },
+            { day: 'saturday', open: '08:00', close: '21:00', isClosed: false },
+            { day: 'sunday', open: '08:00', close: '21:00', isClosed: true },
+          ],
     };
   }
 };
