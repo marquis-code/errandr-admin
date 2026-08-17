@@ -26,6 +26,10 @@
           <input type="number" v-model.number="promoForm.budgetPerOrder" @blur="savePromo" class="w-full border border-indigo-200 rounded-lg p-2 text-sm outline-none focus:border-indigo-400 bg-white" />
         </div>
         <div>
+          <label class="text-xs font-semibold text-gray-600 block mb-1">Discount Value (₦)</label>
+          <input type="number" v-model.number="promoForm.discountValue" @blur="savePromo" class="w-full border border-indigo-200 rounded-lg p-2 text-sm outline-none focus:border-indigo-400 bg-white" />
+        </div>
+        <div>
           <label class="text-xs font-semibold text-gray-600 block mb-1">Total Slots</label>
           <input type="number" v-model.number="promoForm.maxOrders" @blur="savePromo" class="w-full border border-indigo-200 rounded-lg p-2 text-sm outline-none focus:border-indigo-400 bg-white" />
         </div>
@@ -151,6 +155,13 @@
 
           <div class="flex items-center justify-between">
             <div>
+              <label class="text-sm font-semibold text-gray-700 block mb-1">Price (₦)</label>
+              <input type="number" v-model="editForm.price" class="w-full border border-gray-300 rounded-lg p-2.5 outline-none focus:border-[#FF5C1A] text-sm" />
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div>
               <label class="text-sm font-semibold text-gray-700 block">Prepaid by Platform (Promo)</label>
               <p class="text-xs text-gray-500 max-w-[250px]">If true, 100% of vendor payouts for this item goes to the platform.</p>
             </div>
@@ -218,7 +229,8 @@ const editForm = ref({
   isPrepaidByPlatform: false,
   trackStock: false,
   stockQuantity: 0,
-  isAvailable: true
+  isAvailable: true,
+  price: 0
 });
 
 // ── Vendor-Level Promo State ──
@@ -226,6 +238,7 @@ const promoForm = ref({
   enabled: false,
   budgetPerOrder: 0,
   maxOrders: 0,
+  discountValue: 0,
   usedOrders: 0,
   label: '',
   description: ''
@@ -240,6 +253,7 @@ const fetchVendorPromo = async () => {
         enabled: !!vendor.prepaidPromo.enabled,
         budgetPerOrder: vendor.prepaidPromo.budgetPerOrder || 0,
         maxOrders: vendor.prepaidPromo.maxOrders || 0,
+        discountValue: vendor.prepaidPromo.discountValue || 0,
         usedOrders: vendor.prepaidPromo.usedOrders || 0,
         label: vendor.prepaidPromo.label || '',
         description: vendor.prepaidPromo.description || ''
@@ -290,7 +304,8 @@ const openEditModal = (item: any, isPack = false) => {
     isPrepaidByPlatform: !!item.isPrepaidByPlatform,
     trackStock: !!item.trackStock,
     stockQuantity: item.stockQuantity || 0,
-    isAvailable: !!item.isAvailable
+    isAvailable: !!item.isAvailable,
+    price: isPack ? (item.bundlePrice || item.price || 0) : (item.pricePerPortion || item.price || 0)
   };
   isModalOpen.value = true;
 };
@@ -300,7 +315,20 @@ const saveChanges = async () => {
   saving.value = true;
   try {
     const endpoint = isEditingPack.value ? `/menu/packs/admin/update/${selectedItem.value._id}` : `/menu/items/admin/update/${selectedItem.value._id}`;
-    await api.patch(endpoint, editForm.value);
+    
+    const payload: any = {
+      isPrepaidByPlatform: editForm.value.isPrepaidByPlatform,
+      trackStock: editForm.value.trackStock,
+      stockQuantity: editForm.value.stockQuantity,
+      isAvailable: editForm.value.isAvailable,
+    };
+    if (isEditingPack.value) {
+      payload.bundlePrice = editForm.value.price;
+    } else {
+      payload.pricePerPortion = editForm.value.price;
+    }
+    
+    await api.patch(endpoint, payload);
     isModalOpen.value = false;
     fetchMenuItems(); // refresh
   } catch (err) {
