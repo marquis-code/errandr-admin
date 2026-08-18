@@ -190,9 +190,20 @@
         </div>
 
         <div v-else class="overflow-x-auto">
+          <!-- Batch Actions Toolbar -->
+          <div v-if="selectedDispatchers.length > 0" class="bg-red-50 px-6 py-4 border-b border-red-100 flex justify-between items-center">
+            <span class="text-red-700 font-bold">{{ selectedDispatchers.length }} dispatcher(s) selected</span>
+            <button @click="confirmBatchDelete" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 transition-colors shadow-sm">
+              Delete Selected
+            </button>
+          </div>
+          
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="border-b border-gray-100 bg-gray-50 text-[11px] uppercase tracking-wider text-gray-500">
+                <th class="px-6 py-4 w-12 text-center">
+                  <input type="checkbox" :checked="selectedDispatchers.length === allDispatchers.length && allDispatchers.length > 0" @change="toggleSelectAll" class="rounded border-gray-300 text-red-600 focus:ring-red-500" />
+                </th>
                 <th class="px-6 py-4 font-bold">Dispatcher</th>
                 <th class="px-6 py-4 font-bold">School & Matric</th>
                 <th class="px-6 py-4 font-bold">Verification</th>
@@ -202,7 +213,10 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-              <tr v-for="errander in allDispatchers" :key="errander._id" class="hover:bg-gray-50/50 transition-colors">
+              <tr v-for="errander in allDispatchers" :key="errander._id" class="hover:bg-gray-50/50 transition-colors" :class="{'bg-red-50/20': selectedDispatchers.includes(errander._id)}">
+                <td class="px-6 py-4 text-center">
+                  <input type="checkbox" v-model="selectedDispatchers" :value="errander._id" @click.stop class="rounded border-gray-300 text-red-600 focus:ring-red-500" />
+                </td>
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-3">
                     <div class="w-10 h-10 bg-gray-100 rounded-full overflow-hidden shrink-0">
@@ -268,6 +282,16 @@
                         class="w-full text-left px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 flex items-center gap-2 disabled:opacity-50"
                       >
                         <CheckCircle class="w-4 h-4" /> Reactivate
+                      </button>
+                      
+                      <div class="h-px w-full bg-gray-100 my-1"></div>
+                      
+                      <button 
+                        @click.stop="activeDropdownId = null; deleteDispatcher(errander._id)" 
+                        :disabled="processing === errander._id"
+                        class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50"
+                      >
+                        <Trash2 class="w-4 h-4" /> Delete
                       </button>
                     </div>
                   </div>
@@ -591,10 +615,35 @@
                 <span>Reactivate Dispatcher</span>
                 <span class="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
               </button>
+
+              <button 
+                @click="deleteDispatcher(selectedProfile._id)" 
+                :disabled="processing === selectedProfile._id"
+                class="w-full flex items-center justify-between p-4 rounded-xl border border-red-100 bg-red-50 hover:bg-red-100 transition-colors text-red-700 font-bold group"
+              >
+                <span>Delete Dispatcher</span>
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+              </button>
             </div>
             <p class="text-xs text-gray-500 mt-3 text-center">Suspending a dispatcher prevents them from accepting new deliveries or going online.</p>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div v-if="showDeleteModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
+      <h3 class="text-lg font-bold text-gray-900 mb-2">Delete Dispatcher</h3>
+      <p class="text-sm text-gray-600 mb-6">Are you sure you want to permanently delete this dispatcher? This action cannot be undone.</p>
+      <div class="flex gap-3">
+        <button @click="showDeleteModal = false" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-colors">
+          Cancel
+        </button>
+        <button @click="confirmDeleteDispatcher" :disabled="processing !== null" class="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-colors disabled:opacity-50">
+          {{ processing !== null ? 'Deleting...' : 'Yes, Delete' }}
+        </button>
       </div>
     </div>
   </div>
@@ -604,7 +653,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { GATEWAY_ENDPOINT_WITH_AUTH as api } from '@/api_factory/axios.config'
 import { useCustomToast as useToast } from '@/composables/core/useCustomToast'
-import { RefreshCw, X, MoreVertical, Eye, Edit, CheckCircle, XCircle } from 'lucide-vue-next'
+import { RefreshCw, X, MoreVertical, Eye, Edit, CheckCircle, XCircle, Trash2 } from 'lucide-vue-next'
 
 definePageMeta({ layout: 'admin' })
 useHead({ title: 'Dispatchers Management - Admin' })
@@ -831,6 +880,73 @@ const updateTier = async (id: string, tier: number) => {
     await fetchAll()
   } catch (err) {
     showToast({ title: 'Error', message: `Failed to update tier`, toastType: 'error' })
+  } finally {
+    processing.value = null
+  }
+}
+
+const showDeleteModal = ref(false)
+const dispatcherToDelete = ref<string | null>(null)
+
+const deleteDispatcher = (id: string) => {
+  dispatcherToDelete.value = id
+  showDeleteModal.value = true
+}
+
+const selectedDispatchers = ref<string[]>([])
+
+const toggleSelectAll = (e: any) => {
+  if (e.target.checked) {
+    selectedDispatchers.value = allDispatchers.value.map((d: any) => d._id)
+  } else {
+    selectedDispatchers.value = []
+  }
+}
+
+const confirmBatchDelete = async () => {
+  if (!confirm(`Are you sure you want to permanently delete ${selectedDispatchers.value.length} dispatcher(s)? This action cannot be undone.`)) return;
+  processing.value = 'batch-delete'
+  try {
+    await api.post(`/admin/dispatchers/batch-delete`, { ids: selectedDispatchers.value })
+    showToast({ title: 'Success', message: 'Dispatchers successfully deleted.', toastType: 'success' })
+    selectedDispatchers.value = []
+    
+    await Promise.all([
+      fetchPending(),
+      fetchAll()
+    ])
+  } catch (error) {
+    console.error('Error batch deleting dispatchers:', error)
+    showToast({ title: 'Error', message: 'Failed to batch delete dispatchers', toastType: 'error' })
+  } finally {
+    processing.value = null
+  }
+}
+
+const confirmDeleteDispatcher = async () => {
+  if (!dispatcherToDelete.value) return;
+  const id = dispatcherToDelete.value;
+  
+  processing.value = id
+  try {
+    await api.delete(`/admin/dispatchers/${id}`)
+    showToast({ title: 'Success', message: 'Dispatcher successfully deleted.', toastType: 'success' })
+    
+    showDeleteModal.value = false
+    dispatcherToDelete.value = null
+    
+    await Promise.all([
+      fetchPending(),
+      fetchAll()
+    ])
+    
+    if (selectedProfile.value && selectedProfile.value._id === id) {
+      drawerOpen.value = false
+      selectedProfile.value = null
+    }
+  } catch (error) {
+    console.error('Error deleting dispatcher:', error)
+    showToast({ title: 'Error', message: 'Failed to delete dispatcher', toastType: 'error' })
   } finally {
     processing.value = null
   }

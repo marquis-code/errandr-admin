@@ -241,7 +241,12 @@
           <template v-if="activeDrawerTab === 'overview'">
           <!-- Basic Info -->
           <div class="space-y-3">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Store Information</h4>
+            <div class="flex items-center justify-between">
+              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Store Information</h4>
+              <button @click="enterEditMode" class="text-[10px] font-bold text-[#FF5C1A] uppercase tracking-wide hover:underline flex items-center gap-1">
+                <Edit class="w-3 h-3" /> Edit
+              </button>
+            </div>
             <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-4">
               <div class="flex items-start gap-3">
                 <Store class="w-4 h-4 text-gray-400 mt-0.5" />
@@ -263,7 +268,12 @@
 
           <!-- Owner Details -->
           <div class="space-y-3">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Owner Profile</h4>
+            <div class="flex items-center justify-between">
+              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Owner Profile</h4>
+              <button @click="enterEditMode" class="text-[10px] font-bold text-[#FF5C1A] uppercase tracking-wide hover:underline flex items-center gap-1">
+                <Edit class="w-3 h-3" /> Edit
+              </button>
+            </div>
             <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-4">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -297,7 +307,12 @@
 
           <!-- Logistics & Fees -->
           <div class="space-y-3">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Logistics & Config</h4>
+            <div class="flex items-center justify-between">
+              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Logistics & Config</h4>
+              <button @click="enterEditMode" class="text-[10px] font-bold text-[#FF5C1A] uppercase tracking-wide hover:underline flex items-center gap-1">
+                <Edit class="w-3 h-3" /> Edit
+              </button>
+            </div>
             <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-semibold text-gray-500">Business Type</span>
@@ -338,7 +353,12 @@
 
           <!-- Bank Details -->
           <div class="space-y-3" v-if="selectedVendor.bankDetails">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Payout Details</h4>
+            <div class="flex items-center justify-between">
+              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Payout Details</h4>
+              <button @click="enterEditMode" class="text-[10px] font-bold text-[#FF5C1A] uppercase tracking-wide hover:underline flex items-center gap-1">
+                <Edit class="w-3 h-3" /> Edit
+              </button>
+            </div>
             <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
               <div class="flex items-start gap-3">
                 <Banknote class="w-4 h-4 text-gray-400 mt-0.5" />
@@ -353,7 +373,12 @@
 
           <!-- Business Hours -->
           <div class="space-y-3" v-if="selectedVendor.businessHours?.length">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Business Hours</h4>
+            <div class="flex items-center justify-between">
+              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Business Hours</h4>
+              <button @click="enterEditMode" class="text-[10px] font-bold text-[#FF5C1A] uppercase tracking-wide hover:underline flex items-center gap-1">
+                <Edit class="w-3 h-3" /> Edit
+              </button>
+            </div>
             <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-2">
               <div v-for="hours in selectedVendor.businessHours" :key="hours._id" class="flex items-center justify-between text-xs">
                 <span class="font-semibold text-gray-600 capitalize w-24">{{ hours.day }}</span>
@@ -426,6 +451,48 @@
                 <div class="space-y-2">
                   <label class="text-xs font-semibold text-gray-700">Prep Time (mins)</label>
                   <input v-model="editVendorPayload.preparationTime" type="number" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                </div>
+
+                <!-- Owner Profile -->
+                <div class="col-span-2 space-y-4 pt-4 border-t border-gray-100">
+                  <h4 class="text-xs font-bold text-gray-900">Owner Profile</h4>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                      <label class="text-xs font-semibold text-gray-700">First Name</label>
+                      <input v-model="editVendorPayload.owner.firstName" type="text" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                    </div>
+                    <div class="space-y-2">
+                      <label class="text-xs font-semibold text-gray-700">Last Name</label>
+                      <input v-model="editVendorPayload.owner.lastName" type="text" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                    </div>
+                    <div class="space-y-2">
+                      <label class="text-xs font-semibold text-gray-700">Email</label>
+                      <input v-model="editVendorPayload.owner.email" type="email" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                    </div>
+                    <div class="space-y-2">
+                      <label class="text-xs font-semibold text-gray-700">Phone</label>
+                      <input v-model="editVendorPayload.owner.phone" type="text" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Payout Details -->
+                <div class="col-span-2 space-y-4 pt-4 border-t border-gray-100">
+                  <h4 class="text-xs font-bold text-gray-900">Payout Details</h4>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2 col-span-2">
+                      <label class="text-xs font-semibold text-gray-700">Bank Name</label>
+                      <input v-model="editVendorPayload.bankDetails.bankName" type="text" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                    </div>
+                    <div class="space-y-2">
+                      <label class="text-xs font-semibold text-gray-700">Account Number</label>
+                      <input v-model="editVendorPayload.bankDetails.accountNumber" type="text" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                    </div>
+                    <div class="space-y-2">
+                      <label class="text-xs font-semibold text-gray-700">Account Name</label>
+                      <input v-model="editVendorPayload.bankDetails.accountName" type="text" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                    </div>
+                  </div>
                 </div>
                 
                 <!-- Business Hours Editor -->
@@ -560,6 +627,17 @@ const enterEditMode = () => {
       minimumOrder: selectedVendor.value.minimumOrder || 0,
       preparationTime: selectedVendor.value.preparationTime || 0,
       status: selectedVendor.value.status || 'pending',
+      owner: {
+        firstName: selectedVendor.value.owner?.firstName || '',
+        lastName: selectedVendor.value.owner?.lastName || '',
+        email: selectedVendor.value.owner?.email || '',
+        phone: selectedVendor.value.owner?.phone || '',
+      },
+      bankDetails: {
+        bankName: selectedVendor.value.bankDetails?.bankName || '',
+        accountNumber: selectedVendor.value.bankDetails?.accountNumber || '',
+        accountName: selectedVendor.value.bankDetails?.accountName || '',
+      },
       businessHours: selectedVendor.value.businessHours && selectedVendor.value.businessHours.length > 0 
         ? JSON.parse(JSON.stringify(selectedVendor.value.businessHours)) 
         : [
