@@ -495,6 +495,21 @@
                   </div>
                 </div>
                 
+                <!-- Global Service Configuration -->
+                <div class="col-span-2 space-y-4 pt-4 border-t border-gray-100">
+                  <h4 class="text-xs font-bold text-gray-900">Service Configuration (Global)</h4>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                      <label class="text-xs font-semibold text-gray-700">Opens At</label>
+                      <input v-model="editVendorPayload.openingTime" @change="syncHoursToWeeklyAdmin" type="time" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                    </div>
+                    <div class="space-y-2">
+                      <label class="text-xs font-semibold text-gray-700">Closes At</label>
+                      <input v-model="editVendorPayload.closingTime" @change="syncHoursToWeeklyAdmin" type="time" class="w-full p-3 text-base bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20" />
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Business Hours Editor -->
                 <div class="col-span-2 space-y-4 pt-4 border-t border-gray-100">
                   <h4 class="text-xs font-bold text-gray-900">Weekly Schedule</h4>
@@ -607,8 +622,9 @@ const editVendorPayload = ref({
   packagingFee: 0,
   minimumOrder: 0,
   preparationTime: 0,
-  status: 'pending',
-  businessHours: [] as any[]
+  businessHours: [] as any[],
+  openingTime: '08:00',
+  closingTime: '20:00'
 });
 const updatingVendor = ref(false);
 
@@ -649,8 +665,19 @@ const enterEditMode = () => {
             { day: 'saturday', open: '08:00', close: '21:00', isClosed: false },
             { day: 'sunday', open: '08:00', close: '21:00', isClosed: true },
           ],
+      openingTime: selectedVendor.value.openingTime || '08:00',
+      closingTime: selectedVendor.value.closingTime || '20:00'
     };
   }
+};
+
+const syncHoursToWeeklyAdmin = () => {
+  editVendorPayload.value.businessHours.forEach(bh => {
+    if (!bh.isClosed) {
+      bh.open = editVendorPayload.value.openingTime;
+      bh.close = editVendorPayload.value.closingTime;
+    }
+  });
 };
 
 const handleUpdateVendor = async () => {
