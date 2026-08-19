@@ -47,31 +47,37 @@
     </div>
 
     <!-- Table Section -->
-    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+    <div class="bg-white rounded-[1.25rem] border border-gray-100/60 shadow-sm hover:shadow-md transition-all overflow-hidden relative">
+      <div class="px-6 py-5 border-b border-gray-100/60 bg-gray-50/50 flex justify-between items-center">
+        <h3 class="text-sm font-bold text-gray-900 tracking-tight uppercase">Registered Vendors</h3>
+      </div>
+      
       <!-- Loading State -->
-      <div v-if="loading" class="p-8">
-        <SkeletonTable :rows="8" :cols="5" />
+      <div v-if="loading" class="p-8 text-center text-gray-400 text-sm">
+        <div class="w-8 h-8 border-4 border-[#FF5C1A] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        Loading Vendors...
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="filteredVendors.length === 0" class="py-20">
-        <EmptyState 
-          title="No vendors found" 
-          :description="emptyStateDescription"
-        />
+      <div v-else-if="filteredVendors.length === 0" class="py-20 text-center">
+        <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 mx-auto mb-4 shadow-sm border border-gray-100">
+          <Store class="w-8 h-8" />
+        </div>
+        <h4 class="font-bold text-gray-900 tracking-tight">No vendors found</h4>
+        <p class="text-sm text-gray-500 mt-1">Adjust filters or wait for new registrations.</p>
       </div>
 
       <!-- Table View -->
       <div v-else class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="border-b border-gray-100 bg-gray-50/50">
-              <th class="py-4 px-6 font-semibold text-gray-600 text-sm whitespace-nowrap">Store Name</th>
-              <th class="py-4 px-4 font-semibold text-gray-600 text-sm whitespace-nowrap">Type & Category</th>
-              <th class="py-4 px-4 font-semibold text-gray-600 text-sm whitespace-nowrap">Stats</th>
-              <th class="py-4 px-4 font-semibold text-gray-600 text-sm whitespace-nowrap text-center">Status</th>
-              <th class="py-4 px-4 font-semibold text-gray-600 text-sm whitespace-nowrap">Owner</th>
-              <th class="py-4 px-6 font-semibold text-gray-600 text-sm whitespace-nowrap text-right">Actions</th>
+            <tr class="border-b border-gray-100/60 bg-gray-50/50 text-[11px] uppercase tracking-wider text-gray-500">
+              <th class="py-4 px-6 font-bold whitespace-nowrap">Store Name</th>
+              <th class="py-4 px-4 font-bold whitespace-nowrap">Type & Category</th>
+              <th class="py-4 px-4 font-bold whitespace-nowrap">Stats & Promo</th>
+              <th class="py-4 px-4 font-bold whitespace-nowrap text-center">Status</th>
+              <th class="py-4 px-4 font-bold whitespace-nowrap">Owner</th>
+              <th class="py-4 px-6 font-bold whitespace-nowrap text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
@@ -98,12 +104,21 @@
                 </div>
               </td>
               <td class="py-4 px-4 whitespace-nowrap">
-                <div class="flex flex-col gap-1">
-                  <div class="flex items-center gap-1.5">
-                    <Star class="w-3.5 h-3.5 text-amber-500 fill-current" />
-                    <span class="text-xs font-bold text-gray-900">{{ vendor.rating || 0 }}</span>
+                <div class="flex flex-col gap-1.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-gray-900 bg-gray-100 px-2 py-0.5 rounded-md">{{ vendor.totalOrders || 0 }} Orders</span>
+                    <div class="flex items-center gap-1">
+                      <Star class="w-3.5 h-3.5 text-amber-500 fill-current" />
+                      <span class="text-xs font-bold text-gray-900">{{ vendor.rating || 0 }}</span>
+                    </div>
                   </div>
-                  <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">{{ vendor.totalOrders || 0 }} Orders</span>
+                  <div v-if="vendor.prepaidPromo?.enabled" class="flex items-center gap-1.5 text-[10px] font-bold text-[#FF5C1A] bg-[#FF5C1A]/10 px-2 py-0.5 rounded-md w-fit border border-[#FF5C1A]/20">
+                    <div class="w-1.5 h-1.5 rounded-full bg-[#FF5C1A]/100"></div>
+                    Promo: {{ vendor.prepaidPromo?.usedOrders || 0 }} / {{ vendor.prepaidPromo?.maxOrders || 0 }}
+                  </div>
+                  <div v-else class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+                    No Active Promo
+                  </div>
                 </div>
               </td>
               <td class="py-4 px-4 text-center">
@@ -127,7 +142,7 @@
                   <button 
                     v-if="vendor.status === 'pending'" 
                     @click="initiateAction('approve', vendor._id)" 
-                    class="p-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
+                    class="p-2 rounded-lg bg-[#FF5C1A]/10 text-[#FF5C1A] hover:bg-emerald-100 transition-colors"
                     title="Approve Vendor"
                   >
                     <CheckCircle class="w-4 h-4" />
@@ -142,19 +157,19 @@
                     <button @click.stop="activeDropdownId = null; selectedVendor = vendor; activeDrawerTab = 'overview'" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
                       <Eye class="w-4 h-4 text-gray-400" /> View Profile
                     </button>
-                    <button @click.stop="activeDropdownId = null; selectedVendor = vendor; activeDrawerTab = 'edit'" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                    <button @click.stop="activeDropdownId = null; selectedVendor = vendor; enterEditMode()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
                       <Edit class="w-4 h-4 text-gray-400" /> Edit Details
                     </button>
-                    <NuxtLink :to="`/vendors/${vendor._id}`" class="w-full text-left px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50 flex items-center gap-2 font-medium">
+                    <button @click.stop="activeDropdownId = null; selectedVendor = vendor; activeDrawerTab = 'menu'" class="w-full text-left px-4 py-2 text-sm text-gray-900 hover:bg-gray-100 flex items-center gap-2 font-medium">
                       <LayoutList class="w-4 h-4 text-indigo-500" /> Manage Menu & Promos
-                    </NuxtLink>
+                    </button>
                     
                     <div class="h-px w-full bg-gray-100 my-1"></div>
                     
                     <button 
                       v-if="vendor.status === 'pending' || vendor.status === 'suspended'"
                       @click.stop="activeDropdownId = null; initiateAction('approve', vendor._id)" 
-                      class="w-full text-left px-4 py-2 text-sm text-emerald-600 hover:bg-emerald-50 flex items-center gap-2"
+                      class="w-full text-left px-4 py-2 text-sm text-[#FF5C1A] hover:bg-[#FF5C1A]/10 flex items-center gap-2"
                     >
                       <CheckCircle class="w-4 h-4" /> {{ vendor.status === 'suspended' ? 'Restore Vendor' : 'Approve Vendor' }}
                     </button>
@@ -239,165 +254,174 @@
         <div class="p-6 space-y-6 pb-24 bg-gray-50/30">
           
           <template v-if="activeDrawerTab === 'overview'">
-          <!-- Basic Info -->
-          <div class="space-y-3">
-            <div class="flex items-center justify-between">
-              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Store Information</h4>
-              <button @click="enterEditMode" class="text-[10px] font-bold text-[#FF5C1A] uppercase tracking-wide hover:underline flex items-center gap-1">
-                <Edit class="w-3 h-3" /> Edit
-              </button>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-4">
-              <div class="flex items-start gap-3">
-                <Store class="w-4 h-4 text-gray-400 mt-0.5" />
-                <div class="flex-1">
-                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Description</p>
-                  <p class="text-xs font-medium text-gray-900 leading-relaxed mt-1">{{ selectedVendor.description || 'No description provided.' }}</p>
-                </div>
-              </div>
-              <div class="w-full h-px bg-gray-100 ml-7" />
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <Globe class="w-4 h-4 text-gray-400" />
-                  <span class="text-xs font-semibold text-gray-900">{{ selectedVendor.subdomain || 'N/A' }}.erranders.com</span>
-                </div>
-                <Copy class="w-3.5 h-3.5 text-gray-400 cursor-pointer hover:text-gray-900 transition-colors" />
-              </div>
-            </div>
-          </div>
-
-          <!-- Owner Details -->
-          <div class="space-y-3">
-            <div class="flex items-center justify-between">
-              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Owner Profile</h4>
-              <button @click="enterEditMode" class="text-[10px] font-bold text-[#FF5C1A] uppercase tracking-wide hover:underline flex items-center gap-1">
-                <Edit class="w-3 h-3" /> Edit
-              </button>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-4">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <User class="w-4 h-4 text-gray-400" />
-                  <span class="text-xs font-semibold text-gray-900">{{ selectedVendor.owner?.firstName }} {{ selectedVendor.owner?.lastName }}</span>
-                </div>
-              </div>
-              <div class="w-full h-px bg-gray-100 ml-7" />
-              <div class="flex items-center gap-3">
-                <Mail class="w-4 h-4 text-gray-400" />
-                <span class="text-xs font-semibold text-gray-900">{{ selectedVendor.owner?.email }}</span>
-              </div>
-              <div class="w-full h-px bg-gray-100 ml-7" />
-              <div class="flex items-center gap-3">
-                <Phone class="w-4 h-4 text-gray-400" />
-                <span class="text-xs font-semibold text-gray-900">{{ selectedVendor.owner?.phone || selectedVendor.phone || 'N/A' }}</span>
-              </div>
+            
+            <!-- Store & Contact Information -->
+            <div class="space-y-4">
+              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">Store Profile</h4>
               
-              <template v-if="selectedVendor.isStudentBusiness">
-                <div class="w-full h-px bg-gray-100" />
-                <div class="bg-blue-50 p-3 rounded-lg flex items-start gap-3">
-                  <GraduationCap class="w-4 h-4 text-blue-600 mt-0.5" />
+              <div class="px-2 space-y-4 text-sm">
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Description</p>
+                  <p class="font-medium text-gray-900 leading-relaxed">{{ selectedVendor.description || 'No description provided.' }}</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-y-4 gap-x-4">
                   <div>
-                    <p class="text-[10px] font-bold text-blue-800 uppercase tracking-wide">Student Vendor</p>
-                    <p class="text-xs font-semibold text-blue-900 mt-0.5">{{ selectedVendor.university || 'University Student' }} ({{ selectedVendor.matricNumber || 'N/A' }})</p>
+                    <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Owner</p>
+                    <p class="font-bold text-gray-900">{{ selectedVendor.owner?.firstName }} {{ selectedVendor.owner?.lastName }}</p>
+                  </div>
+                  <div>
+                    <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Email</p>
+                    <p class="font-bold text-gray-900">{{ selectedVendor.owner?.email }}</p>
+                  </div>
+                  <div>
+                    <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Phone</p>
+                    <p class="font-bold text-gray-900">{{ selectedVendor.owner?.phone || selectedVendor.phone || 'N/A' }}</p>
+                  </div>
+                  <div>
+                    <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Website (Subdomain)</p>
+                    <p class="font-bold text-gray-900 flex items-center gap-1">{{ selectedVendor.subdomain || 'N/A' }}.erranders.com <Copy class="w-3 h-3 text-gray-400 cursor-pointer" /></p>
                   </div>
                 </div>
-              </template>
-            </div>
-          </div>
 
-          <!-- Logistics & Fees -->
-          <div class="space-y-3">
-            <div class="flex items-center justify-between">
-              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Logistics & Config</h4>
-              <button @click="enterEditMode" class="text-[10px] font-bold text-[#FF5C1A] uppercase tracking-wide hover:underline flex items-center gap-1">
-                <Edit class="w-3 h-3" /> Edit
-              </button>
+                <div v-if="selectedVendor.isStudentBusiness" class="bg-blue-50/50 p-3 rounded-lg border-l-2 border-blue-500">
+                  <p class="text-[10px] font-bold text-blue-800 uppercase tracking-wide">Student Vendor</p>
+                  <p class="text-xs font-semibold text-blue-900 mt-0.5">{{ selectedVendor.university || 'University Student' }} ({{ selectedVendor.matricNumber || 'N/A' }})</p>
+                </div>
+              </div>
             </div>
-            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-gray-500">Business Type</span>
-                <span class="text-xs font-bold text-gray-900 capitalize">{{ selectedVendor.businessType?.replace('_', ' ') }}</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-gray-500">Service Location</span>
-                <span class="text-xs font-bold text-gray-900 capitalize">{{ selectedVendor.serviceLocation?.replace('_', ' ') || 'N/A' }}</span>
-              </div>
-              <div class="w-full h-px bg-gray-100" />
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-gray-500">Base Delivery Fee</span>
-                <span class="text-xs font-bold text-gray-900">₦{{ selectedVendor.baseDeliveryFee || selectedVendor.deliveryFee || 0 }}</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-gray-500">Packaging Fee</span>
-                <span class="text-xs font-bold text-gray-900">₦{{ selectedVendor.packagingFee || 0 }}</span>
-              </div>
-              <div class="w-full h-px bg-gray-100" />
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-gray-500">Min Order</span>
-                <span class="text-xs font-bold text-gray-900">₦{{ selectedVendor.minimumOrder || 0 }}</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-gray-500">Prep Time</span>
-                <span class="text-xs font-bold text-gray-900">{{ selectedVendor.preparationTime || 0 }} mins</span>
+
+            <!-- Configuration & Logistics -->
+            <div class="space-y-4 mt-6">
+              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">Logistics & Configuration</h4>
+              <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm px-2">
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Business Type</p>
+                  <p class="font-bold text-gray-900 capitalize">{{ selectedVendor.businessType?.replace('_', ' ') }}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Service Location</p>
+                  <p class="font-bold text-gray-900 capitalize">{{ selectedVendor.serviceLocation?.replace('_', ' ') || 'N/A' }}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Dispatch Mode</p>
+                  <p class="font-bold text-gray-900 capitalize">{{ selectedVendor.dispatchMode?.replace('_', ' ') || 'platform' }}</p>
+                </div>
+                <div v-if="selectedVendor.vendorCode">
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Vendor Code</p>
+                  <p class="font-bold text-gray-900">{{ selectedVendor.vendorCode }}</p>
+                </div>
+                
+                <!-- Fees -->
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Base Delivery Fee</p>
+                  <p class="font-bold text-gray-900">₦{{ selectedVendor.baseDeliveryFee || selectedVendor.deliveryFee || 0 }}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Packaging Fee</p>
+                  <p class="font-bold text-gray-900">₦{{ selectedVendor.packagingFee || 0 }}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Min Order</p>
+                  <p class="font-bold text-gray-900">₦{{ selectedVendor.minimumOrder || 0 }}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Prep Time</p>
+                  <p class="font-bold text-gray-900">{{ selectedVendor.preparationTime || 0 }} mins</p>
+                </div>
               </div>
               
-              <template v-if="selectedVendor.preOrderOnly">
-                <div class="w-full h-px bg-gray-100" />
-                <div class="bg-amber-50 p-3 rounded-lg flex items-center gap-3">
-                  <AlertCircle class="w-4 h-4 text-amber-600" />
-                  <p class="text-xs font-semibold text-amber-900">Pre-order Only ({{ selectedVendor.preOrderLeadTime }}hrs lead time)</p>
+              <div v-if="selectedVendor.preOrderOnly" class="mx-2 bg-amber-50/50 p-3 rounded-lg border-l-2 border-amber-500">
+                <p class="text-xs font-semibold text-amber-900 flex items-center gap-1.5"><AlertCircle class="w-4 h-4" /> Pre-order Only ({{ selectedVendor.preOrderLeadTime || selectedVendor.preOrderDays || 0 }}hrs lead time)</p>
+              </div>
+            </div>
+
+            <!-- Financials & Banking -->
+            <div class="space-y-4 mt-6">
+              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">Financials & Banking</h4>
+              <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm px-2">
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Ledger Balance</p>
+                  <p class="text-lg font-black text-[#FF5C1A]">₦{{ Number(selectedVendor.balance || 0).toLocaleString() }}</p>
                 </div>
-              </template>
-            </div>
-          </div>
-
-          <!-- Bank Details -->
-          <div class="space-y-3" v-if="selectedVendor.bankDetails">
-            <div class="flex items-center justify-between">
-              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Payout Details</h4>
-              <button @click="enterEditMode" class="text-[10px] font-bold text-[#FF5C1A] uppercase tracking-wide hover:underline flex items-center gap-1">
-                <Edit class="w-3 h-3" /> Edit
-              </button>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
-              <div class="flex items-start gap-3">
-                <Banknote class="w-4 h-4 text-gray-400 mt-0.5" />
-                <div class="flex-1">
-                  <p class="text-xs font-bold text-gray-900">{{ selectedVendor.bankDetails.bankName }}</p>
-                  <p class="text-[11px] font-semibold text-gray-500 mt-0.5">{{ selectedVendor.bankDetails.accountNumber }}</p>
-                  <p class="text-[10px] font-bold text-gray-400 mt-1 uppercase">{{ selectedVendor.bankDetails.accountName }}</p>
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Total Ratings</p>
+                  <p class="text-lg font-black text-gray-900">{{ selectedVendor.totalRatings || 0 }}</p>
+                </div>
+                
+                <div class="col-span-2 mt-2" v-if="selectedVendor.bankDetails">
+                  <div class="bg-gray-50 rounded-lg p-3">
+                    <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Bank Payout Details</p>
+                    <p class="font-bold text-gray-900 text-sm">{{ selectedVendor.bankDetails.bankName }}</p>
+                    <p class="text-sm text-gray-600 font-mono">{{ selectedVendor.bankDetails.accountNumber }} - <span class="uppercase">{{ selectedVendor.bankDetails.accountName }}</span></p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Business Hours -->
-          <div class="space-y-3" v-if="selectedVendor.businessHours?.length">
-            <div class="flex items-center justify-between">
-              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Business Hours</h4>
-              <button @click="enterEditMode" class="text-[10px] font-bold text-[#FF5C1A] uppercase tracking-wide hover:underline flex items-center gap-1">
-                <Edit class="w-3 h-3" /> Edit
-              </button>
-            </div>
-            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-2">
-              <div v-for="hours in selectedVendor.businessHours" :key="hours._id" class="flex items-center justify-between text-xs">
-                <span class="font-semibold text-gray-600 capitalize w-24">{{ hours.day }}</span>
-                <span v-if="hours.isClosed" class="font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-md text-[10px] uppercase">Closed</span>
-                <span v-else class="font-medium text-gray-900">{{ hours.open }} - {{ hours.close }}</span>
+            <!-- Prepaid Promo Configuration -->
+            <div class="space-y-4 mt-6">
+              <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+                <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Prepaid Promo</h4>
+                <div class="w-2 h-2 rounded-full" :class="selectedVendor.prepaidPromo?.enabled ? 'bg-green-500' : 'bg-gray-300'"></div>
+              </div>
+              <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm px-2" v-if="selectedVendor.prepaidPromo">
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Promo Status</p>
+                  <p class="font-bold text-gray-900">{{ selectedVendor.prepaidPromo.enabled ? 'Active' : 'Inactive' }}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Discount Value</p>
+                  <p class="font-bold text-gray-900">₦{{ selectedVendor.prepaidPromo.discountValue || 0 }}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Slots Used</p>
+                  <p class="font-bold text-[#FF5C1A]">{{ selectedVendor.prepaidPromo.usedOrders || 0 }} / {{ selectedVendor.prepaidPromo.maxOrders || 0 }}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Budget Per Order</p>
+                  <p class="font-bold text-gray-900">₦{{ selectedVendor.prepaidPromo.budgetPerOrder || 0 }}</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Offers / Tags -->
-          <div class="space-y-3" v-if="selectedVendor.offers?.length">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Active Offers</h4>
-            <div class="space-y-2">
-              <div v-for="(offer, idx) in selectedVendor.offers" :key="idx" class="bg-emerald-50 p-3 rounded-lg border border-emerald-100 flex items-start gap-2">
-                <Percent class="w-3.5 h-3.5 text-emerald-600 mt-0.5 shrink-0" />
-                <p class="text-xs font-medium text-emerald-900">{{ offer }}</p>
+            <!-- Business Hours & Tags -->
+            <div class="space-y-4 mt-6" v-if="selectedVendor.businessHours?.length || selectedVendor.tags?.length || selectedVendor.offers?.length">
+              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">Hours & Tags</h4>
+              
+              <div class="px-2 space-y-4">
+                <div v-if="selectedVendor.tags?.length">
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Vendor Tags</p>
+                  <div class="flex flex-wrap gap-2">
+                    <span v-for="tag in selectedVendor.tags" :key="tag" class="text-[10px] font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded uppercase">{{ tag }}</span>
+                  </div>
+                </div>
+
+                <div v-if="selectedVendor.businessHours?.length">
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Schedule</p>
+                  <div class="grid grid-cols-2 gap-2">
+                    <div v-for="hours in selectedVendor.businessHours" :key="hours.day" class="text-xs flex items-center justify-between">
+                      <span class="font-semibold text-gray-500 capitalize">{{ hours.day }}</span>
+                      <span v-if="hours.isClosed" class="text-rose-500 font-bold">Closed</span>
+                      <span v-else class="text-gray-900 font-medium">{{ hours.open }} - {{ hours.close }}</span>
+                    </div>
+                  </div>
+                  <div v-if="selectedVendor.breakPeriod?.start" class="mt-2 text-xs text-amber-600">
+                    <span class="font-semibold">Break:</span> {{ selectedVendor.breakPeriod.start }} - {{ selectedVendor.breakPeriod.end }}
+                  </div>
+                </div>
+                
+                <div v-if="selectedVendor.offers?.length">
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2 mt-4">Active Offers</p>
+                  <div class="space-y-1">
+                    <div v-for="(offer, idx) in selectedVendor.offers" :key="idx" class="text-xs font-bold text-[#FF5C1A]">
+                      • {{ offer }}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+
           </template>
 
           <template v-if="activeDrawerTab === 'menu'">
