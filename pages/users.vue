@@ -47,27 +47,34 @@
       </div>
 
       <!-- Table Section -->
-      <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div v-if="loading" class="p-4">
-          <SkeletonTable :rows="8" :cols="5" />
+      <div class="bg-white rounded-[1.25rem] border border-gray-100/60 shadow-sm hover:shadow-md transition-all overflow-hidden relative">
+        <div class="px-6 py-5 border-b border-gray-100/60 bg-gray-50/50 flex justify-between items-center">
+          <h3 class="text-sm font-bold text-gray-900 tracking-tight uppercase">Platform Users</h3>
         </div>
 
-        <div v-else-if="filteredUsers.length === 0" class="py-20">
-          <EmptyState 
-            title="No users found" 
-            :description="emptyStateDescription"
-          />
+        <div v-if="loading" class="p-8 text-center text-gray-400 text-sm">
+          <div class="w-8 h-8 border-4 border-[#FF5C1A] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          Loading Users...
+        </div>
+
+        <div v-else-if="filteredUsers.length === 0" class="py-20 text-center">
+          <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 mx-auto mb-4 shadow-sm border border-gray-100">
+            <UsersIcon class="w-8 h-8" />
+          </div>
+          <h4 class="font-bold text-gray-900 tracking-tight">No users found</h4>
+          <p class="text-sm text-gray-500 mt-1">There are currently no active users matching your filter.</p>
         </div>
 
         <div v-else class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="border-b border-gray-100 bg-white">
-                <th class="py-4 px-6 font-semibold text-gray-600 text-sm whitespace-nowrap">User</th>
-                <th class="py-4 px-4 font-semibold text-gray-600 text-sm whitespace-nowrap text-center">Role</th>
-                <th class="py-4 px-4 font-semibold text-gray-600 text-sm whitespace-nowrap text-center">Status</th>
-                <th class="py-4 px-4 font-semibold text-gray-600 text-sm whitespace-nowrap">Joined Date</th>
-                <th class="py-4 px-6 font-semibold text-gray-600 text-sm whitespace-nowrap text-right">Actions</th>
+              <tr class="border-b border-gray-100/60 bg-gray-50/50 text-[11px] uppercase tracking-wider text-gray-500">
+                <th class="py-4 px-6 font-bold whitespace-nowrap">User</th>
+                <th class="py-4 px-4 font-bold whitespace-nowrap text-center">Role</th>
+                <th class="py-4 px-4 font-bold whitespace-nowrap text-center">Wallet</th>
+                <th class="py-4 px-4 font-bold whitespace-nowrap text-center">Status</th>
+                <th class="py-4 px-4 font-bold whitespace-nowrap">Joined Date</th>
+                <th class="py-4 px-6 font-bold whitespace-nowrap text-right">Actions</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -91,6 +98,11 @@
                   </span>
                 </td>
                 <td class="py-4 px-4 text-center">
+                  <span class="text-xs font-bold text-gray-900 bg-gray-100 px-2 py-0.5 rounded-md">
+                    ₦{{ (user.walletBalance || 0).toLocaleString() }}
+                  </span>
+                </td>
+                <td class="py-4 px-4 text-center">
                   <div class="flex justify-center">
                     <StatusBadge :status="user.isActive ? 'active' : 'suspended'" class="scale-75" />
                   </div>
@@ -111,7 +123,7 @@
                     <button 
                       v-else 
                       @click.stop="initiateAction('activate', user._id)" 
-                      class="p-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors"
+                      class="p-2 rounded-lg bg-[#FF5C1A]/10 text-[#FF5C1A] hover:bg-emerald-100 transition-colors"
                       title="Activate User"
                     >
                       <UserCheck2 class="w-4 h-4" />
@@ -154,6 +166,18 @@
               <span class="text-xs font-semibold text-[#FF5C1A] bg-[#FF5C1A]/10 px-3 py-1 rounded-lg border border-[#FF5C1A]/20 capitalize">{{ selectedUser.role }}</span>
               <StatusBadge :status="selectedUser.isActive ? 'active' : 'suspended'" class="scale-90" />
             </div>
+
+            <!-- Quick Stats Row -->
+            <div class="flex items-center justify-between w-4/5 mt-6 bg-white rounded-lg border border-gray-100 divide-x divide-gray-100 shadow-sm">
+              <div class="text-center flex-1 py-3">
+                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Wallet Balance</p>
+                <p class="text-sm font-bold text-[#FF5C1A]">₦{{ Number(selectedUser.walletBalance || 0).toLocaleString() }}</p>
+              </div>
+              <div class="text-center flex-1 py-3">
+                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Joined</p>
+                <p class="text-xs font-semibold text-gray-900">{{ new Date(selectedUser.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) }}</p>
+              </div>
+            </div>
           </div>
 
           <!-- Tabs -->
@@ -175,72 +199,143 @@
           <div class="py-6 space-y-4">
             <!-- Overview Tab -->
             <template v-if="activeDrawerTab === 'overview'">
-              <div class="space-y-3">
-                <div class="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Full Name</span>
-                  <span class="text-sm font-bold text-gray-900">{{ selectedUser.firstName }} {{ selectedUser.lastName }}</span>
+              <div class="space-y-6">
+                <!-- Personal Info -->
+                <div>
+                  <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2 mb-4">
+                    Personal Information
+                  </h4>
+                  <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm px-2">
+                    <div>
+                      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Full Name</p>
+                      <p class="font-bold text-gray-900">{{ selectedUser.firstName }} {{ selectedUser.lastName }}</p>
+                    </div>
+                    <div>
+                      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Role</p>
+                      <span class="text-[10px] font-bold text-[#FF5C1A] bg-[#FF5C1A]/10 px-2 py-0.5 rounded-md capitalize tracking-wide">{{ selectedUser.role }}</span>
+                    </div>
+                    <div>
+                      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Phone Number</p>
+                      <p class="font-bold text-gray-900">{{ selectedUser.phone || selectedUser.phoneNumber || 'N/A' }}</p>
+                    </div>
+                    <div>
+                      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Email</p>
+                      <p class="font-bold text-gray-900 truncate">{{ selectedUser.email }}</p>
+                    </div>
+                  </div>
                 </div>
-                <div class="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Email</span>
-                  <span class="text-sm font-bold text-gray-900 truncate ml-4">{{ selectedUser.email }}</span>
-                </div>
-                <div class="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Phone</span>
-                  <span class="text-sm font-bold text-gray-900">{{ selectedUser.phoneNumber || selectedUser.phone || 'N/A' }}</span>
-                </div>
-                <div class="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Role</span>
-                  <span class="text-xs font-semibold text-[#FF5C1A] bg-[#FF5C1A]/10 px-3 py-1 rounded-lg capitalize">{{ selectedUser.role }}</span>
-                </div>
-                <div class="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Status</span>
-                  <StatusBadge :status="selectedUser.isActive ? 'active' : 'suspended'" class="scale-90" />
+                
+                <!-- Gamification & Engagement -->
+                <div>
+                  <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2 mb-4">
+                    Engagement & Rewards
+                  </h4>
+                  <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm px-2">
+                    <div>
+                      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Reward Points</p>
+                      <p class="text-xl font-black text-gray-900">{{ selectedUser.points || 0 }} <span class="text-xs text-gray-400 font-medium">pts</span></p>
+                    </div>
+                    <div>
+                      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Active Streak</p>
+                      <p class="text-xl font-black text-gray-900">{{ selectedUser.streakCount || 0 }} <span class="text-xs">🔥</span></p>
+                    </div>
+                    <div>
+                      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Referral Code</p>
+                      <p class="font-bold text-[#FF5C1A] font-mono tracking-wider">{{ selectedUser.referralCode || 'N/A' }}</p>
+                    </div>
+                    <div>
+                      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Total Referrals</p>
+                      <p class="font-bold text-gray-900">{{ selectedUser.referralCount || 0 }}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </template>
 
             <!-- Account Tab -->
             <template v-if="activeDrawerTab === 'account'">
-              <div class="space-y-3">
-                <div class="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">User ID</span>
-                  <span class="text-xs font-mono font-semibold text-gray-700 bg-gray-50 px-2 py-1 rounded">{{ selectedUser._id }}</span>
+              <div class="space-y-6">
+                <!-- Account Status -->
+                <div>
+                  <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2 mb-4">
+                    Account Status
+                  </h4>
+                  <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm px-2">
+                    <div>
+                      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">User ID</p>
+                      <p class="font-mono text-xs font-bold text-gray-700 bg-gray-50 px-2 py-1 rounded inline-block">{{ selectedUser._id }}</p>
+                    </div>
+                    <div>
+                      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Joined Date</p>
+                      <p class="font-bold text-gray-900">{{ new Date(selectedUser.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) }}</p>
+                    </div>
+                    <div>
+                      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Email Verification</p>
+                      <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md" :class="selectedUser.emailVerified || selectedUser.isEmailVerified ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'">
+                        {{ selectedUser.emailVerified || selectedUser.isEmailVerified ? 'Verified' : 'Unverified' }}
+                      </span>
+                    </div>
+                    <div>
+                      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Last Updated</p>
+                      <p class="font-bold text-gray-900">{{ selectedUser.updatedAt ? new Date(selectedUser.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A' }}</p>
+                    </div>
+                  </div>
                 </div>
-                <div class="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Joined</span>
-                  <span class="text-sm font-bold text-gray-900">{{ new Date(selectedUser.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) }}</span>
-                </div>
-                <div class="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Last Updated</span>
-                  <span class="text-sm font-bold text-gray-900">{{ selectedUser.updatedAt ? new Date(selectedUser.updatedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : 'N/A' }}</span>
-                </div>
-                <div class="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Email Verified</span>
-                  <span class="text-sm font-bold" :class="selectedUser.emailVerified || selectedUser.isEmailVerified ? 'text-emerald-600' : 'text-rose-500'">
-                    {{ selectedUser.emailVerified || selectedUser.isEmailVerified ? 'Yes' : 'No' }}
-                  </span>
-                </div>
-                <div v-if="selectedUser.address || selectedUser.location" class="flex justify-between items-start p-4 bg-white rounded-xl border border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Address</span>
-                  <span class="text-sm font-bold text-gray-900 text-right ml-4">{{ selectedUser.address || selectedUser.location || 'N/A' }}</span>
+
+                <!-- Locations & Addresses -->
+                <div>
+                  <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2 mb-4">
+                    Saved Locations
+                  </h4>
+                  <div class="px-2">
+                    <template v-if="selectedUser.addresses?.length">
+                      <div class="space-y-3">
+                        <div v-for="(addr, idx) in selectedUser.addresses" :key="idx" class="bg-gray-50 p-3 rounded-lg flex items-start gap-3">
+                          <MapPin class="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                          <div>
+                            <p class="text-[10px] font-bold text-gray-900 uppercase tracking-wide mb-0.5">{{ addr.label || 'Saved Address' }} <span v-if="addr.isDefault" class="ml-1 text-[8px] bg-[#FF5C1A]/10 text-[#FF5C1A] px-1 py-0.5 rounded uppercase">Default</span></p>
+                            <p class="text-xs font-medium text-gray-600 leading-relaxed">{{ addr.address || addr.street }}</p>
+                            <p class="text-[10px] text-gray-500 mt-1" v-if="addr.city || addr.state">{{ addr.city }}, {{ addr.state }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                    <template v-else-if="selectedUser.address || selectedUser.location">
+                      <div class="bg-gray-50 p-3 rounded-lg flex items-start gap-3">
+                        <MapPin class="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                        <p class="text-xs font-medium text-gray-600 leading-relaxed">{{ selectedUser.address || selectedUser.location }}</p>
+                      </div>
+                    </template>
+                    <template v-else>
+                      <p class="text-xs font-medium text-gray-400 italic">No addresses saved</p>
+                    </template>
+                  </div>
                 </div>
               </div>
             </template>
 
             <!-- Activity Tab -->
             <template v-if="activeDrawerTab === 'activity'">
-              <div class="space-y-3">
-                <div class="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Total Orders</span>
-                  <span class="text-sm font-bold text-gray-900">{{ selectedUser.ordersCount || selectedUser.orders?.length || 0 }}</span>
-                </div>
-                <div class="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Wallet Balance</span>
-                  <span class="text-sm font-bold text-gray-900">₦{{ Number(selectedUser.walletBalance || selectedUser.wallet?.balance || 0).toLocaleString() }}</span>
-                </div>
-                <div class="flex justify-between items-center p-4 bg-white rounded-xl border border-gray-100">
-                  <span class="text-sm font-medium text-gray-500">Account Created</span>
-                  <span class="text-sm font-bold text-gray-900">{{ timeAgo(selectedUser.createdAt) }}</span>
+              <div class="space-y-6">
+                <!-- Wallet & Transactions -->
+                <div>
+                  <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2 mb-4">
+                    Wallet & Activity
+                  </h4>
+                  <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm px-2">
+                    <div>
+                      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Wallet Balance</p>
+                      <p class="text-lg font-black text-[#FF5C1A]">₦{{ Number(selectedUser.walletBalance || selectedUser.wallet?.balance || 0).toLocaleString() }}</p>
+                    </div>
+                    <div>
+                      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Total Orders</p>
+                      <p class="text-lg font-black text-gray-900">{{ selectedUser.ordersCount || selectedUser.orders?.length || 0 }}</p>
+                    </div>
+                    <div>
+                      <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Account Age</p>
+                      <p class="font-bold text-gray-900">{{ timeAgo(selectedUser.createdAt) }}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </template>
@@ -287,7 +382,7 @@
             <button 
               v-else
               @click="initiateAction('activate', selectedUser._id); closeDrawer()"
-              class="flex-1 py-3 px-4 rounded-xl text-emerald-600 font-semibold text-sm bg-emerald-50 hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2"
+              class="flex-1 py-3 px-4 rounded-xl text-[#FF5C1A] font-semibold text-sm bg-[#FF5C1A]/10 hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2"
             >
               <UserCheck2 class="w-4 h-4" /> Activate
             </button>

@@ -1,81 +1,90 @@
 <template>
-  <div class="h-screen w-full flex bg-[#F0F2F5] overflow-hidden fixed inset-0 z-50">
+  <div class="h-screen w-full flex bg-gray-50/50 overflow-hidden fixed inset-0 z-50">
     <!-- Left Sidebar -->
     <div 
       :class="[
-        'w-full md:w-[35%] lg:w-[30%] max-w-[420px] min-w-[320px] flex-col bg-white border-r border-gray-100 flex-shrink-0 transition-all',
+        'w-full md:w-[35%] lg:w-[30%] max-w-[420px] min-w-[320px] flex-col bg-white border-r border-gray-100/80 flex-shrink-0 transition-all shadow-sm z-10',
         activeChat ? 'hidden md:flex' : 'flex'
       ]"
     >
       <!-- Header -->
-      <div class="h-[60px] px-4 bg-[#FF5C1A] flex items-center justify-between flex-shrink-0">
+      <div class="h-[72px] px-6 bg-white border-b border-gray-100 flex items-center justify-between flex-shrink-0">
         <div class="flex items-center gap-3">
-          <button @click="navigateTo('/dashboard')" class="p-2 hover:bg-white/10 rounded-full transition-colors text-white" title="Back to Dashboard">
+          <button @click="navigateTo('/dashboard')" class="p-2 hover:bg-gray-50 rounded-xl transition-colors text-gray-600" title="Back to Dashboard">
             <ArrowLeft class="w-5 h-5" />
           </button>
-          <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold overflow-hidden cursor-pointer">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#FF5C1A] to-[#FF7A45] flex items-center justify-center text-white font-bold overflow-hidden shadow-sm">
             {{ user ? (user.firstName?.[0] || user.email?.[0] || 'A').toUpperCase() : 'A' }}
           </div>
-          <span class="font-semibold text-white text-base truncate">Support Chats</span>
+          <span class="font-bold text-gray-900 text-lg font-heading tracking-tight">Support</span>
         </div>
-        <div class="flex items-center gap-4 text-white">
-          <MessageSquare class="w-5 h-5 cursor-pointer hover:text-white/80 transition-colors" />
-          <MoreVertical class="w-5 h-5 cursor-pointer hover:text-white/80 transition-colors" />
+        <div class="flex items-center gap-2 text-gray-400">
+          <button class="p-2 hover:bg-gray-50 hover:text-[#FF5C1A] rounded-xl transition-colors">
+            <MessageSquare class="w-5 h-5" />
+          </button>
+          <button class="p-2 hover:bg-gray-50 hover:text-[#FF5C1A] rounded-xl transition-colors">
+            <MoreVertical class="w-5 h-5" />
+          </button>
         </div>
       </div>
 
       <!-- Search -->
-      <div class="p-2 bg-white border-b border-gray-100">
-        <div class="bg-[#F0F2F5] rounded-lg flex items-center px-4 py-1.5 transition-all border border-transparent focus-within:bg-white focus-within:border-[#FF5C1A]/50">
-          <Search class="w-4 h-4 text-[#54656F] mr-3" />
+      <div class="p-4 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-10">
+        <div class="bg-gray-50/80 rounded-xl flex items-center px-4 py-2.5 transition-all border border-gray-200/60 focus-within:bg-white focus-within:border-[#FF5C1A]/30 focus-within:ring-4 focus-within:ring-[#FF5C1A]/10 shadow-sm">
+          <Search class="w-4 h-4 text-gray-400 mr-3" />
           <input 
             v-model="searchQuery" 
             type="text" 
-            placeholder="Search support chats" 
-            class="bg-transparent border-none outline-none text-[15px] w-full placeholder:text-[#54656F] text-[#111B21] py-1"
+            placeholder="Search conversations..." 
+            class="bg-transparent border-none outline-none text-[15px] font-medium w-full placeholder:text-gray-400 text-gray-900"
           />
         </div>
       </div>
 
       <!-- Chat List -->
-      <div class="flex-1 overflow-y-auto bg-white">
+      <div class="flex-1 overflow-y-auto bg-white custom-scrollbar">
         <div v-if="loading" class="p-4 space-y-3">
-          <div v-for="i in 5" :key="i" class="h-16 bg-gray-100 animate-pulse rounded-lg" />
+          <div v-for="i in 5" :key="i" class="h-20 bg-gray-50 animate-pulse rounded-2xl" />
         </div>
-        <div v-else-if="filteredChats.length === 0" class="flex flex-col items-center justify-center h-full text-[#54656F] space-y-2 p-6 text-center">
-          <MessageSquare class="w-12 h-12 opacity-20" />
-          <p class="text-[14px]">No active support chats found.</p>
+        <div v-else-if="filteredChats.length === 0" class="flex flex-col items-center justify-center h-full text-gray-400 space-y-4 p-8 text-center">
+          <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mb-2 border border-gray-100">
+            <MessageSquare class="w-8 h-8 opacity-40 text-gray-400" />
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-700">No conversations</p>
+            <p class="text-xs mt-1">Active support chats will appear here.</p>
+          </div>
         </div>
-        <div v-else class="flex flex-col">
+        <div v-else class="flex flex-col p-2 space-y-1">
           <button
             v-for="chat in filteredChats"
             :key="chat.userId"
             @click="selectChat(chat)"
-            class="w-full text-left flex items-center px-3 py-3 hover:bg-[#F5F6F6] transition-colors group"
-            :class="{ 'bg-[#F0F2F5]': activeChat?.userId === chat.userId }"
+            class="w-full text-left flex items-center px-4 py-3.5 rounded-2xl transition-all group border border-transparent"
+            :class="activeChat?.userId === chat.userId ? 'bg-[#FF5C1A]/5 border-[#FF5C1A]/10 shadow-sm' : 'hover:bg-gray-50'"
           >
             <!-- Avatar -->
-            <div class="w-12 h-12 rounded-full bg-[#FFF0E5] flex items-center justify-center text-[#FF5C1A] font-bold text-lg flex-shrink-0 mr-3 overflow-hidden">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-100 to-rose-100 flex items-center justify-center text-[#FF5C1A] font-bold text-lg flex-shrink-0 mr-4 overflow-hidden border border-white shadow-sm">
               <img v-if="chat.userData?.avatar" :src="chat.userData.avatar" class="w-full h-full object-cover" />
               <span v-else>{{ getInitials(chat.userName) }}</span>
             </div>
             
             <!-- Info -->
-            <div class="flex-1 min-w-0 border-b border-gray-100 pb-3 pt-1 group-last:border-none">
-              <div class="flex items-center justify-between mb-0.5">
-                <h3 class="font-normal text-[#111B21] text-[16px] truncate">
+            <div class="flex-1 min-w-0 flex flex-col justify-center">
+              <div class="flex items-center justify-between mb-1">
+                <h3 class="font-semibold text-gray-900 text-[15px] truncate transition-colors group-hover:text-[#FF5C1A]" :class="{'text-[#FF5C1A]': activeChat?.userId === chat.userId}">
                   {{ chat.userName }}
                 </h3>
-                <span class="text-[12px] whitespace-nowrap ml-2" :class="activeChat?.userId === chat.userId ? 'text-[#111B21]' : 'text-[#54656F]'">
+                <span class="text-[11px] font-semibold tracking-wide whitespace-nowrap ml-2 transition-colors" :class="chat.unreadCount > 0 ? 'text-[#FF5C1A]' : 'text-gray-400'">
                   {{ formatTime(chat.lastMessageAt) }}
                 </span>
               </div>
               <div class="flex items-center justify-between">
-                <p class="text-[14px] text-[#54656F] truncate flex items-center gap-1">
-                  {{ chat.lastMessage }}
+                <p class="text-[13px] text-gray-500 font-medium truncate flex-1" :class="{'text-gray-900 font-semibold': chat.unreadCount > 0}">
+                  {{ chat.lastMessage || 'Sent an attachment' }}
                 </p>
-                <div v-if="chat.unreadCount > 0" class="w-5 h-5 rounded-full bg-[#FF5C1A] text-white flex items-center justify-center text-[11px] font-bold">
-                  {{ chat.unreadCount }}
+                <div v-if="chat.unreadCount > 0" class="w-5 h-5 rounded-full bg-[#FF5C1A] text-white flex items-center justify-center text-[10px] font-bold shadow-sm shadow-[#FF5C1A]/20 shrink-0 ml-3">
+                  {{ chat.unreadCount > 99 ? '99+' : chat.unreadCount }}
                 </div>
               </div>
             </div>
@@ -87,24 +96,26 @@
     <!-- Right Area (Chat View) -->
     <div 
       :class="[
-        'flex-1 flex-col bg-[#F0F2F5] border-l border-[#E1E1E1]',
+        'flex-1 flex-col bg-gray-50/50 relative',
         !activeChat ? 'hidden md:flex' : 'flex'
       ]"
     >
-      <div v-if="!activeChat" class="flex-1 flex flex-col items-center justify-center text-center p-8 bg-[#F0F2F5]">
-        <div class="w-80 h-80 mb-8 opacity-20 mx-auto">
-          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M50 100C77.6142 100 100 77.6142 100 50C100 22.3858 77.6142 0 50 0C22.3858 0 0 22.3858 0 50C0 77.6142 22.3858 100 50 100Z" fill="#FF5C1A"/>
-            <path d="M70.5 35.5C70.5 35.5 68.5 32 63.5 32C58.5 32 55.5 35.5 55.5 35.5C55.5 35.5 53 38 52 38.5C51 39 48.5 38 46 36.5C43.5 35 42.5 32 42.5 32C42.5 32 44.5 29 42.5 27.5C40.5 26 38.5 23 37.5 23C36.5 23 34.5 24.5 33 26.5C31.5 28.5 30 33 34.5 39C39 45 44.5 50 49 51.5C53.5 53 58.5 53 62.5 51.5C66.5 50 69.5 47 70.5 45C71.5 43 70.5 35.5 70.5 35.5Z" fill="white"/>
-          </svg>
-        </div>
-        <h2 class="text-[32px] font-light text-[#41525D] mb-4">Support Dashboard</h2>
-        <p class="text-[14px] text-[#667781] max-w-md leading-relaxed">
-          Manage incoming support requests from students and vendors.<br/>
-        </p>
-        <div class="mt-10 flex items-center justify-center gap-1.5 text-[14px] text-[#8696A0]">
-          <Lock class="w-3.5 h-3.5" />
-          <span>End-to-end encrypted</span>
+      <div v-if="!activeChat" class="flex-1 flex flex-col items-center justify-center text-center p-8 bg-[url('/noise.png')] relative before:absolute before:inset-0 before:bg-gray-50/90 before:backdrop-blur-3xl">
+        <div class="relative z-10 max-w-sm mx-auto flex flex-col items-center">
+          <div class="w-24 h-24 mb-8 relative">
+             <div class="absolute inset-0 bg-[#FF5C1A]/10 rounded-full blur-2xl"></div>
+             <div class="w-full h-full bg-white rounded-3xl rotate-12 flex items-center justify-center shadow-xl border border-gray-100">
+               <MessageSquare class="w-10 h-10 text-[#FF5C1A] -rotate-12" />
+             </div>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-3 font-heading">Support Messages</h2>
+          <p class="text-sm font-medium text-gray-500 leading-relaxed">
+            Select a conversation from the sidebar to start messaging with customers, vendors, and erranders.
+          </p>
+          <div class="mt-8 flex items-center justify-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest px-4 py-2 bg-white rounded-full border border-gray-100 shadow-sm">
+            <Lock class="w-3.5 h-3.5" />
+            <span>End-to-end encrypted</span>
+          </div>
         </div>
       </div>
 

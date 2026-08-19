@@ -39,36 +39,39 @@
 
         <template v-else>
           <!-- Total Volume Card -->
-          <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm relative overflow-hidden">
-            <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center mb-3 border border-emerald-100">
-              <Wallet class="w-4 h-4 text-emerald-600" />
+          <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-emerald-200 transition-all duration-300">
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mb-4 border border-emerald-100 group-hover:scale-110 transition-transform duration-300">
+              <Wallet class="w-5 h-5 text-emerald-600" />
             </div>
-            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Total Volume</p>
-            <h2 class="text-xl font-bold text-gray-900 tabular-nums">₦{{ (stats?.totalVolume || 0).toLocaleString() }}</h2>
-            <div class="flex items-center gap-1.5 mt-1.5">
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Volume</p>
+            <h2 class="text-2xl font-black text-gray-900 tabular-nums font-heading">₦{{ (stats?.totalVolume || 0).toLocaleString() }}</h2>
+            <div class="flex items-center gap-1.5 mt-2">
               <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span class="text-[10px] font-semibold text-emerald-600">All time</span>
+              <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">All time</span>
             </div>
           </div>
 
           <!-- Commission Card -->
-          <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm relative overflow-hidden">
-            <div class="w-8 h-8 rounded-lg bg-[#FF5C1A]/10 flex items-center justify-center mb-3 border border-[#FF5C1A]/20">
-              <TrendingUp class="w-4 h-4 text-[#FF5C1A]" />
+          <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-[#FF5C1A]/30 transition-all duration-300">
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-[#FF5C1A]/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="w-10 h-10 rounded-xl bg-[#FF5C1A]/10 flex items-center justify-center mb-4 border border-[#FF5C1A]/20 group-hover:scale-110 transition-transform duration-300">
+              <TrendingUp class="w-5 h-5 text-[#FF5C1A]" />
             </div>
-            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Platform Earnings</p>
-            <h2 class="text-xl font-bold text-[#FF5C1A] tabular-nums">₦{{ (stats?.totalCommissions || 0).toLocaleString() }}</h2>
-            <span class="text-[10px] font-semibold text-gray-500 mt-1 block">Total platform service fees</span>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Platform Earnings</p>
+            <h2 class="text-2xl font-black text-[#FF5C1A] tabular-nums font-heading">₦{{ (stats?.totalCommissions || 0).toLocaleString() }}</h2>
+            <span class="text-[10px] font-bold text-gray-500 mt-2 block uppercase tracking-wide">Total service fees</span>
           </div>
 
           <!-- Net Balance Card -->
-          <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm relative overflow-hidden">
-            <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center mb-3 border border-indigo-100">
-              <ArrowDownLeft class="w-4 h-4 text-indigo-600" />
+          <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-indigo-200 transition-all duration-300">
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-indigo-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mb-4 border border-indigo-100 group-hover:scale-110 transition-transform duration-300">
+              <ArrowDownLeft class="w-5 h-5 text-indigo-600" />
             </div>
-            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Net Balance</p>
-            <h2 class="text-xl font-bold text-gray-900 tabular-nums">₦{{ (netBalance || 0).toLocaleString() }}</h2>
-            <span class="text-[10px] font-semibold text-indigo-600 mt-1 block">Combined wallet balance</span>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Net Balance</p>
+            <h2 class="text-2xl font-black text-gray-900 tabular-nums font-heading">₦{{ (netBalance || 0).toLocaleString() }}</h2>
+            <span class="text-[10px] font-bold text-indigo-600 mt-2 block uppercase tracking-wide">Combined wallet balance</span>
           </div>
         </template>
       </div>
@@ -222,17 +225,33 @@
             </div>
           </div>
 
-          <!-- Payout Details -->
-          <div class="space-y-3" v-if="selectedTransaction.metadata?.isPayoutRequest">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Payout Destination</h4>
+          <!-- Payout Details & Metadata -->
+          <div class="space-y-3" v-if="selectedTransaction.metadata">
+            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Additional Details</h4>
             <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
-              <div class="flex justify-between items-center">
+              <div class="flex justify-between items-center" v-if="selectedTransaction.metadata.bankCode">
                 <span class="text-xs font-medium text-gray-500">Bank Code</span>
                 <span class="text-xs font-bold text-gray-900">{{ selectedTransaction.metadata.bankCode }}</span>
               </div>
-              <div class="flex justify-between items-center">
+              <div class="flex justify-between items-center" v-if="selectedTransaction.metadata.accountNumber">
                 <span class="text-xs font-medium text-gray-500">Account Number</span>
                 <span class="text-xs font-bold text-gray-900 font-mono">{{ selectedTransaction.metadata.accountNumber }}</span>
+              </div>
+              <div class="flex justify-between items-center" v-if="selectedTransaction.metadata.userName">
+                <span class="text-xs font-medium text-gray-500">Account Name</span>
+                <span class="text-xs font-bold text-gray-900">{{ selectedTransaction.metadata.userName }}</span>
+              </div>
+              <div class="flex justify-between items-center" v-if="selectedTransaction.metadata.paystackReference">
+                <span class="text-xs font-medium text-gray-500">Paystack Ref</span>
+                <span class="text-xs font-bold text-[#FF5C1A] font-mono">{{ selectedTransaction.metadata.paystackReference }}</span>
+              </div>
+              <div class="flex justify-between items-center" v-if="selectedTransaction.metadata.transferCode">
+                <span class="text-xs font-medium text-gray-500">Transfer Code</span>
+                <span class="text-xs font-bold text-gray-900 font-mono">{{ selectedTransaction.metadata.transferCode }}</span>
+              </div>
+              <div class="flex justify-between items-center" v-if="selectedTransaction.metadata.userEmail">
+                <span class="text-xs font-medium text-gray-500">Email</span>
+                <span class="text-xs font-bold text-gray-900">{{ selectedTransaction.metadata.userEmail }}</span>
               </div>
             </div>
           </div>

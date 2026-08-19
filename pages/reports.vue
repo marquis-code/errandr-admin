@@ -21,22 +21,26 @@
     </div>
 
     <!-- Stats Summary -->
-    <div v-if="!loading" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">total</p>
-        <p class="text-2xl font-semibold text-gray-900 mt-1">{{ total }}</p>
+    <div v-if="!loading" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
+        <div class="absolute -right-6 -top-6 w-24 h-24 bg-gray-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest relative z-10">Total</p>
+        <p class="text-3xl font-black text-gray-900 mt-2 font-heading relative z-10 tabular-nums">{{ total }}</p>
       </div>
-      <div class="bg-amber-50 rounded-xl p-4 border border-amber-100 shadow-sm">
-        <p class="text-[10px] font-bold text-amber-500 uppercase tracking-wide">open</p>
-        <p class="text-2xl font-semibold text-amber-700 mt-1">{{ stats.pending }}</p>
+      <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-amber-200 transition-all duration-300">
+        <div class="absolute -right-6 -top-6 w-24 h-24 bg-amber-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <p class="text-[10px] font-bold text-amber-500 uppercase tracking-widest relative z-10">Open</p>
+        <p class="text-3xl font-black text-amber-700 mt-2 font-heading relative z-10 tabular-nums">{{ stats.pending }}</p>
       </div>
-      <div class="bg-blue-50 rounded-xl p-4 border border-blue-100 shadow-sm">
-        <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wide">reviewing</p>
-        <p class="text-2xl font-semibold text-blue-700 mt-1">{{ stats.investigating }}</p>
+      <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-blue-200 transition-all duration-300">
+        <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest relative z-10">Reviewing</p>
+        <p class="text-3xl font-black text-blue-700 mt-2 font-heading relative z-10 tabular-nums">{{ stats.investigating }}</p>
       </div>
-      <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-100 shadow-sm">
-        <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-wide">resolved</p>
-        <p class="text-2xl font-semibold text-emerald-700 mt-1">{{ stats.resolved }}</p>
+      <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-emerald-200 transition-all duration-300">
+        <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest relative z-10">Resolved</p>
+        <p class="text-3xl font-black text-emerald-700 mt-2 font-heading relative z-10 tabular-nums">{{ stats.resolved }}</p>
       </div>
     </div>
 
@@ -56,10 +60,12 @@
     </div>
 
     <!-- Empty State -->
-    <div v-else-if="filteredReports.length === 0" class="py-20 bg-white rounded-xl border border-gray-100 shadow-sm text-center">
+    <div v-else-if="filteredReports.length === 0" class="py-24 bg-gradient-to-b from-white to-gray-50/50 rounded-2xl border border-gray-100 shadow-sm text-center relative overflow-hidden">
+      <div class="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02] mix-blend-overlay"></div>
       <EmptyState 
         title="No reports found" 
         :description="`There are no ${activeTab === 'all' ? '' : activeTab} reports at this time.`"
+        class="relative z-10"
       />
     </div>
 

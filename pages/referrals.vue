@@ -24,14 +24,18 @@
       </template>
       <template v-else>
         <div v-for="stat in statCards" :key="stat.label"
-          class="bg-white p-5 rounded-xl border border-gray-100 hover:border-gray-300 transition-colors group">
-          <div class="flex items-center justify-between mb-4">
-            <div :class="stat.bgClass" class="w-10 h-10 rounded-lg flex items-center justify-center">
+          class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
+          <!-- Abstract Background Glow -->
+          <div class="absolute -right-6 -top-6 w-24 h-24 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+               :class="stat.bgClass.replace('bg-', 'bg-').replace('/10', '/5').replace('text-', 'bg-')"></div>
+               
+          <div class="flex items-center justify-between mb-4 relative z-10">
+            <div :class="stat.bgClass" class="w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-current/10">
               <component :is="stat.icon" class="w-5 h-5" />
             </div>
           </div>
-          <p class="text-xs font-medium text-gray-500 mb-1">{{ stat.label }}</p>
-          <h3 class="text-2xl font-semibold text-gray-900 font-heading">{{ stat.value }}</h3>
+          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 relative z-10">{{ stat.label }}</p>
+          <h3 class="text-2xl font-black text-gray-900 font-heading relative z-10 tabular-nums">{{ stat.value }}</h3>
         </div>
       </template>
     </div>
@@ -471,38 +475,48 @@
           </div>
         </div>
 
-        <!-- Referrals List -->
+        <!-- Activity Log (Referrals) -->
         <div class="py-6 px-6 bg-gray-50/30 -mx-6 min-h-[300px]">
-          <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-4">Onboarded Users</h4>
+          <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-4">Activity Log (Onboarded Users)</h4>
           
           <div v-if="facRefsLoading" class="flex justify-center py-10">
             <Loader2 class="w-6 h-6 animate-spin text-[#FF5C1A]" />
           </div>
           
           <div v-else-if="facilitatorReferrals.length === 0" class="text-center py-10">
-            <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
-              <Users class="w-4 h-4 text-gray-400" />
+            <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2 border border-gray-200">
+               <Users class="w-4 h-4 text-gray-400" />
             </div>
-            <p class="text-xs text-gray-500">No users onboarded yet</p>
+            <p class="text-xs text-gray-500 font-medium">No activity yet</p>
           </div>
           
-          <div v-else class="space-y-3">
-            <div v-for="ref in facilitatorReferrals" :key="ref._id" class="bg-white p-4 rounded-xl border border-gray-100 flex items-center justify-between shadow-sm">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded bg-[#FF5C1A]/10 text-[#FF5C1A] flex items-center justify-center font-bold text-xs">
-                  {{ ref.referred?.firstName?.charAt(0) || ref.referredType?.charAt(0)?.toUpperCase() || 'U' }}
-                </div>
-                <div>
-                  <p class="text-sm font-semibold text-gray-900">{{ ref.referred?.firstName }} {{ ref.referred?.lastName }}</p>
-                  <p class="text-[10px] text-gray-500">{{ ref.referred?.email || 'No email' }}</p>
-                </div>
+          <div v-else class="space-y-4 relative pl-4 before:content-[''] before:absolute before:left-[21px] before:top-4 before:bottom-4 before:w-px before:bg-gray-200">
+            <div v-for="(ref, index) in facilitatorReferrals" :key="ref._id" class="relative">
+              <!-- Timeline Node -->
+              <div class="absolute -left-[27px] top-4 w-3 h-3 rounded-full bg-white border-2 flex items-center justify-center"
+                   :class="index === 0 ? 'border-[#FF5C1A]' : 'border-gray-300'">
+                 <div v-if="index === 0" class="w-1 h-1 rounded-full bg-[#FF5C1A]"></div>
               </div>
-              <div class="text-right">
-                <span class="text-[10px] font-medium px-2 py-0.5 rounded capitalize"
-                  :class="ref.referredType === 'vendor' ? 'bg-emerald-50 text-emerald-600' : ref.referredType === 'errander' ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'">
-                  {{ ref.referredType }}
-                </span>
-                <p class="text-[10px] text-gray-400 mt-1">{{ formatDate(ref.createdAt) }}</p>
+              
+              <div class="bg-white p-4 rounded-xl border border-gray-100 flex items-center justify-between shadow-sm hover:shadow-md hover:border-gray-200 transition-all">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-[#FF5C1A]/10 text-[#FF5C1A] border border-[#FF5C1A]/20 flex items-center justify-center font-bold text-sm">
+                    {{ ref.referred?.firstName?.charAt(0) || ref.referredType?.charAt(0)?.toUpperCase() || 'U' }}
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-gray-900">
+                      Onboarded <span class="text-[#FF5C1A]">{{ ref.referred?.firstName }} {{ ref.referred?.lastName }}</span>
+                    </p>
+                    <p class="text-[10px] text-gray-500 mt-0.5">Earned <span class="font-bold text-gray-700">{{ ref.referrerPointsAwarded || 100 }}</span> pts • {{ ref.referred?.email || 'No email' }}</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded capitalize tracking-wide"
+                    :class="ref.referredType === 'vendor' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : ref.referredType === 'errander' ? 'bg-amber-50 text-amber-600 border border-amber-100' : 'bg-blue-50 text-blue-600 border border-blue-100'">
+                    {{ ref.referredType }}
+                  </span>
+                  <p class="text-[10px] text-gray-400 mt-1.5 font-medium">{{ formatDate(ref.createdAt) }}</p>
+                </div>
               </div>
             </div>
           </div>

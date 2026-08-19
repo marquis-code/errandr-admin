@@ -1,30 +1,32 @@
 <template>
-  <div v-if="isOpen" class="w-full h-full flex flex-col font-sans relative overflow-hidden bg-[#E5DDD5]">
+  <div v-if="isOpen" class="w-full h-full flex flex-col font-sans relative overflow-hidden bg-white">
     <!-- Chat Panel -->
-    <div class="w-full h-full flex flex-col bg-[#E5DDD5]">
+    <div class="w-full h-full flex flex-col bg-white">
       <!-- Header -->
-      <div class="px-4 py-2.5 bg-[#FF5C1A] text-white flex items-center gap-4 sticky top-0 z-20 shadow-sm">
-        <button @click="$emit('close')" class="lg:hidden p-2 hover:bg-white/10 rounded-full transition-colors">
-          <ArrowLeft class="w-5 h-5 text-white" />
+      <div class="px-6 py-4 bg-white/80 backdrop-blur-md text-gray-900 flex items-center gap-4 sticky top-0 z-20 shadow-sm border-b border-gray-100/50">
+        <button @click="$emit('close')" class="lg:hidden p-2 hover:bg-gray-50 rounded-xl transition-colors">
+          <ArrowLeft class="w-5 h-5 text-gray-600" />
         </button>
-        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold overflow-hidden cursor-pointer">
+        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-100 to-rose-100 flex items-center justify-center text-sm font-bold overflow-hidden cursor-pointer shadow-sm border border-white">
           <img v-if="receiverAvatar" :src="receiverAvatar" class="w-full h-full object-cover" />
-          <User v-else class="w-6 h-6 text-white" />
+          <User v-else class="w-6 h-6 text-[#FF5C1A]" />
         </div>
         <div class="flex-1 min-w-0">
-          <h3 class="text-[16px] font-medium truncate leading-tight text-white">{{ receiverName || 'Support Chat' }}</h3>
-          <p class="text-[13px] text-white/80 font-normal truncate">
-            Customer Support • {{ isTyping ? 'typing...' : 'online' }}
+          <h3 class="text-base font-bold truncate leading-tight text-gray-900 font-heading">{{ receiverName || 'Support Chat' }}</h3>
+          <p class="text-xs text-gray-500 font-medium truncate mt-0.5 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full" :class="isTyping ? 'bg-amber-400 animate-pulse' : 'bg-emerald-400'"></span>
+            {{ isTyping ? 'Typing...' : 'Online' }}
           </p>
         </div>
       </div>
 
       <!-- Messages Area -->
-      <div ref="messageContainer" class="flex-1 overflow-y-auto px-4 py-6 space-y-2 scroll-smooth bg-[#F0F2F5] bg-repeat">
+      <div ref="messageContainer" class="flex-1 overflow-y-auto px-6 py-6 space-y-4 scroll-smooth bg-gray-50/50 relative">
+        <div class="absolute inset-0 bg-[url('/noise.png')] opacity-[0.02] mix-blend-overlay pointer-events-none"></div>
         
-        <div class="flex justify-center mb-6 sticky top-2 z-10">
-          <span class="px-3 py-1 bg-[#D1E9F6] text-[#54656F] text-[11px] font-bold rounded-lg shadow-sm">
-            Support Chat
+        <div class="flex justify-center mb-8 sticky top-4 z-10">
+          <span class="px-4 py-1.5 bg-white/80 backdrop-blur-md text-gray-500 text-[10px] font-bold rounded-full shadow-sm border border-gray-100/50 uppercase tracking-widest">
+            Today
           </span>
         </div>
 
@@ -33,66 +35,72 @@
         </div>
         
         <div v-else-if="messages.length === 0" class="flex flex-col items-center justify-center p-10 text-center space-y-3 mt-10">
-          <div class="p-5 bg-white rounded-3xl shadow-sm">
-            <p class="text-[12px] text-gray-500 font-medium leading-relaxed">
-              No messages yet in this support thread.
+          <div class="p-6 bg-white rounded-3xl shadow-sm border border-gray-100 max-w-sm w-full mx-auto">
+            <div class="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-3">
+              <MessageSquare class="w-6 h-6 text-gray-400" />
+            </div>
+            <p class="text-sm text-gray-900 font-semibold mb-1">Start a conversation</p>
+            <p class="text-xs text-gray-500 font-medium leading-relaxed">
+              Send a message to begin the support session.
             </p>
           </div>
         </div>
 
         <div v-for="(msg, idx) in messages" :key="msg._id || idx" 
-          class="flex flex-col w-full animate-message-in" 
+          class="flex flex-col w-full animate-message-in relative z-10" 
           :class="isMe(msg) ? 'items-end' : 'items-start'">
           
           <div :class="[
-            'relative max-w-[85%] px-3 py-1.5 rounded-lg text-[14.5px] shadow-sm mb-1 group transition-all',
+            'relative max-w-[75%] px-5 py-3.5 text-sm shadow-sm transition-all border',
             isMe(msg) 
-              ? 'bg-[#DCF8C6] text-[#054740] rounded-tr-none ml-10' 
-              : 'bg-white text-[#111B21] rounded-tl-none mr-10'
+              ? 'bg-gradient-to-br from-[#FF5C1A] to-[#FF7A45] text-white rounded-3xl rounded-tr-sm border-transparent' 
+              : 'bg-white text-gray-900 rounded-3xl rounded-tl-sm border-gray-100'
           ]">
             <!-- Sender name -->
-            <p v-if="!isMe(msg)" class="text-[12px] font-bold text-[#FF5C1A] mb-0.5">
+            <p v-if="!isMe(msg)" class="text-xs font-bold text-[#FF5C1A] mb-1.5">
               {{ msg.sender?.firstName || msg.senderName || 'User' }}
             </p>
 
-            <div v-if="msg.messageType === 'image'" class="mb-1 -mx-1 -mt-0.5">
-              <img :src="msg.attachment" class="rounded-lg max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity" @click="msg.attachment && openImage(msg.attachment)" />
+            <div v-if="msg.messageType === 'image'" class="mb-2 -mx-2 -mt-1">
+              <img :src="msg.attachment" class="rounded-2xl max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity border border-white/20" @click="msg.attachment && openImage(msg.attachment)" />
             </div>
-            <div v-if="msg.messageType === 'voice'" class="mb-1 min-w-[200px] flex items-center gap-3 py-2">
+            <div v-if="msg.messageType === 'voice'" class="mb-2 min-w-[200px] flex items-center gap-3 py-2">
               <audio :src="msg.attachment" controls class="h-8 w-full custom-audio" />
             </div>
 
-            <div class="flex items-end gap-2 flex-wrap">
-              <span v-if="msg.message || msg.content" class="break-words flex-1 min-w-0 font-medium">{{ msg.message || msg.content }}</span>
+            <div class="flex items-end gap-3 flex-wrap">
+              <span v-if="msg.message || msg.content" class="break-words flex-1 min-w-0 font-medium leading-relaxed">{{ msg.message || msg.content }}</span>
               <div class="flex items-center gap-1 shrink-0 mt-1 self-end">
-                <span class="text-sm text-gray-400 font-medium">
+                <span class="text-[10px] font-semibold tracking-wide" :class="isMe(msg) ? 'text-white/80' : 'text-gray-400'">
                   {{ formatTime(msg.createdAt) }}
                 </span>
-                <div v-if="isMe(msg)" class="flex items-center">
-                  <Check v-if="!msg._id" class="w-3 h-3 text-gray-400" />
-                  <CheckCheck v-else class="w-3.5 h-3.5 text-[#34B7F1]" />
+                <div v-if="isMe(msg)" class="flex items-center ml-1">
+                  <Check v-if="!msg._id" class="w-3.5 h-3.5 text-white/60" />
+                  <CheckCheck v-else class="w-4 h-4 text-white" />
                 </div>
               </div>
             </div>
           </div>
         </div>
         
-        <div v-if="isTyping" class="flex items-center ml-2 transition-all">
-          <div class="bg-white px-3 py-2 rounded-lg shadow-sm text-[12px] text-[#FF5C1A] font-bold animate-pulse">
-            {{ receiverName || 'User' }} is typing...
+        <div v-if="isTyping" class="flex items-center ml-2 transition-all relative z-10">
+          <div class="bg-white px-4 py-3 rounded-2xl rounded-tl-sm shadow-sm border border-gray-100 flex items-center gap-1.5">
+            <div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
+            <div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+            <div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
           </div>
         </div>
       </div>
 
       <!-- Input Bar -->
-      <div class="px-2 py-3 bg-[#F0F2F5] flex flex-col gap-2">
-        <div class="flex items-center gap-2">
-          <div class="flex-1 bg-white rounded-xl px-4 py-2.5 flex items-center shadow-sm border border-transparent focus-within:border-[#FF5C1A]/20 focus-within:ring-2 focus-within:ring-[#FF5C1A]/10 transition-all">
+      <div class="px-4 py-4 bg-white/80 backdrop-blur-md border-t border-gray-100 flex flex-col gap-2 relative z-20">
+        <div class="max-w-4xl w-full mx-auto flex items-center gap-3">
+          <div class="flex-1 bg-gray-50/80 rounded-2xl px-5 py-3.5 flex items-center shadow-inner border border-gray-200/50 focus-within:bg-white focus-within:border-[#FF5C1A]/30 focus-within:ring-4 focus-within:ring-[#FF5C1A]/10 transition-all">
             <input 
               v-model="newMsgText" 
               type="text" 
-              placeholder="Type a message to reply" 
-              class="flex-1 bg-transparent border-none outline-none text-[15px] font-medium text-[#111B21] placeholder:text-gray-400"
+              placeholder="Type your message..." 
+              class="flex-1 bg-transparent border-none outline-none text-sm font-medium text-gray-900 placeholder:text-gray-400"
               @input="handleTyping"
               @keyup.enter="handleSend"
             />
@@ -101,10 +109,10 @@
           <button 
             @click="handleSend"
             :disabled="!newMsgText.trim()"
-            class="w-12 h-12 text-white rounded-full flex items-center justify-center transition-all shadow-md shrink-0 disabled:opacity-50"
-            :class="newMsgText.trim() ? 'bg-[#FF5C1A] hover:bg-[#E54D12]' : 'bg-gray-400'"
+            class="w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-sm shrink-0 disabled:opacity-50 disabled:cursor-not-allowed group"
+            :class="newMsgText.trim() ? 'bg-gradient-to-br from-[#FF5C1A] to-[#FF7A45] hover:shadow-md hover:-translate-y-0.5' : 'bg-gray-100'"
           >
-            <Send class="w-5 h-5 ml-0.5" />
+            <Send class="w-5 h-5 ml-0.5 transition-transform" :class="newMsgText.trim() ? 'text-white group-hover:scale-110' : 'text-gray-400'" />
           </button>
         </div>
       </div>
