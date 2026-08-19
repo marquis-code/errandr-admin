@@ -46,28 +46,34 @@
     </div>
 
     <!-- Table Section -->
-    <div class="bg-white rounded-xl border border-gray-100 overflow-hidden min-h-[400px] shadow-sm">
-      <div v-if="loading" class="p-5">
-        <SkeletonTable :rows="10" :cols="6" />
+    <div class="bg-white rounded-[1.25rem] border border-gray-100/60 shadow-sm hover:shadow-md transition-all overflow-hidden min-h-[400px] relative">
+      <div class="px-6 py-5 border-b border-gray-100/60 bg-gray-50/50 flex justify-between items-center">
+        <h3 class="text-sm font-bold text-gray-900 tracking-tight uppercase">Recent Orders</h3>
+      </div>
+      
+      <div v-if="loading" class="p-8 text-center text-gray-400 text-sm">
+        <div class="w-8 h-8 border-4 border-[#FF5C1A] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        Loading Orders...
       </div>
 
       <div v-else-if="filteredOrders.length === 0" class="py-20 text-center">
-        <EmptyState 
-          title="No orders found" 
-          description="There are currently no active orders matching your filter."
-        />
+        <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 mx-auto mb-4 shadow-sm border border-gray-100">
+          <PackageOpen class="w-8 h-8" />
+        </div>
+        <h4 class="font-bold text-gray-900 tracking-tight">No orders found</h4>
+        <p class="text-sm text-gray-500 mt-1">There are currently no active orders matching your filter.</p>
       </div>
 
       <div v-else class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="border-b border-gray-100 bg-gray-50/50">
-              <th class="py-3 px-5 font-semibold text-gray-500 text-[11px] uppercase tracking-wide whitespace-nowrap">Date</th>
-              <th class="py-3 px-4 font-semibold text-gray-500 text-[11px] uppercase tracking-wide whitespace-nowrap">Customer</th>
-              <th class="py-3 px-4 font-semibold text-gray-500 text-[11px] uppercase tracking-wide whitespace-nowrap">Amount</th>
-              <th class="py-3 px-4 font-semibold text-gray-500 text-[11px] uppercase tracking-wide whitespace-nowrap text-center">Vendor</th>
-              <th class="py-3 px-4 font-semibold text-gray-500 text-[11px] uppercase tracking-wide whitespace-nowrap text-center">Status</th>
-              <th class="py-3 px-5 font-semibold text-gray-500 text-[11px] uppercase tracking-wide whitespace-nowrap text-right">Actions</th>
+            <tr class="border-b border-gray-100/60 bg-gray-50/50 text-[11px] uppercase tracking-wider text-gray-500">
+              <th class="py-3 px-5 font-bold whitespace-nowrap">Date</th>
+              <th class="py-3 px-4 font-bold whitespace-nowrap">Customer</th>
+              <th class="py-3 px-4 font-bold whitespace-nowrap">Amount</th>
+              <th class="py-3 px-4 font-bold whitespace-nowrap text-center">Vendor</th>
+              <th class="py-3 px-4 font-bold whitespace-nowrap text-center">Status</th>
+              <th class="py-3 px-5 font-bold whitespace-nowrap text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
@@ -94,13 +100,13 @@
               </td>
               <td class="py-3 px-4 text-center">
                 <div v-if="order.type === 'custom_errand'" class="inline-flex items-center gap-2 pr-2 py-1 pl-1 bg-white rounded-md border border-gray-100 truncate max-w-[150px]">
-                  <div class="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-emerald-600 shrink-0 bg-emerald-50 border border-emerald-100">
+                  <div class="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-[#FF5C1A] shrink-0 bg-[#FF5C1A]/10 border border-[#FF5C1A]/20">
                     C
                   </div>
                   <p class="text-[10px] font-semibold text-gray-700 truncate">Custom Errand</p>
                 </div>
                 <div v-else class="inline-flex items-center gap-2 pr-2 py-1 pl-1 bg-white rounded-md border border-gray-100 truncate max-w-[150px]">
-                  <div class="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-indigo-600 shrink-0 bg-indigo-50 border border-indigo-100">
+                  <div class="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-gray-900 shrink-0 bg-gray-100 border border-gray-200">
                     {{ order.vendor?.storeName?.[0] || 'V' }}
                   </div>
                   <p class="text-[10px] font-semibold text-gray-700 truncate">{{ order.vendor?.storeName || 'N/A' }}</p>
@@ -150,105 +156,117 @@
 
         <!-- Details Section -->
         <div class="py-6 space-y-6 pb-24 bg-gray-50/30 -mx-6 px-6">
-          <div class="space-y-3">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+          <div class="space-y-4">
+            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">
               Order Details
             </h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-gray-500">Order ID / No.</span>
-                <span class="text-xs font-semibold text-gray-900 break-all font-mono">{{ selectedOrder.orderNumber || selectedOrder._id }}</span>
+            <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm px-2">
+              <div>
+                <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-1">Order ID</span>
+                <span class="text-xs font-bold text-gray-900 font-mono">{{ selectedOrder.orderNumber || selectedOrder._id }}</span>
               </div>
-              <div class="w-full h-px bg-gray-100" />
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-gray-500">Order Type</span>
-                <span class="text-[10px] font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded-md uppercase tracking-wide">{{ selectedOrder.type?.replace('_', ' ') || 'standard' }}</span>
+              <div>
+                <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-1">Order Type</span>
+                <span class="text-xs font-bold text-[#FF5C1A] uppercase tracking-wide">{{ selectedOrder.type?.replace('_', ' ') || 'standard' }}</span>
               </div>
-              <div class="w-full h-px bg-gray-100" />
-              <div class="flex justify-between items-center">
-                <span class="text-xs font-semibold text-gray-500">Status</span>
-                <StatusBadge :status="selectedOrder.status" class="scale-75 origin-right transition-transform" />
+              <div>
+                <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-1">Status</span>
+                <StatusBadge :status="selectedOrder.status" class="scale-90 origin-left" />
               </div>
-              <template v-if="selectedOrder.uniqueCode">
-                <div class="w-full h-px bg-gray-100" />
-                <div class="flex items-center justify-between">
-                  <span class="text-xs font-semibold text-gray-500">Unique Code</span>
-                  <span class="text-xs font-bold text-gray-900 tracking-wider">{{ selectedOrder.uniqueCode }}</span>
-                </div>
-              </template>
+              <div v-if="selectedOrder.uniqueCode">
+                <span class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide block mb-1">Verification Code</span>
+                <span class="text-xs font-bold text-gray-900 tracking-wider">{{ selectedOrder.uniqueCode }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer Info -->
+          <div class="space-y-4 mt-6">
+            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">
+              Customer Information
+            </h4>
+            <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm px-2">
+              <div>
+                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Name</p>
+                <p class="font-bold text-gray-900">{{ selectedOrder.customer?.firstName }} {{ selectedOrder.customer?.lastName }}</p>
+              </div>
+              <div>
+                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Phone</p>
+                <p class="font-bold text-gray-900">{{ selectedOrder.customer?.phone || 'N/A' }}</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Delivery Address</p>
+                <p class="text-xs font-medium text-gray-700 leading-relaxed">{{ selectedOrder.deliveryAddress || selectedOrder.specificAddress || selectedOrder.shippingAddress || 'No address provided' }}</p>
+              </div>
             </div>
           </div>
 
           <!-- Custom Errand Specific -->
-          <div class="space-y-3" v-if="selectedOrder.type === 'custom_errand' && selectedOrder.customDetails">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+          <div class="space-y-4 mt-6" v-if="selectedOrder.type === 'custom_errand' && selectedOrder.customDetails">
+            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">
               Errand Specifics
             </h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-4">
+            <div class="px-2 space-y-4">
               <div class="flex items-start gap-3">
-                <MapPin class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                <MapPin class="w-4 h-4 text-[#FF5C1A] mt-0.5 shrink-0" />
                 <div>
-                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Pickup Location</p>
-                  <p class="text-xs font-medium text-gray-900 mt-0.5">{{ selectedOrder.customDetails.pickupLocation }}</p>
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">Pickup Location</p>
+                  <p class="text-xs font-medium text-gray-900">{{ selectedOrder.customDetails.pickupLocation }}</p>
                 </div>
               </div>
-              <div class="w-full h-px bg-gray-100 ml-7" />
               <div class="flex items-start gap-3">
                 <MapPin class="w-4 h-4 text-rose-500 mt-0.5 shrink-0" />
                 <div>
-                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Dropoff Location</p>
-                  <p class="text-xs font-medium text-gray-900 mt-0.5">{{ selectedOrder.customDetails.dropoffLocation }}</p>
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1">Dropoff Location</p>
+                  <p class="text-xs font-medium text-gray-900">{{ selectedOrder.customDetails.dropoffLocation }}</p>
                 </div>
               </div>
-              <div class="w-full h-px bg-gray-100" />
               <div>
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-1.5">Description</p>
-                <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                  <p class="text-xs font-medium text-gray-700 leading-relaxed">{{ selectedOrder.customDetails.description }}</p>
-                </div>
+                <p class="text-xs font-medium text-gray-700 leading-relaxed bg-gray-50 p-3 rounded-lg">{{ selectedOrder.customDetails.description }}</p>
               </div>
             </div>
           </div>
 
           <!-- Marketplace Specific -->
-          <div class="space-y-3" v-if="selectedOrder.type === 'marketplace'">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+          <div class="space-y-4 mt-6" v-if="selectedOrder.type === 'marketplace'">
+            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">
               Items & Vendor
             </h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-4">
-              <div class="flex items-center gap-2 pb-3 border-b border-gray-100" v-if="selectedOrder.vendor">
-                <Store class="w-4 h-4 text-gray-500" />
-                <span class="text-xs font-semibold text-gray-900">{{ selectedOrder.vendor.storeName }}</span>
+            <div class="px-2 space-y-4">
+              <div class="flex items-center gap-2 mb-2" v-if="selectedOrder.vendor">
+                <Store class="w-4 h-4 text-[#FF5C1A]" />
+                <span class="text-xs font-bold text-gray-900">{{ selectedOrder.vendor.storeName }}</span>
               </div>
               
-              <div class="space-y-3" v-if="selectedOrder.items?.length">
+              <div class="space-y-4" v-if="selectedOrder.items?.length">
                 <div v-for="item in selectedOrder.items" :key="item._id" class="flex items-start justify-between">
-                  <div class="flex items-start gap-2">
-                    <span class="text-xs font-bold text-gray-900 mt-0.5">{{ item.quantity }}x</span>
+                  <div class="flex items-start gap-3">
+                    <span class="text-xs font-black text-[#FF5C1A] bg-[#FF5C1A]/10 px-2 py-0.5 rounded">{{ item.quantity }}x</span>
                     <div class="flex flex-col">
-                      <span class="text-xs font-medium text-gray-700">{{ item.name }}</span>
-                      <div v-if="item.customizations?.length" class="mt-1 space-y-0.5">
-                        <p v-for="(custom, idx) in item.customizations" :key="idx" class="text-[10px] text-gray-500 flex items-center gap-1">
-                          <span class="text-gray-300">+</span> {{ custom.name }} <span v-if="custom.price > 0">(₦{{ custom.price?.toLocaleString() }})</span>
+                      <span class="text-xs font-bold text-gray-900">{{ item.name }}</span>
+                      <div v-if="item.customizations?.length" class="mt-1 space-y-1">
+                        <p v-for="(custom, idx) in item.customizations" :key="idx" class="text-[10px] font-medium text-gray-500 flex items-center gap-1">
+                          <span class="text-gray-300">•</span> {{ custom.name }} <span class="font-semibold text-gray-700" v-if="custom.price > 0">(+₦{{ custom.price?.toLocaleString() }})</span>
                         </p>
                       </div>
                     </div>
                   </div>
-                  <span class="text-xs font-semibold text-gray-900">₦{{ Number(item.subtotal || item.price || 0).toLocaleString() }}</span>
+                  <span class="text-xs font-black text-gray-900">₦{{ Number(item.subtotal || item.price || 0).toLocaleString() }}</span>
                 </div>
               </div>
 
               <!-- Packs -->
-              <div class="space-y-3" v-if="selectedOrder.packs?.length">
-                <div v-for="pack in selectedOrder.packs" :key="pack._id" class="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                  <div class="flex items-center gap-2 mb-2">
-                    <Box class="w-3.5 h-3.5 text-gray-500" />
-                    <span class="text-xs font-semibold text-gray-900">{{ pack.name }}</span>
+              <div class="space-y-4 mt-2" v-if="selectedOrder.packs?.length">
+                <div v-for="pack in selectedOrder.packs" :key="pack._id" class="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                  <div class="flex items-center gap-2 mb-3">
+                    <Box class="w-3.5 h-3.5 text-gray-400" />
+                    <span class="text-xs font-bold text-gray-900 uppercase tracking-wide">{{ pack.name }}</span>
                   </div>
-                  <div class="space-y-1.5 pl-5">
-                    <div v-for="pItem in pack.items" :key="pItem._id" class="flex justify-between items-center text-[11px]">
-                      <span class="text-gray-600 font-medium">{{ pItem.quantity }}x {{ pItem.name }}</span>
-                      <span class="text-gray-900 font-semibold">₦{{ Number(pItem.subtotal || 0).toLocaleString() }}</span>
+                  <div class="space-y-2 pl-5">
+                    <div v-for="pItem in pack.items" :key="pItem._id" class="flex justify-between items-center text-xs">
+                      <span class="text-gray-600 font-medium"><span class="font-bold text-gray-900 mr-1">{{ pItem.quantity }}x</span> {{ pItem.name }}</span>
+                      <span class="text-gray-900 font-black">₦{{ Number(pItem.subtotal || 0).toLocaleString() }}</span>
                     </div>
                   </div>
                 </div>
@@ -256,88 +274,116 @@
             </div>
           </div>
 
-          <!-- Vendor Note -->
-          <div class="space-y-3" v-if="selectedOrder.vendorNote">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
-              Customer Instruction
+          <!-- Notes -->
+          <div class="space-y-4 mt-6" v-if="selectedOrder.vendorNote || selectedOrder.adminNote">
+            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">
+              Instructions & Notes
             </h4>
-            <div class="bg-amber-50 p-4 rounded-xl border border-amber-100 shadow-sm flex gap-3">
-              <MessageSquare class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-              <p class="text-xs font-medium text-amber-900 leading-relaxed">{{ selectedOrder.vendorNote }}</p>
+            <div class="px-2 space-y-3">
+              <div v-if="selectedOrder.vendorNote" class="bg-amber-50 p-3 rounded-xl flex gap-3">
+                <MessageSquare class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <p class="text-xs font-medium text-amber-900 leading-relaxed"><span class="font-bold block mb-1 uppercase text-[10px]">Customer Note</span> {{ selectedOrder.vendorNote }}</p>
+              </div>
+              <div v-if="selectedOrder.adminNote" class="bg-blue-50 p-3 rounded-xl flex gap-3">
+                <MessageSquare class="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                <p class="text-xs font-medium text-blue-900 leading-relaxed"><span class="font-bold block mb-1 uppercase text-[10px]">Admin Note</span> {{ selectedOrder.adminNote }}</p>
+              </div>
             </div>
           </div>
 
-          <div class="space-y-3">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
-              Pricing Breakdown
+          <!-- Payment & Billing -->
+          <div class="space-y-4 mt-6">
+            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2 flex justify-between items-center">
+              Billing & Revenue Split
+              <span class="px-2 py-0.5 rounded-md font-bold text-[10px]" :class="selectedOrder.paymentStatus === 'paid' ? 'bg-emerald-100 text-[#FF5C1A]' : 'bg-amber-100 text-amber-700'">{{ selectedOrder.paymentStatus || 'Pending' }}</span>
             </h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
+            
+            <div class="px-2 space-y-3">
               <div class="flex justify-between items-center text-xs">
-                <span class="text-gray-500 font-semibold">Subtotal</span>
-                <span class="text-gray-900 font-semibold">₦{{ Number(selectedOrder.subtotal || 0).toLocaleString() }}</span>
-              </div>
-              <div class="flex justify-between items-center text-xs">
-                <span class="text-gray-500 font-semibold">Delivery Fee</span>
-                <span class="text-gray-900 font-semibold">₦{{ Number(selectedOrder.deliveryFee || 0).toLocaleString() }}</span>
-              </div>
-              <div class="flex justify-between items-center text-xs" v-if="selectedOrder.serviceFee">
-                <span class="text-gray-500 font-semibold">Service Fee</span>
-                <span class="text-gray-900 font-semibold">₦{{ Number(selectedOrder.serviceFee || 0).toLocaleString() }}</span>
+                <span class="text-gray-500 font-semibold uppercase tracking-wide text-[10px]">Items Subtotal</span>
+                <span class="text-gray-900 font-bold">₦{{ Number(selectedOrder.subtotal || 0).toLocaleString() }}</span>
               </div>
               <div class="flex justify-between items-center text-xs" v-if="selectedOrder.packagingFee">
-                <span class="text-gray-500 font-semibold">Packaging Fee</span>
-                <span class="text-gray-900 font-semibold">₦{{ Number(selectedOrder.packagingFee || 0).toLocaleString() }}</span>
+                <span class="text-gray-500 font-semibold uppercase tracking-wide text-[10px]">Packaging</span>
+                <span class="text-gray-900 font-bold">₦{{ Number(selectedOrder.packagingFee || 0).toLocaleString() }}</span>
               </div>
-              <div class="w-full h-px bg-gray-100" />
-              <div class="flex justify-between items-center">
-                <span class="text-xs font-bold text-gray-900 uppercase">Total</span>
-                <span class="text-sm font-bold text-[#FF5C1A]">₦{{ Number(selectedOrder.total || selectedOrder.totalAmount || 0).toLocaleString() }}</span>
+              
+              <div class="my-3 py-3 border-y border-gray-100 border-dashed space-y-3">
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-gray-500 font-bold uppercase tracking-wide text-[10px]">Total Delivery Charged</span>
+                  <span class="text-gray-900 font-black">₦{{ Number(selectedOrder.deliveryFee || 0).toLocaleString() }}</span>
+                </div>
+                <!-- Breakdown -->
+                <div class="pl-3 border-l-2 border-[#FF5C1A]/20 space-y-2" v-if="selectedOrder.erranderPayout || selectedOrder.serviceFee">
+                  <div class="flex justify-between items-center text-[11px]" v-if="selectedOrder.erranderPayout">
+                    <span class="text-[#FF5C1A] font-bold">↳ Errander Payout</span>
+                    <span class="text-[#FF5C1A] font-black">₦{{ Number(selectedOrder.erranderPayout || 0).toLocaleString() }}</span>
+                  </div>
+                  <div class="flex justify-between items-center text-[11px]" v-if="selectedOrder.serviceFee">
+                    <span class="text-gray-900 font-bold">↳ Platform Service Fee</span>
+                    <span class="text-gray-900 font-black">₦{{ Number(selectedOrder.serviceFee || 0).toLocaleString() }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Discounts / Promos -->
+              <div class="flex justify-between items-center text-xs" v-if="selectedOrder.discountAmount">
+                <span class="text-emerald-500 font-bold uppercase tracking-wide text-[10px]">Discount Applied</span>
+                <span class="text-emerald-600 font-black">-₦{{ Number(selectedOrder.discountAmount || 0).toLocaleString() }}</span>
+              </div>
+              <div class="flex justify-between items-center text-xs" v-if="selectedOrder.vendorPrepaidPromoAmount">
+                <span class="text-emerald-500 font-bold uppercase tracking-wide text-[10px]">Vendor Prepaid Promo</span>
+                <span class="text-emerald-600 font-black">-₦{{ Number(selectedOrder.vendorPrepaidPromoAmount || 0).toLocaleString() }}</span>
+              </div>
+
+              <div class="flex justify-between items-center text-xs" v-if="selectedOrder.platformProcessingFee">
+                <span class="text-gray-500 font-semibold uppercase tracking-wide text-[10px]">Processing Fee</span>
+                <span class="text-gray-900 font-bold">₦{{ Number(selectedOrder.platformProcessingFee || 0).toLocaleString() }}</span>
+              </div>
+              <div class="flex justify-between items-center text-xs" v-if="selectedOrder.transferFee">
+                <span class="text-gray-500 font-semibold uppercase tracking-wide text-[10px]">Transfer Fee</span>
+                <span class="text-gray-900 font-bold">₦{{ Number(selectedOrder.transferFee || 0).toLocaleString() }}</span>
+              </div>
+
+              <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+                <span class="text-xs font-black text-gray-900 uppercase">Total Paid</span>
+                <span class="text-lg font-black text-[#FF5C1A]">₦{{ Number(selectedOrder.total || selectedOrder.totalAmount || 0).toLocaleString() }}</span>
               </div>
             </div>
           </div>
 
-          <div class="space-y-3">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
-              Payment & Delivery
+          <!-- Cancellation info -->
+          <div class="space-y-4 mt-6" v-if="selectedOrder.status === 'cancelled'">
+            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">
+              Cancellation Details
             </h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
-              <div class="flex justify-between items-center">
-                <span class="text-xs font-semibold text-gray-500 flex items-center gap-1.5"><CreditCard class="w-3.5 h-3.5" /> Payment</span>
-                <span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md" 
-                  :class="selectedOrder.paymentStatus === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'">
-                  {{ selectedOrder.paymentStatus || 'Pending' }}
-                </span>
-              </div>
-              <div class="w-full h-px bg-gray-100" />
-              <div class="flex justify-between items-start gap-4">
-                <span class="text-xs font-semibold text-gray-500 shrink-0 mt-0.5">Delivery To</span>
-                <div class="text-right">
-                  <p class="text-xs font-semibold text-gray-900">{{ selectedOrder.recipientName || (selectedOrder.customer?.firstName + ' ' + selectedOrder.customer?.lastName) || 'User' }}</p>
-                  <p class="text-[10px] text-gray-500 font-medium">{{ selectedOrder.recipientPhone || 'No phone provided' }}</p>
-                  <p class="text-xs font-medium text-gray-700 mt-1">{{ selectedOrder.deliveryAddress || selectedOrder.specificAddress || selectedOrder.shippingAddress || 'No address provided' }}</p>
-                </div>
+            <div class="bg-rose-50 p-4 rounded-xl">
+              <p class="text-[10px] font-bold text-rose-800 uppercase tracking-wide mb-1">Reason</p>
+              <p class="text-xs font-medium text-rose-900">{{ selectedOrder.cancellationReason || 'No reason provided' }}</p>
+              <div class="mt-2 text-[10px] font-semibold text-rose-700 flex justify-between" v-if="selectedOrder.cancelledBy">
+                <span>Cancelled By: <span class="uppercase">{{ selectedOrder.cancelledBy }}</span></span>
               </div>
             </div>
           </div>
 
           <!-- Status Timeline -->
-          <div class="space-y-3" v-if="selectedOrder.statusHistory?.length">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">
+          <div class="space-y-4 mt-6" v-if="selectedOrder.statusHistory?.length">
+            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">
               Order Timeline
             </h4>
-            <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm relative pl-6">
-              <div class="absolute top-8 bottom-8 left-[31px] w-px bg-gray-200"></div>
+            <div class="px-2 relative pl-6">
+              <div class="absolute top-2 bottom-2 left-3 w-px bg-gray-200"></div>
               <div class="space-y-6">
                 <div v-for="(hist, idx) in selectedOrder.statusHistory" :key="hist._id || idx" class="flex items-start gap-4 relative z-10">
                   <div class="w-6 h-6 rounded-full flex items-center justify-center shrink-0 bg-white border-2"
-                    :class="idx === selectedOrder.statusHistory.length - 1 ? 'border-[#FF5C1A] text-[#FF5C1A]' : 'border-gray-100 text-gray-400'">
+                    :class="idx === selectedOrder.statusHistory.length - 1 ? 'border-[#FF5C1A] text-[#FF5C1A]' : 'border-gray-200 text-gray-400'">
                     <CheckCircle2 class="w-3.5 h-3.5" v-if="idx < selectedOrder.statusHistory.length - 1" />
                     <div class="w-2 h-2 rounded-full bg-[#FF5C1A]" v-else />
                   </div>
                   <div class="flex-1 min-w-0 pt-0.5">
                     <p class="text-xs font-bold text-gray-900 capitalize">{{ hist.status?.replace(/_/g, ' ') }}</p>
-                    <p class="text-[10px] font-medium text-gray-500 mt-0.5 leading-relaxed">{{ hist.note }}</p>
-                    <p class="text-[10px] font-semibold text-gray-400 mt-1">{{ new Date(hist.timestamp).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) }}</p>
+                    <p class="text-[10px] font-medium text-gray-500 mt-0.5 leading-relaxed" v-if="hist.note">{{ hist.note }}</p>
+                    <p class="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-wide">{{ new Date(hist.timestamp).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) }}</p>
                   </div>
                 </div>
               </div>
@@ -363,7 +409,7 @@
 
 <script setup lang="ts">
 import { admin_api } from '@/api_factory/modules/admin';
-import { Package, Search, ChevronRight, Copy, MapPin, Store, Box, CreditCard, CheckCircle2, Clock, MessageSquare } from 'lucide-vue-next';
+import { PackageOpen, Package, Search, ChevronRight, Copy, MapPin, Store, Box, CreditCard, CheckCircle2, Clock, MessageSquare } from 'lucide-vue-next';
 import { onMounted, ref, computed } from 'vue';
 import SideDrawer from '@/components/ui/SideDrawer.vue';
 import EmptyState from '@/components/core/EmptyState.vue';
