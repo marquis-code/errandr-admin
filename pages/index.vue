@@ -6,15 +6,11 @@
       <div class="w-full">
         <!-- Header -->
         <div class="text-center mb-10">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-[1.5rem] bg-gray-900/10 text-gray-900 mb-6 shadow-inner border border-gray-100">
-            <ShieldCheck class="w-8 h-8" />
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-[1.5rem] bg-gray-900/10 text-gray-900 shadow-inner border border-gray-100">
+            <img src="@/assets/img/erranders-icon-2048.png" class="h-12 w-auto" />
           </div>
           <h1 class="text-3xl font-medium text-gray-900 tracking-tight mb-2">Admin Login</h1>
           <p class="text-gray-500 font-medium text-sm">Access the Errandr operations dashboard</p>
-          <div class="flex items-center justify-center gap-2 mt-4 text-emerald-600 text-sm font-bold bg-emerald-50 py-1 px-3 rounded-full border border-emerald-100 max-w-max mx-auto">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            System Operational
-          </div>
         </div>
 
         <!-- Form -->
@@ -45,26 +41,19 @@
           </transition>
 
           <button type="submit" :disabled="loading"
-            class="w-full py-4 bg-gray-900 hover:bg-black text-white rounded-2xl font-medium text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-xl shadow-gray-900/20 group active:scale-[0.98]">
+            class="w-full py-3 bg-gray-900 hover:bg-black text-white rounded-2xl font-medium text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-xl shadow-gray-900/20 group active:scale-[0.98]">
             <Loader2 v-if="loading" class="animate-spin w-5 h-5" />
             <span v-else>Secure Login</span>
             <Lock v-if="!loading" class="w-4 h-4 group-hover:text-emerald-400 transition-colors" />
           </button>
         </form>
-
-        <!-- Footer -->
-        <div class="mt-10 text-center pt-8 border-t border-gray-100">
-          <p class="text-xs font-mono text-gray-400 font-medium uppercase tracking-wider">
-            Authorized personnel only. Sessions are monitored.
-          </p>
-        </div>
       </div>
       
-      <div class="mt-8 text-center flex items-center justify-center gap-4 text-sm font-bold text-gray-400">
+      <!-- <div class="mt-8 text-center flex items-center justify-center gap-4 text-sm font-bold text-gray-400">
         <p>&copy; {{ new Date().getFullYear() }} Errandr Ops</p>
         <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
         <span>Confidential</span>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
