@@ -11,10 +11,10 @@
           class="w-full pl-10 pr-4 py-2.5 bg-white hover:bg-gray-50 transition-colors border border-gray-100 rounded-lg text-base font-medium focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A] placeholder:text-gray-400 shadow-sm"
         />
       </div>
-      
       <div class="flex items-center gap-2 shrink-0">
-        <button class="px-4 py-2 bg-white hover:bg-gray-50 border border-gray-100 rounded-lg text-xs font-semibold text-gray-700 transition-colors flex items-center gap-1.5 shadow-sm">
-          <Download class="w-3.5 h-3.5" /> Export
+        <DateRangePicker v-model:start="startDate" v-model:end="endDate" />
+        <button class="px-4 py-3 bg-white hover:bg-gray-50 border border-gray-100 rounded-xl text-sm font-semibold text-gray-700 transition-colors flex items-center gap-2 shadow-sm h-[52px]">
+          <Download class="w-4 h-4" /> Export
         </button>
       </div>
     </div>
@@ -26,54 +26,158 @@
         <p class="text-xs font-medium text-gray-500">Track revenue, commissions, and all platform transactions.</p>
       </div>
 
-      <!-- Financial Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Loading State -->
-        <template v-if="loading">
-          <div v-for="i in 3" :key="`fin-loading-${i}`" class="bg-white p-5 rounded-xl border border-gray-100 animate-pulse h-32 shadow-sm">
-            <div class="w-8 h-8 bg-gray-200 rounded-lg mb-4"></div>
-            <div class="w-24 h-3 bg-gray-200 rounded mb-2"></div>
-            <div class="w-32 h-6 bg-gray-200 rounded"></div>
-          </div>
-        </template>
+      <!-- Dashboard Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left Column: Primary Stats -->
+        <div class="lg:col-span-8 space-y-6">
+          
+          <!-- Loading State -->
+          <template v-if="loading && !stats">
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 animate-pulse h-40 shadow-sm mb-6"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div v-for="i in 4" :key="`fin-loading-${i}`" class="bg-white p-5 rounded-xl border border-gray-100 animate-pulse h-32 shadow-sm"></div>
+            </div>
+          </template>
 
-        <template v-else>
-          <!-- Total Volume Card -->
-          <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-emerald-200 transition-all duration-300">
-            <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mb-4 border border-emerald-100 group-hover:scale-110 transition-transform duration-300">
-              <Wallet class="w-5 h-5 text-emerald-600" />
-            </div>
-            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Volume</p>
-            <h2 class="text-2xl font-black text-gray-900 tabular-nums font-heading">₦{{ (stats?.totalVolume || 0).toLocaleString() }}</h2>
-            <div class="flex items-center gap-1.5 mt-2">
-              <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">All time</span>
-            </div>
-          </div>
+          <template v-else>
+            <!-- Revenue Performance Widget -->
+            <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+              <div class="absolute -right-12 -top-12 w-48 h-48 bg-emerald-50 rounded-full blur-3xl opacity-50"></div>
+              
+              <div class="flex-1 space-y-1 z-10 w-full">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><Calendar class="w-3.5 h-3.5"/> Today's Revenue</p>
+                <div class="flex items-baseline gap-3">
+                  <h2 class="text-4xl font-black text-gray-900 tabular-nums font-heading tracking-tight">₦{{ (stats?.todaysRevenue || 0).toLocaleString() }}</h2>
+                  
+                  <div class="flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-bold"
+                       :class="revenueGrowth >= 0 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'">
+                    <TrendingUp v-if="revenueGrowth >= 0" class="w-3.5 h-3.5" />
+                    <TrendingDown v-else class="w-3.5 h-3.5" />
+                    {{ Math.abs(revenueGrowth).toFixed(1) }}%
+                  </div>
+                </div>
+                <p class="text-xs font-medium text-gray-500 mt-2">Yesterday: ₦{{ (stats?.yesterdaysRevenue || 0).toLocaleString() }}</p>
+              </div>
 
-          <!-- Commission Card -->
-          <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-[#FF5C1A]/30 transition-all duration-300">
-            <div class="absolute -right-6 -top-6 w-24 h-24 bg-[#FF5C1A]/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div class="w-10 h-10 rounded-xl bg-[#FF5C1A]/10 flex items-center justify-center mb-4 border border-[#FF5C1A]/20 group-hover:scale-110 transition-transform duration-300">
-              <TrendingUp class="w-5 h-5 text-[#FF5C1A]" />
+              <div class="w-full md:w-auto shrink-0 z-10 flex gap-2">
+                <button class="flex-1 md:flex-none px-4 py-2.5 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-xs font-bold transition-colors shadow-sm">View Report</button>
+              </div>
             </div>
-            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Platform Earnings</p>
-            <h2 class="text-2xl font-black text-[#FF5C1A] tabular-nums font-heading">₦{{ (stats?.totalCommissions || 0).toLocaleString() }}</h2>
-            <span class="text-[10px] font-bold text-gray-500 mt-2 block uppercase tracking-wide">Total service fees</span>
-          </div>
 
-          <!-- Net Balance Card -->
-          <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-indigo-200 transition-all duration-300">
-            <div class="absolute -right-6 -top-6 w-24 h-24 bg-indigo-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mb-4 border border-indigo-100 group-hover:scale-110 transition-transform duration-300">
-              <ArrowDownLeft class="w-5 h-5 text-indigo-600" />
+            <!-- Financial Cards Grid (2x2) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Total Volume Card -->
+              <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-emerald-200 transition-all duration-300">
+                <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mb-4 border border-emerald-100 group-hover:scale-110 transition-transform duration-300">
+                  <Wallet class="w-5 h-5 text-emerald-600" />
+                </div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Volume</p>
+                <h2 class="text-2xl font-black text-gray-900 tabular-nums font-heading">₦{{ (stats?.totalVolume || 0).toLocaleString() }}</h2>
+                <div class="flex items-center gap-1.5 mt-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">All time</span>
+                </div>
+              </div>
+
+              <!-- Commission Card -->
+              <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-[#FF5C1A]/30 transition-all duration-300">
+                <div class="absolute -right-6 -top-6 w-24 h-24 bg-[#FF5C1A]/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="w-10 h-10 rounded-xl bg-[#FF5C1A]/10 flex items-center justify-center mb-4 border border-[#FF5C1A]/20 group-hover:scale-110 transition-transform duration-300">
+                  <TrendingUp class="w-5 h-5 text-[#FF5C1A]" />
+                </div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Platform Earnings</p>
+                <h2 class="text-2xl font-black text-[#FF5C1A] tabular-nums font-heading">₦{{ (stats?.totalCommissions || 0).toLocaleString() }}</h2>
+                <span class="text-[10px] font-bold text-gray-500 mt-2 block uppercase tracking-wide">Total service fees</span>
+              </div>
+
+              <!-- Net Balance Card -->
+              <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-indigo-200 transition-all duration-300">
+                <div class="absolute -right-6 -top-6 w-24 h-24 bg-indigo-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mb-4 border border-indigo-100 group-hover:scale-110 transition-transform duration-300">
+                  <ArrowDownLeft class="w-5 h-5 text-indigo-600" />
+                </div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Net Balance</p>
+                <h2 class="text-2xl font-black text-gray-900 tabular-nums font-heading">₦{{ (netBalance || 0).toLocaleString() }}</h2>
+                <span class="text-[10px] font-bold text-indigo-600 mt-2 block uppercase tracking-wide">Combined wallet balance</span>
+              </div>
+
+              <!-- Highest Spender Card -->
+              <div class="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl relative overflow-hidden group hover:shadow-2xl transition-all duration-300">
+                <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/5 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-4 border border-white/10 group-hover:scale-110 transition-transform duration-300">
+                  <Star class="w-5 h-5 text-[#FF5C1A]" fill="currentColor" />
+                </div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Top Spender</p>
+                <div v-if="stats?.highestPurchaseUser">
+                  <h2 class="text-xl font-black text-white tabular-nums font-heading truncate">{{ stats.highestPurchaseUser.owner?.firstName }} {{ stats.highestPurchaseUser.owner?.lastName }}</h2>
+                  <span class="text-[10px] font-bold text-[#FF5C1A] mt-2 block uppercase tracking-wide">₦{{ (stats.highestPurchaseUser.totalSpent || 0).toLocaleString() }} Lifetime</span>
+                </div>
+                <div v-else>
+                  <h2 class="text-xl font-black text-white tabular-nums font-heading">N/A</h2>
+                  <span class="text-[10px] font-bold text-gray-500 mt-2 block uppercase tracking-wide">No data yet</span>
+                </div>
+              </div>
             </div>
-            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Net Balance</p>
-            <h2 class="text-2xl font-black text-gray-900 tabular-nums font-heading">₦{{ (netBalance || 0).toLocaleString() }}</h2>
-            <span class="text-[10px] font-bold text-indigo-600 mt-2 block uppercase tracking-wide">Combined wallet balance</span>
+          </template>
+        </div>
+
+        <!-- Right Column: AI Actionable Insights -->
+        <div class="lg:col-span-4">
+          <div class="bg-gradient-to-b from-indigo-900 to-indigo-950 p-6 rounded-2xl border border-indigo-800 shadow-xl relative overflow-hidden h-full flex flex-col">
+            <div class="absolute -left-12 -bottom-12 w-48 h-48 bg-indigo-500 rounded-full blur-3xl opacity-20"></div>
+            <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-[#FF5C1A] to-transparent opacity-50"></div>
+            
+            <div class="flex items-center gap-2 mb-6 z-10">
+              <div class="p-2 bg-indigo-800/50 rounded-lg border border-indigo-700/50">
+                <Sparkles class="w-4 h-4 text-indigo-300" />
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-white font-heading">Actionable Insights</h3>
+                <p class="text-[10px] font-medium text-indigo-300">System generated recommendations</p>
+              </div>
+            </div>
+
+            <div class="space-y-4 z-10 flex-1">
+              <template v-if="loading && !stats">
+                <div v-for="i in 3" :key="`insight-skel-${i}`" class="h-20 bg-indigo-800/30 animate-pulse rounded-xl border border-indigo-700/30"></div>
+              </template>
+              <template v-else>
+                <div v-if="revenueGrowth < 0" class="p-4 bg-rose-500/10 rounded-xl border border-rose-500/20 hover:bg-rose-500/20 transition-colors cursor-pointer group">
+                  <div class="flex items-start gap-3">
+                    <div class="mt-0.5"><TrendingDown class="w-4 h-4 text-rose-400" /></div>
+                    <div>
+                      <p class="text-xs font-bold text-rose-200 mb-1 group-hover:text-rose-100">Revenue is down {{ Math.abs(revenueGrowth).toFixed(1) }}%</p>
+                      <p class="text-[10px] font-medium text-rose-300/80 leading-relaxed">Consider launching a targeted push campaign to inactive users to boost order volume today.</p>
+                      <button class="mt-2 text-[10px] font-bold text-white bg-rose-500/20 px-3 py-1.5 rounded-lg border border-rose-500/30 hover:bg-rose-500/40 transition-colors">Create Campaign</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div v-if="revenueGrowth > 10" class="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors cursor-pointer group">
+                  <div class="flex items-start gap-3">
+                    <div class="mt-0.5"><TrendingUp class="w-4 h-4 text-emerald-400" /></div>
+                    <div>
+                      <p class="text-xs font-bold text-emerald-200 mb-1 group-hover:text-emerald-100">Strong Momentum (+{{ revenueGrowth.toFixed(1) }}%)</p>
+                      <p class="text-[10px] font-medium text-emerald-300/80 leading-relaxed">Great job! Consider adjusting vendor commission rates slightly to capitalize on high volume.</p>
+                      <button class="mt-2 text-[10px] font-bold text-white bg-emerald-500/20 px-3 py-1.5 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/40 transition-colors">Review Rates</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors cursor-pointer group">
+                  <div class="flex items-start gap-3">
+                    <div class="mt-0.5"><UserPlus class="w-4 h-4 text-indigo-300" /></div>
+                    <div>
+                      <p class="text-xs font-bold text-indigo-100 mb-1 group-hover:text-white">Acquisition Strategy</p>
+                      <p class="text-[10px] font-medium text-indigo-300/80 leading-relaxed">Top spender is highly active. Create a referral code for them to invite more high-value peers.</p>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </div>
           </div>
-        </template>
+        </div>
       </div>
     </div>
 
@@ -152,6 +256,42 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination -->
+      <div v-if="totalPages > 1 && !loading" class="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50 gap-4">
+        <div class="text-xs font-medium text-gray-500">
+          Showing <span class="font-bold text-gray-900">{{ ((currentPage - 1) * 50) + 1 }}</span> to <span class="font-bold text-gray-900">{{ Math.min(currentPage * 50, totalTransactions) }}</span> of <span class="font-bold text-gray-900">{{ totalTransactions }}</span> transactions
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button 
+            @click="handlePageChange(currentPage - 1)" 
+            :disabled="currentPage === 1"
+            class="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-white hover:text-gray-900 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+          >
+            <ChevronLeft class="w-4 h-4" />
+          </button>
+          <div class="flex items-center gap-1">
+            <template v-for="page in displayedPages" :key="page">
+              <button 
+                v-if="page !== '...'"
+                @click="handlePageChange(page as number)"
+                :class="page === currentPage ? 'bg-[#FF5C1A] text-white border-[#FF5C1A] shadow-md shadow-[#FF5C1A]/20' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:border-gray-300 shadow-sm'"
+                class="w-8 h-8 rounded-lg border text-xs font-bold transition-all flex items-center justify-center"
+              >
+                {{ page }}
+              </button>
+              <span v-else class="w-8 h-8 flex items-center justify-center text-gray-400 text-xs font-bold">...</span>
+            </template>
+          </div>
+          <button 
+            @click="handlePageChange(currentPage + 1)" 
+            :disabled="currentPage === totalPages"
+            class="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-white hover:text-gray-900 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+          >
+            <ChevronRight class="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
 
@@ -292,12 +432,13 @@
 
 <script setup lang="ts">
 import { useAdminFinances } from '@/composables/modules/admin';
-import { Download, Wallet, TrendingUp, ArrowDownLeft, Search, ListFilter, ChevronRight, Copy, FileText, Package } from 'lucide-vue-next';
+import { Download, Wallet, TrendingUp, TrendingDown, ArrowDownLeft, Search, ListFilter, ChevronRight, ChevronLeft, Copy, FileText, Package, Star, Calendar, Sparkles, UserPlus } from 'lucide-vue-next';
 import { onMounted, ref, computed } from 'vue';
 import SideDrawer from '@/components/ui/SideDrawer.vue';
 import EmptyState from '@/components/core/EmptyState.vue';
 import SkeletonTable from '@/components/ui/SkeletonTable.vue';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
+import DateRangePicker from '@/components/ui/DateRangePicker.vue';
 
 definePageMeta({
   layout: 'admin'
@@ -305,10 +446,12 @@ definePageMeta({
 
 useHead({ title: 'Finances - Errander Admin' });
 
-const { stats, transactions, loading, fetchFinances, approvePayout, rejectPayout, markPayoutAsPaid, downloadReceipt } = useAdminFinances();
+const { stats, transactions, totalTransactions, currentPage, fetchTransactions, loading, fetchFinances, approvePayout, rejectPayout, markPayoutAsPaid, downloadReceipt } = useAdminFinances();
 
 const searchQuery = ref('');
 const selectedTransaction = ref<any>(null);
+const startDate = ref('');
+const endDate = ref('');
 
 const handleApprovePayout = async (id: string) => {
   await approvePayout(id);
@@ -334,13 +477,46 @@ const netBalance = computed(() => {
 });
 
 const filteredTransactions = computed(() => {
-  if (!searchQuery.value) return transactions.value;
-  const q = searchQuery.value.toLowerCase();
-  return transactions.value.filter((tx: any) => 
-    tx.description?.toLowerCase().includes(q) || 
-    tx.wallet?.owner?.firstName?.toLowerCase().includes(q) ||
-    tx.wallet?.owner?.lastName?.toLowerCase().includes(q)
-  );
+  return transactions.value.filter((tx: any) => {
+    const q = searchQuery.value.toLowerCase();
+    const matchesSearch = !q || 
+      tx.description?.toLowerCase().includes(q) || 
+      tx.wallet?.owner?.firstName?.toLowerCase().includes(q) ||
+      tx.wallet?.owner?.lastName?.toLowerCase().includes(q);
+      
+    let matchesDate = true;
+    if (startDate.value || endDate.value) {
+      const txDate = new Date(tx.createdAt).getTime();
+      if (startDate.value && txDate < new Date(startDate.value).getTime()) matchesDate = false;
+      if (endDate.value && txDate > new Date(endDate.value).getTime() + 86400000) matchesDate = false;
+    }
+      
+    return matchesSearch && matchesDate;
+  });
+});
+
+const totalPages = computed(() => Math.ceil((totalTransactions.value || 0) / 50));
+
+const revenueGrowth = computed(() => {
+  if (!stats.value) return 0;
+  const today = stats.value.todaysRevenue || 0;
+  const yesterday = stats.value.yesterdaysRevenue || 0;
+  if (yesterday === 0) return today > 0 ? 100 : 0;
+  return ((today - yesterday) / yesterday) * 100;
+});
+
+const handlePageChange = async (page: number) => {
+  if (page < 1 || page > totalPages.value) return;
+  await fetchTransactions(page, 50);
+};
+
+const displayedPages = computed(() => {
+  const current = currentPage.value;
+  const total = totalPages.value;
+  if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1);
+  if (current <= 3) return [1, 2, 3, 4, '...', total];
+  if (current >= total - 2) return [1, '...', total - 3, total - 2, total - 1, total];
+  return [1, '...', current - 1, current, current + 1, '...', total];
 });
 
 onMounted(fetchFinances);

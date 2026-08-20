@@ -12,14 +12,43 @@
             class="w-full pl-14 pr-14 py-3.5 bg-white hover:bg-gray-50 transition-colors border border-gray-100 rounded-xl text-base font-semibold focus:outline-none focus:ring-4 focus:ring-[#FF5C1A]/5 focus:border-[#FF5C1A]/20 placeholder:text-gray-400 shadow-sm"
           />
         </div>
-        
-        <div class="flex items-center gap-4 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-sm shrink-0">
-          <div class="w-10 h-10 rounded-xl bg-[#FF5C1A]/10 flex items-center justify-center">
-            <UsersIcon class="w-5 h-5 text-[#FF5C1A]" />
+        <!-- Quick Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full md:w-auto">
+          <div class="flex items-center gap-4 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-none shrink-0">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+              <UsersIcon class="w-5 h-5 text-blue-600" />
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total</span>
+              <span class="text-lg font-black text-gray-900 leading-none">{{ users.length }}</span>
+            </div>
           </div>
-          <div class="flex flex-col">
-            <span class="text-sm font-semibold text-gray-500">Total Users</span>
-            <span class="text-lg font-bold text-gray-900 leading-none">{{ users.length }}</span>
+          <div class="flex items-center gap-4 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-none shrink-0">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+              <Activity class="w-5 h-5 text-emerald-600" />
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Active</span>
+              <span class="text-lg font-black text-gray-900 leading-none">{{ activeUsersCount }}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-none shrink-0">
+            <div class="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center">
+              <XCircle class="w-5 h-5 text-rose-600" />
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Suspended</span>
+              <span class="text-lg font-black text-gray-900 leading-none">{{ suspendedUsersCount }}</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-none shrink-0">
+            <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
+              <DollarSign class="w-5 h-5 text-indigo-600" />
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Wallet Bal</span>
+              <span class="text-lg font-black text-gray-900 leading-none">₦{{ totalWalletBalance.toLocaleString() }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -33,7 +62,7 @@
           </div>
         </div>
         
-        <div class="flex overflow-x-auto pb-2 hide-scrollbar gap-2">
+        <div class="flex overflow-x-auto pb-2 hide-scrollbar gap-2 flex-1">
           <button 
             v-for="role in roles" 
             :key="role"
@@ -43,6 +72,10 @@
           >
             <span class="capitalize">{{ role }}</span>
           </button>
+        </div>
+        
+        <div class="flex-shrink-0">
+          <DateRangePicker v-model:start="startDate" v-model:end="endDate" />
         </div>
       </div>
 
@@ -404,16 +437,14 @@
 </template>
 
 <script setup lang="ts">
-import { useAdminUsers } from '@/composables/modules/admin';
 import { admin_api } from '@/api_factory/modules/admin';
-import { GATEWAY_ENDPOINT_WITH_AUTH as api } from '@/api_factory/axios.config';
-import { Search, Eye, Users as UsersIcon, UserX2, UserCheck2 } from 'lucide-vue-next';
-import { onMounted, ref, computed } from 'vue';
-import EmptyState from '@/components/core/EmptyState.vue';
-import ConfirmationModal from '@/components/ui/ConfirmationModal.vue';
-import SkeletonTable from '@/components/ui/SkeletonTable.vue';
+import { useAdminUsers } from '@/composables/modules/admin';
+import { Users as UsersIcon, Search, MoreHorizontal, UserCheck, UserX, Shield, Edit2, Activity, DollarSign, XCircle, UserX2, UserCheck2, MapPin } from 'lucide-vue-next';
+import { ref, computed, onMounted } from 'vue';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 import SideDrawer from '@/components/ui/SideDrawer.vue';
+import DateRangePicker from '@/components/ui/DateRangePicker.vue';
+import ConfirmationModal from '@/components/ui/ConfirmationModal.vue';
 import { useCustomToast } from '@/composables/core/useCustomToast';
 
 definePageMeta({
@@ -426,6 +457,8 @@ const { showToast } = useCustomToast();
 const { users, loading, fetchUsers } = useAdminUsers();
 const searchQuery = ref('');
 const selectedRole = ref('all');
+const startDate = ref('');
+const endDate = ref('');
 const roles = ['all', 'admin', 'vendor', 'student'];
 
 // Drawer state
@@ -450,6 +483,10 @@ const confirmModal = ref({
   userId: ''
 });
 
+const activeUsersCount = computed(() => users.value.filter(u => u.isActive).length);
+const suspendedUsersCount = computed(() => users.value.filter(u => !u.isActive).length);
+const totalWalletBalance = computed(() => users.value.reduce((acc, u) => acc + (Number(u.walletBalance) || 0), 0));
+
 const filteredUsers = computed(() => {
   return users.value.filter(user => {
     const matchesSearch = !searchQuery.value || 
@@ -458,7 +495,14 @@ const filteredUsers = computed(() => {
     
     const matchesRole = selectedRole.value === 'all' || user.role === selectedRole.value;
     
-    return matchesSearch && matchesRole;
+    let matchesDate = true;
+    if (startDate.value || endDate.value) {
+      const uDate = new Date(user.createdAt).getTime();
+      if (startDate.value && uDate < new Date(startDate.value).getTime()) matchesDate = false;
+      if (endDate.value && uDate > new Date(endDate.value).getTime() + 86400000) matchesDate = false;
+    }
+    
+    return matchesSearch && matchesRole && matchesDate;
   });
 });
 

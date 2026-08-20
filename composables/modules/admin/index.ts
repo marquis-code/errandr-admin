@@ -122,20 +122,35 @@ export const useAdminFinances = () => {
   const loading = ref(false);
   const stats = ref<any>(null);
   const transactions = ref<any[]>([]);
+  const totalTransactions = ref(0);
+  const currentPage = ref(1);
+
+  const fetchTransactions = async (page = 1, limit = 50) => {
+    loading.value = true;
+    try {
+      const res = await wallets_api.getTransactions(page, limit);
+      transactions.value = res.data.transactions || [];
+      totalTransactions.value = res.data.total || 0;
+      currentPage.value = page;
+    } catch (e: any) {
+      console.error(e);
+    } finally {
+      loading.value = false;
+    }
+  };
 
   const fetchFinances = async () => {
     loading.value = true;
     try {
-      const [statsRes, txRes, dashboardStatsRes] = await Promise.all([
+      const [statsRes, dashboardStatsRes] = await Promise.all([
         wallets_api.getGlobalStats(),
-        wallets_api.getTransactions(),
         admin_api.getDashboardStats()
       ]);
       stats.value = {
         ...statsRes.data,
         totalCommissions: dashboardStatsRes.data.totalRevenue || 0
       };
-      transactions.value = txRes.data;
+      await fetchTransactions(currentPage.value);
     } finally {
       loading.value = false;
     }
@@ -199,5 +214,5 @@ export const useAdminFinances = () => {
     }
   };
 
-  return { loading, stats, transactions, fetchFinances, approvePayout, rejectPayout, markPayoutAsPaid, downloadReceipt };
+  return { loading, stats, transactions, totalTransactions, currentPage, fetchTransactions, fetchFinances, approvePayout, rejectPayout, markPayoutAsPaid, downloadReceipt };
 };

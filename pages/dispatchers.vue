@@ -182,23 +182,54 @@
         </div>
       </div>
 
-      <!-- Stats -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="bg-white p-5 rounded-[1.25rem] border border-gray-100/60 transition-all hover:shadow-md group overflow-hidden relative">
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-gray-50 to-transparent rounded-bl-full opacity-50 -z-10 group-hover:scale-110 transition-transform"></div>
-          <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Total Dispatchers</p>
-          <p class="text-3xl font-black text-gray-900 mt-2 tracking-tight">{{ allTotal }}</p>
+      <!-- Stats Grid -->
+      <div v-else class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+        <div class="flex items-center gap-4 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-none">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+            <Bike class="w-5 h-5 text-blue-600" />
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Erranders</span>
+            <span class="text-lg font-black text-gray-900 leading-none">{{ allTotal }}</span>
+          </div>
         </div>
-        <div class="bg-white p-5 rounded-[1.25rem] border border-gray-100/60 transition-all hover:shadow-md group overflow-hidden relative">
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-50 to-transparent rounded-bl-full opacity-50 -z-10 group-hover:scale-110 transition-transform"></div>
-          <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Approved</p>
-          <p class="text-3xl font-black text-[#FF5C1A] mt-2 tracking-tight">{{ allDispatchers.filter((d: any) => d.isApproved).length }}</p>
+        <div class="flex items-center gap-4 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-none">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+            <CheckCircle class="w-5 h-5 text-emerald-600" />
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Approved</span>
+            <span class="text-lg font-black text-gray-900 leading-none">{{ allDispatchers.filter((d: any) => d.isApproved).length }}</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-none">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+            <Clock class="w-5 h-5 text-amber-600" />
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Pending Review</span>
+            <span class="text-lg font-black text-gray-900 leading-none">{{ total }}</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-none">
+          <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+            <MapPin class="w-5 h-5 text-purple-600" />
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Currently Online</span>
+            <span class="text-lg font-black text-gray-900 leading-none">{{ allDispatchers.filter((d: any) => d.isOnline).length }}</span>
+          </div>
         </div>
       </div>
 
+
+
       <div class="bg-white rounded-[1.25rem] border border-gray-100/60 overflow-hidden shadow-sm hover:shadow-md transition-all group relative">
-        <div class="px-6 py-5 border-b border-gray-100/60 bg-gray-50/50 flex justify-between items-center">
+        <div class="px-6 py-5 border-b border-gray-100/60 bg-gray-50/50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <h3 class="text-sm font-bold text-gray-900 tracking-tight uppercase">Registered Dispatchers</h3>
+          <div class="w-full md:w-auto">
+            <DateRangePicker v-model:start="startDate" v-model:end="endDate" />
+          </div>
         </div>
         
         <div v-if="allLoading && !allDispatchers.length" class="p-8 text-center text-gray-400 text-sm">
@@ -233,13 +264,13 @@
                 <th class="px-6 py-4 font-bold">School & Matric</th>
                 <th class="px-6 py-4 font-bold">Verification</th>
                 <th class="px-6 py-4 font-bold text-center">Deliveries</th>
-                <th class="px-6 py-4 font-bold text-center text-[#FF5C1A]">Earnings</th>
+                <th class="px-6 py-4 font-bold text-center text-[#FF5C1A]">Wallet/Earnings</th>
                 <th class="px-6 py-4 font-bold text-center">Status</th>
                 <th class="px-6 py-4 font-bold text-right">Actions</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-              <tr v-for="errander in allDispatchers" :key="errander._id" class="hover:bg-gray-50/50 transition-colors" :class="{'bg-red-50/20': selectedDispatchers.includes(errander._id)}">
+              <tr v-for="errander in filteredAllDispatchers" :key="errander._id" class="hover:bg-gray-50/50 transition-colors" :class="{'bg-red-50/20': selectedDispatchers.includes(errander._id)}">
                 <td class="px-6 py-4 text-center">
                   <input type="checkbox" v-model="selectedDispatchers" :value="errander._id" @click.stop class="rounded border-gray-300 text-red-600 focus:ring-red-500" />
                 </td>
@@ -270,7 +301,14 @@
                   <span class="font-bold text-gray-900 bg-gray-100 px-2.5 py-1 rounded-md">{{ errander.totalDeliveries || 0 }}</span>
                 </td>
                 <td class="px-6 py-4 text-center">
-                  <span class="font-bold text-[#FF5C1A] bg-[#FF5C1A]/10 px-2.5 py-1 rounded-md border border-[#FF5C1A]/20">₦{{ (errander.totalEarnings || 0).toLocaleString() }}</span>
+                  <div class="flex flex-col items-center justify-center gap-1">
+                    <span class="font-bold text-[#FF5C1A] bg-[#FF5C1A]/10 px-2.5 py-1 rounded-md border border-[#FF5C1A]/20 text-xs" title="Wallet Balance">
+                      Wallet: ₦{{ Number(errander.user?.walletBalance || 0).toLocaleString() }}
+                    </span>
+                    <span class="font-medium text-gray-500 text-[10px]" title="Total Earnings">
+                      Earned: ₦{{ Number(errander.totalEarnings || 0).toLocaleString() }}
+                    </span>
+                  </div>
                 </td>
                 <td class="px-6 py-4 text-center">
                   <span v-if="errander.status === 'online'" class="inline-flex items-center gap-1.5 text-xs font-bold text-[#FF5C1A] bg-[#FF5C1A]/10 px-2 py-1 rounded-full"><div class="w-1.5 h-1.5 rounded-full bg-[#FF5C1A]/100 animate-pulse"></div>Online</span>
@@ -434,8 +472,9 @@
           </div>
 
           <div class="flex space-x-2 mt-2 mb-4 w-full">
-            <button @click="activeDrawerTab = 'overview'" :class="activeDrawerTab === 'overview' ? 'bg-[#FF5C1A] text-white' : 'bg-gray-100 text-gray-600'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors">Overview</button>
-            <button @click="enterEditMode" :class="activeDrawerTab === 'edit' ? 'bg-[#FF5C1A] text-white' : 'bg-gray-100 text-gray-600'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors">Edit</button>
+            <button @click="activeDrawerTab = 'overview'" :class="activeDrawerTab === 'overview' ? 'bg-[#FF5C1A] text-white border-[#FF5C1A]/20' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors shadow-sm border border-transparent">Overview</button>
+            <button @click="activeDrawerTab = 'errands'" :class="activeDrawerTab === 'errands' ? 'bg-[#FF5C1A] text-white border-[#FF5C1A]/20' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors shadow-sm border border-transparent">Errands</button>
+            <button @click="enterEditMode" :class="activeDrawerTab === 'edit' ? 'bg-[#FF5C1A] text-white border-[#FF5C1A]/20' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors shadow-sm border border-transparent">Edit</button>
           </div>
 
           <template v-if="activeDrawerTab === 'overview'">
@@ -464,8 +503,8 @@
             </div>
 
             <!-- Guarantor Details -->
-            <div v-if="selectedProfile.guarantorDetails" class="space-y-4 mt-6">
-              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">Guarantor Information</h4>
+            <div v-if="selectedProfile.guarantorDetails" class="space-y-4 mt-6 bg-blue-50/50 p-4 rounded-xl border border-blue-100/50 shadow-sm">
+              <h4 class="text-[10px] font-bold text-blue-800 uppercase tracking-wider border-b border-blue-100 pb-2 flex items-center gap-2"><Shield class="w-3 h-3"/> Guarantor Information</h4>
               <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm px-2">
                 <div class="col-span-2">
                   <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Guarantor Name</p>
@@ -483,8 +522,8 @@
             </div>
 
             <!-- Banking & Financials -->
-            <div class="space-y-4 mt-6">
-              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">Financials & Banking</h4>
+            <div class="space-y-4 mt-6 bg-[#FF5C1A]/5 p-4 rounded-xl border border-[#FF5C1A]/10 shadow-sm">
+              <h4 class="text-[10px] font-bold text-[#FF5C1A] uppercase tracking-wider border-b border-[#FF5C1A]/10 pb-2 flex items-center gap-2"><DollarSign class="w-3 h-3"/> Financials & Banking</h4>
               <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm px-2">
                 <div>
                   <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Wallet Balance</p>
@@ -505,8 +544,8 @@
             </div>
 
             <!-- Performance & Gamification -->
-            <div class="space-y-4 mt-6">
-              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">Performance Metrics</h4>
+            <div class="space-y-4 mt-6 bg-purple-50/50 p-4 rounded-xl border border-purple-100/50 shadow-sm">
+              <h4 class="text-[10px] font-bold text-purple-800 uppercase tracking-wider border-b border-purple-100 pb-2 flex items-center gap-2"><Star class="w-3 h-3"/> Performance Metrics</h4>
               <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm px-2">
                 <div>
                   <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Deliveries</p>
@@ -532,8 +571,8 @@
             </div>
 
             <!-- Operations & Verification -->
-            <div class="space-y-4 mt-6">
-              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">Operations & Status</h4>
+            <div class="space-y-4 mt-6 bg-emerald-50/50 p-4 rounded-xl border border-emerald-100/50 shadow-sm">
+              <h4 class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider border-b border-emerald-100 pb-2 flex items-center gap-2"><CheckCircle class="w-3 h-3"/> Operations & Status</h4>
               <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm px-2">
                 <div>
                   <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Device Status</p>
@@ -590,6 +629,36 @@
               </div>
             </div>
 
+          </template>
+
+          <!-- Errands Tab -->
+          <template v-if="activeDrawerTab === 'errands'">
+            <div class="space-y-4">
+              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">Dispatcher Errands</h4>
+              
+              <div v-if="!selectedProfile.batchOrders?.length" class="text-center py-8">
+                <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <FileText class="w-5 h-5 text-gray-400" />
+                </div>
+                <p class="text-sm font-bold text-gray-900">No errands found</p>
+                <p class="text-xs text-gray-500 mt-1">This dispatcher hasn't been assigned any errands yet.</p>
+              </div>
+
+              <div v-else class="space-y-3">
+                <div v-for="order in selectedProfile.batchOrders" :key="order._id || order" class="bg-gray-50 p-4 rounded-xl border border-gray-100/60 hover:border-[#FF5C1A]/30 transition-colors shadow-sm">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="font-mono text-xs font-bold text-gray-900">#{{ typeof order === 'string' ? order.slice(-6).toUpperCase() : (order._id?.slice(-6).toUpperCase() || 'UNKNOWN') }}</span>
+                    <span class="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-bold uppercase tracking-wider rounded">Batched Order</span>
+                  </div>
+                  <div class="text-xs text-gray-500">
+                    <p class="font-medium flex items-center gap-1.5"><Bike class="w-3 h-3"/> Assigned Errand</p>
+                    <p class="mt-1 flex items-center gap-1.5" v-if="typeof order !== 'string' && order.status">
+                      Status: <span class="font-bold text-gray-700">{{ order.status }}</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </template>
 
           <!-- Edit Tab -->
@@ -701,10 +770,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
-import { GATEWAY_ENDPOINT_WITH_AUTH as api } from '@/api_factory/axios.config'
+import { GATEWAY_ENDPOINT_WITH_AUTH as api } from '@/api_factory/axios.config';
+import { Bike, FileText, CheckCircle, XCircle, Search, User, MapPin, MoreHorizontal, Shield, Edit2, Star, Clock, AlertTriangle, AlertCircle, RefreshCw, Eye, Hash, Calendar, DollarSign, Image as ImageIcon } from 'lucide-vue-next';
+import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
+import StatusBadge from '@/components/ui/StatusBadge.vue';
+import SkeletonTable from '@/components/ui/SkeletonTable.vue';
+import ConfirmationModal from '@/components/ui/ConfirmationModal.vue';
+import DateRangePicker from '@/components/ui/DateRangePicker.vue';
 import { useCustomToast as useToast } from '@/composables/core/useCustomToast'
-import { RefreshCw, X, MoreVertical, Eye, Edit, CheckCircle, XCircle, Trash2, Bike, Users, CheckSquare, Wallet, DollarSign, Package } from 'lucide-vue-next'
 
 definePageMeta({ layout: 'admin' })
 useHead({ title: 'Dispatchers Management - Admin' })
@@ -721,7 +794,6 @@ onMounted(() => {
   fetchPending();
   fetchAll();
 });
-import { onUnmounted } from 'vue';
 onUnmounted(() => {
   document.removeEventListener('click', closeDropdown);
 });
@@ -737,10 +809,40 @@ const total = ref(0)
 const totalPages = computed(() => Math.ceil(total.value / 10))
 
 // All dispatchers state
-const allDispatchers = ref<any[]>([])
+const allDispatchers = ref<any[]>([]);
+const allTotal = ref(0);
+const selectedDispatchers = ref<string[]>([]);
+const startDate = ref('');
+const endDate = ref('');
+
+const filteredAllDispatchers = computed(() => {
+  return allDispatchers.value.filter(d => {
+    let matchesDate = true;
+    if (startDate.value || endDate.value) {
+      const dDate = new Date(d.createdAt).getTime();
+      if (startDate.value && dDate < new Date(startDate.value).getTime()) matchesDate = false;
+      if (endDate.value && dDate > new Date(endDate.value).getTime() + 86400000) matchesDate = false;
+    }
+    return matchesDate;
+  });
+});
+
+const fetchAll = async () => {
+  allLoading.value = true
+  try {
+    const res = await api.get(`/admin/dispatchers?page=${allPage.value}&limit=10`)
+    const payload = res.data?.data || res.data;
+    allDispatchers.value = payload?.dispatchers || []
+    allTotal.value = payload?.total || 0
+  } catch (err) {
+    showToast({ title: 'Error', message: 'Failed to fetch all dispatchers', toastType: 'error' })
+  } finally {
+    allLoading.value = false
+  }
+}
+
 const allLoading = ref(false)
 const allPage = ref(1)
-const allTotal = ref(0)
 const allTotalPages = computed(() => Math.ceil(allTotal.value / 10))
 
 const processing = ref<string | null>(null)
@@ -789,7 +891,8 @@ const handleUpdateDispatcher = async () => {
     const res = await api.put(`/admin/dispatchers/${selectedProfile.value._id}`, editDispatcherPayload.value);
     showToast({ title: 'Success', message: 'Dispatcher updated successfully', toastType: 'success' });
     await fetchAll();
-    selectedProfile.value = res.data.errander || res.data;
+    const payload = res.data?.data || res.data;
+    selectedProfile.value = payload.errander || payload;
   } catch (err) {
     showToast({ title: 'Error', message: 'Failed to update dispatcher', toastType: 'error' });
   } finally {
@@ -801,8 +904,9 @@ const fetchPending = async () => {
   loading.value = true
   try {
     const res = await api.get(`/admin/dispatchers/pending?page=${page.value}&limit=10`)
-    dispatchers.value = res.data?.dispatchers || []
-    total.value = res.data?.total || 0
+    const payload = res.data?.data || res.data;
+    dispatchers.value = payload?.dispatchers || []
+    total.value = payload?.total || 0
   } catch (err) {
     showToast({ title: 'Error', message: 'Failed to fetch pending dispatchers', toastType: 'error' })
   } finally {
@@ -810,18 +914,6 @@ const fetchPending = async () => {
   }
 }
 
-const fetchAll = async () => {
-  allLoading.value = true
-  try {
-    const res = await api.get(`/admin/dispatchers?page=${allPage.value}&limit=10`)
-    allDispatchers.value = res.data?.dispatchers || []
-    allTotal.value = res.data?.total || 0
-  } catch (err) {
-    showToast({ title: 'Error', message: 'Failed to fetch all dispatchers', toastType: 'error' })
-  } finally {
-    allLoading.value = false
-  }
-}
 
 // Watchers
 watch(page, fetchPending)
@@ -859,7 +951,8 @@ const openProfileDrawer = async (errander: any) => {
   activeDrawerTab.value = 'overview'
   try {
     const res = await api.get(`/admin/dispatchers/${errander._id}`)
-    selectedProfile.value = res.data
+    const payload = res.data?.data || res.data;
+    selectedProfile.value = payload;
     drawerOpen.value = true
   } catch (err) {
     showToast({ title: 'Error', message: 'Failed to load profile', toastType: 'error' })
@@ -877,7 +970,8 @@ const toggleSuspension = async (id: string, action: 'suspend' | 'activate') => {
     await fetchAll()
     // Refresh drawer data
     const res = await api.get(`/admin/dispatchers/${id}`)
-    selectedProfile.value = res.data
+    const payload = res.data?.data || res.data;
+    selectedProfile.value = payload;
   } catch (err) {
     showToast({ title: 'Error', message: `Failed to ${action} dispatcher`, toastType: 'error' })
   } finally {
@@ -927,7 +1021,8 @@ const updateTier = async (id: string, tier: number) => {
     await api.put(`/admin/dispatchers/${id}/tier`, { tier: Number(tier) })
     showToast({ title: 'Success', message: `Tier updated successfully`, toastType: 'success' })
     const res = await api.get(`/admin/dispatchers/${id}`)
-    selectedProfile.value = res.data
+    const payload = res.data?.data || res.data;
+    selectedProfile.value = payload;
     await fetchAll()
   } catch (err) {
     showToast({ title: 'Error', message: `Failed to update tier`, toastType: 'error' })
@@ -944,7 +1039,7 @@ const deleteDispatcher = (id: string) => {
   showDeleteModal.value = true
 }
 
-const selectedDispatchers = ref<string[]>([])
+
 
 const toggleSelectAll = (e: any) => {
   if (e.target.checked) {

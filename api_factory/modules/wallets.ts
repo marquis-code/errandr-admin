@@ -5,8 +5,8 @@ export const wallets_api = {
     return GATEWAY_ENDPOINT_WITH_AUTH.get('/wallets/mine');
   },
 
-  getTransactions: () => {
-    return GATEWAY_ENDPOINT_WITH_AUTH.get('/wallets/all');
+  getTransactions: (page: number = 1, limit: number = 50) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get(`/wallets/all?page=${page}&limit=${limit}`);
   },
 
   updatePreferences: (payload: { preference: string; bankDetails?: any }) => {

@@ -6,11 +6,14 @@
         <h1 class="text-2xl font-semibold text-gray-900 font-heading tracking-tight">Facilitators Management</h1>
         <p class="text-xs text-gray-500">Manage campus ambassadors and track referral growth</p>
       </div>
-      <button @click="showAddModal = true"
-        class="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg font-medium text-xs hover:bg-gray-800 transition-colors">
-        <UserPlus class="w-4 h-4" />
-        Add Facilitator
-      </button>
+      <div class="flex items-center gap-2">
+        <DateRangePicker v-model:start="startDate" v-model:end="endDate" />
+        <button @click="showAddModal = true"
+          class="flex items-center gap-2 px-4 h-[52px] bg-gray-900 text-white rounded-xl font-medium text-xs hover:bg-gray-800 transition-colors">
+          <UserPlus class="w-4 h-4" />
+          Add Facilitator
+        </button>
+      </div>
     </div>
 
     <!-- Stats Grid -->
@@ -531,6 +534,7 @@ import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { referrals_api } from '@/api_factory/modules/referrals'
 import { useCustomToast } from '@/composables/core/useCustomToast'
 import SideDrawer from '@/components/ui/SideDrawer.vue'
+import DateRangePicker from '@/components/ui/DateRangePicker.vue'
 import {
   Gift, Users, UserPlus, UserMinus, Trophy, Search,
   Mail, TrendingUp, Loader2, Star, X, ArrowDown
@@ -544,14 +548,16 @@ const { showToast } = useCustomToast()
 // ─── State ───────────────────────────────────────────────────────
 
 const activeTab = ref<'facilitators' | 'referrals' | 'leaderboard'>('facilitators')
-const statsLoading = ref(true)
+const statsLoading = ref(false)
+const statsData = ref<any>(null)
+const facilitators = ref<any[]>([])
 const facilitatorsLoading = ref(true)
 const referralsLoading = ref(true)
-const leaderboardLoading = ref(true)
-const stats = ref<any>({})
-const facilitators = ref<any[]>([])
-const referralData = ref<any>({})
 const leaderboard = ref<any[]>([])
+const leaderboardLoading = ref(true)
+
+const startDate = ref('');
+const endDate = ref('');
 const facilitatorSearch = ref('')
 const referralPage = ref(1)
 
@@ -587,20 +593,28 @@ const tabs = [
 // ─── Computed ────────────────────────────────────────────────────
 
 const statCards = computed(() => [
-  { label: 'Total Referrals', value: stats.value.totalReferrals || 0, icon: Gift, bgClass: 'bg-gray-50 text-gray-600 border border-gray-100' },
-  { label: 'Active Facilitators', value: stats.value.activeFacilitators || 0, icon: Users, bgClass: 'bg-gray-50 text-gray-600 border border-gray-100' },
-  { label: 'This Week', value: stats.value.recentReferrals || 0, icon: TrendingUp, bgClass: 'bg-gray-50 text-gray-600 border border-gray-100' },
-  { label: 'Points Awarded', value: (stats.value.totalPointsAwarded || 0).toLocaleString(), icon: Star, bgClass: 'bg-gray-50 text-gray-600 border border-gray-100' },
+  { label: 'Total Referrals', value: statsData.value?.totalReferrals || 0, icon: Gift, bgClass: 'bg-gray-50 text-gray-600 border border-gray-100' },
+  { label: 'Active Facilitators', value: statsData.value?.activeFacilitators || 0, icon: Users, bgClass: 'bg-gray-50 text-gray-600 border border-gray-100' },
+  { label: 'This Week', value: statsData.value?.recentReferrals || 0, icon: TrendingUp, bgClass: 'bg-gray-50 text-gray-600 border border-gray-100' },
+  { label: 'Points Awarded', value: (statsData.value?.totalPointsAwarded || 0).toLocaleString(), icon: Star, bgClass: 'bg-gray-50 text-gray-600 border border-gray-100' },
 ])
 
 const filteredFacilitators = computed(() => {
-  if (!facilitatorSearch.value) return facilitators.value
-  const q = facilitatorSearch.value.toLowerCase()
-  return facilitators.value.filter((f: any) =>
-    f.name?.toLowerCase().includes(q) ||
-    f.email?.toLowerCase().includes(q) ||
-    f.referralCode?.toLowerCase().includes(q)
-  )
+  return facilitators.value.filter(f => {
+    const q = facilitatorSearch.value.toLowerCase()
+    const matchesSearch = !q || (f.name?.toLowerCase().includes(q) || 
+                                f.email?.toLowerCase().includes(q) || 
+                                f.referralCode?.toLowerCase().includes(q))
+                                
+    let matchesDate = true;
+    if (startDate.value || endDate.value) {
+      const fDate = new Date(f.createdAt).getTime();
+      if (startDate.value && fDate < new Date(startDate.value).getTime()) matchesDate = false;
+      if (endDate.value && fDate > new Date(endDate.value).getTime() + 86400000) matchesDate = false;
+    }
+    
+    return matchesSearch && matchesDate;
+  })
 })
 
 // ─── Fetchers ────────────────────────────────────────────────────

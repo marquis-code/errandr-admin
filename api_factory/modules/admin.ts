@@ -49,15 +49,21 @@ export const admin_api = {
     return GATEWAY_ENDPOINT_WITH_AUTH.delete(`/admin/vendors/${id}`);
   },
 
-  getRecentOrders: (limit: number = 10) => {
-    return GATEWAY_ENDPOINT_WITH_AUTH.get(`/admin/orders/recent?limit=${limit}`);
+  getRecentOrders: (page: number = 1, limit: number = 10, startDate?: string, endDate?: string, status?: string, customerId?: string, vendorId?: string) => {
+    let url = `/admin/orders/recent?page=${page}&limit=${limit}`;
+    if (startDate) url += `&startDate=${startDate}`;
+    if (endDate) url += `&endDate=${endDate}`;
+    if (status) url += `&status=${status}`;
+    if (customerId) url += `&customerId=${customerId}`;
+    if (vendorId) url += `&vendorId=${vendorId}`;
+    return GATEWAY_ENDPOINT_WITH_AUTH.get(url);
   },
 
   getCustomErrandSettings: () => {
     return GATEWAY_ENDPOINT_WITH_AUTH.get('/settings/errands/custom');
   },
 
-  updateCustomErrandSettings: (payload: { baseFee: number; expressFee: number; convenienceFee?: number; commissionPercentage?: number }) => {
+  updateCustomErrandSettings: (payload: any) => {
     return GATEWAY_ENDPOINT_WITH_AUTH.put('/settings/errands/custom', payload);
   },
 

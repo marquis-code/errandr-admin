@@ -2,7 +2,7 @@
   <div>
     <div class="space-y-6 animate-fade-in max-w-full mx-auto pb-10">
     <!-- Search & Quick Stats -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
       <div class="flex-1 relative max-w-2xl group">
         <Search class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#FF5C1A] transition-colors" />
         <input 
@@ -13,13 +13,34 @@
         />
       </div>
       
-      <div class="flex items-center gap-4 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-sm shrink-0">
-        <div class="w-10 h-10 rounded-xl bg-[#FF5C1A]/10 flex items-center justify-center">
-          <Store class="w-5 h-5 text-[#FF5C1A]" />
+      <!-- Quick Stats Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full md:w-auto">
+        <div class="flex items-center gap-4 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-none shrink-0">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+            <Store class="w-5 h-5 text-blue-600" />
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total</span>
+            <span class="text-lg font-black text-gray-900 leading-none">{{ vendors.length }}</span>
+          </div>
         </div>
-        <div class="flex flex-col">
-          <span class="text-sm font-semibold text-gray-500">Total Vendors</span>
-          <span class="text-lg font-bold text-gray-900 leading-none">{{ vendors.length }}</span>
+        <div class="flex items-center gap-4 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-none shrink-0">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+            <CheckCircle class="w-5 h-5 text-emerald-600" />
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Approved</span>
+            <span class="text-lg font-black text-gray-900 leading-none">{{ approvedVendorsCount }}</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 px-5 py-3 bg-white rounded-xl border border-gray-100 shadow-none shrink-0">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+            <Clock class="w-5 h-5 text-amber-600" />
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Pending</span>
+            <span class="text-lg font-black text-gray-900 leading-none">{{ pendingVendorsCount }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -33,7 +54,7 @@
         </div>
       </div>
       
-      <div class="flex overflow-x-auto pb-2 hide-scrollbar gap-2">
+      <div class="flex overflow-x-auto pb-2 hide-scrollbar gap-2 flex-1">
         <button 
           v-for="tab in tabs" 
           :key="tab.key" 
@@ -43,6 +64,10 @@
         >
           {{ tab.label }}
         </button>
+      </div>
+      
+      <div class="flex-shrink-0">
+        <DateRangePicker v-model:start="startDate" v-model:end="endDate" />
       </div>
     </div>
 
@@ -595,16 +620,16 @@
 
 <script setup lang="ts">
 import { useAdminVendors } from '@/composables/modules/admin';
-import { Search, Store, Eye, EyeOff, Trash2, CheckCircle, XCircle, RefreshCcw, Star, Globe, Copy, User, Mail, Phone, GraduationCap, Banknote, AlertCircle, Percent, MoreVertical, Edit, Loader2, LayoutList } from 'lucide-vue-next';
+import { Search, Store, Eye, EyeOff, Trash2, CheckCircle, XCircle, RefreshCcw, Star, Globe, Copy, User, Mail, Phone, GraduationCap, Banknote, AlertCircle, Percent, MoreVertical, Edit, Loader2, LayoutList, Shield, Calendar, Clock, DollarSign, Image as ImageIcon, MapPin, Edit2 } from 'lucide-vue-next';
 import { onMounted, ref, computed, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import VendorMenuManager from "@/components/vendors/VendorMenuManager.vue";
-
 import EmptyState from '@/components/core/EmptyState.vue';
 import SkeletonTable from '@/components/ui/SkeletonTable.vue';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 import ConfirmationModal from '@/components/ui/ConfirmationModal.vue';
 import SideDrawer from '@/components/ui/SideDrawer.vue';
+import DateRangePicker from '@/components/ui/DateRangePicker.vue';
 
 import { admin_api } from '@/api_factory/modules/admin';
 import { useCustomToast } from '@/composables/core/useCustomToast';
@@ -621,6 +646,8 @@ const { vendors, loading, fetchVendors, approveVendor, rejectVendor, toggleVendo
 const activeTab = ref('all');
 const searchQuery = ref('');
 const selectedVendor = ref<any>(null);
+const startDate = ref('');
+const endDate = ref('');
 const activeDrawerTab = ref('overview');
 const activeDropdownId = ref<string | null>(null);
 
@@ -738,13 +765,24 @@ const tabs = [
   { key: 'suspended', label: 'Suspended' },
 ];
 
+const approvedVendorsCount = computed(() => vendors.value.filter((v) => v.status === 'approved').length);
+const pendingVendorsCount = computed(() => vendors.value.filter((v) => v.status === 'pending').length);
+
 const filteredVendors = computed(() => {
   return vendors.value.filter((v) => {
     const matchesTab = activeTab.value === 'all' || v.status === activeTab.value;
     const matchesSearch = !searchQuery.value || 
       v.storeName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       (v.category && v.category.toLowerCase().includes(searchQuery.value.toLowerCase()));
-    return matchesTab && matchesSearch;
+      
+    let matchesDate = true;
+    if (startDate.value || endDate.value) {
+      const vDate = new Date(v.createdAt).getTime();
+      if (startDate.value && vDate < new Date(startDate.value).getTime()) matchesDate = false;
+      if (endDate.value && vDate > new Date(endDate.value).getTime() + 86400000) matchesDate = false;
+    }
+      
+    return matchesTab && matchesSearch && matchesDate;
   });
 });
 

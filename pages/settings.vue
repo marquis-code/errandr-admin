@@ -47,51 +47,51 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <!-- Standard Base Fee -->
+          <!-- Room Delivery Fee -->
           <div class="space-y-2">
             <div class="flex items-center gap-2">
-              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">standard base fee (₦)</label>
-              <button @click="showInfo('standardFee')" class="w-4 h-4 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-[#FF5C1A]/10 hover:text-[#FF5C1A] transition-colors">
+              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">room delivery fee (₦)</label>
+              <button @click="showInfo('roomDeliveryFee')" class="w-4 h-4 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-[#FF5C1A]/10 hover:text-[#FF5C1A] transition-colors">
                 <Info class="w-3 h-3" />
               </button>
             </div>
             <input 
-              v-model.number="form.baseFee"
+              v-model.number="form.roomDeliveryFee"
               type="number" required min="0"
               class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
             />
-            <p v-if="form.baseFee !== originalForm.baseFee" class="text-[10px] font-medium text-amber-600 bg-amber-50 px-3 py-1.5 rounded-xl flex items-center gap-1">
+            <p v-if="form.roomDeliveryFee !== originalForm.roomDeliveryFee" class="text-[10px] font-medium text-amber-600 bg-amber-50 px-3 py-1.5 rounded-xl flex items-center gap-1">
               <AlertTriangle class="w-3 h-3" />
-              changing from ₦{{ originalForm.baseFee }} → ₦{{ form.baseFee }}. this affects what students pay for normal custom errands.
+              changing from ₦{{ originalForm.roomDeliveryFee }} → ₦{{ form.roomDeliveryFee }}.
             </p>
             <!-- Info Tooltip -->
-            <div v-if="activeInfo === 'standardFee'" class="p-3 bg-blue-50 text-blue-800 rounded-xl text-[11px] font-medium leading-relaxed space-y-1 border border-blue-100">
+            <div v-if="activeInfo === 'roomDeliveryFee'" class="p-3 bg-blue-50 text-blue-800 rounded-xl text-[11px] font-medium leading-relaxed space-y-1 border border-blue-100">
               <p class="font-semibold">what is this?</p>
-              <p>the base delivery fee for routine, non-urgent custom errands (e.g. laundry pickup, stationery runs). students see this as the starting delivery price.</p>
+              <p>the total delivery fee students pay for room delivery. the errander's profit is this fee minus the platform fee.</p>
               <button @click="activeInfo = ''" class="text-blue-500 underline">dismiss</button>
             </div>
           </div>
 
-          <!-- Express Base Fee -->
+          <!-- Drop-off Service Fee -->
           <div class="space-y-2">
             <div class="flex items-center gap-2">
-              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">express base fee (₦)</label>
-              <button @click="showInfo('expressFee')" class="w-4 h-4 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-[#FF5C1A]/10 hover:text-[#FF5C1A] transition-colors">
+              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">drop-off service fee (₦)</label>
+              <button @click="showInfo('dropoffServiceFee')" class="w-4 h-4 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-[#FF5C1A]/10 hover:text-[#FF5C1A] transition-colors">
                 <Info class="w-3 h-3" />
               </button>
             </div>
             <input 
-              v-model.number="form.expressFee"
+              v-model.number="form.dropoffServiceFee"
               type="number" required min="0"
               class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
             />
-            <p v-if="form.expressFee !== originalForm.expressFee" class="text-[10px] font-medium text-amber-600 bg-amber-50 px-3 py-1.5 rounded-xl flex items-center gap-1">
+            <p v-if="form.dropoffServiceFee !== originalForm.dropoffServiceFee" class="text-[10px] font-medium text-amber-600 bg-amber-50 px-3 py-1.5 rounded-xl flex items-center gap-1">
               <AlertTriangle class="w-3 h-3" />
-              changing from ₦{{ originalForm.expressFee }} → ₦{{ form.expressFee }}. this is the premium fee for urgent, time-sensitive errands.
+              changing from ₦{{ originalForm.dropoffServiceFee }} → ₦{{ form.dropoffServiceFee }}.
             </p>
-            <div v-if="activeInfo === 'expressFee'" class="p-3 bg-blue-50 text-blue-800 rounded-xl text-[11px] font-medium leading-relaxed space-y-1 border border-blue-100">
+            <div v-if="activeInfo === 'dropoffServiceFee'" class="p-3 bg-blue-50 text-blue-800 rounded-xl text-[11px] font-medium leading-relaxed space-y-1 border border-blue-100">
               <p class="font-semibold">what is this?</p>
-              <p>the premium delivery fee for time-sensitive errands (e.g. rush food delivery, urgent documents). the difference between standard and express is the "urgency premium" that incentivizes erranders to prioritize.</p>
+              <p>the total delivery fee students pay for a generic drop-off (non-doorstep). the errander's profit is this fee minus the platform fee.</p>
               <button @click="activeInfo = ''" class="text-blue-500 underline">dismiss</button>
             </div>
           </div>
@@ -626,6 +626,9 @@ const savingExamBrethren = ref(false);
 const form = reactive({
   baseFee: 450,
   expressFee: 850,
+  roomDeliveryFee: 350,
+  dropoffServiceFee: 300,
+  platformFee: 50,
   convenienceFee: 50,
   commissionFlatFee: 50,
   customErrandCommissionPercentage: 20,
@@ -729,6 +732,9 @@ const loadSettings = async () => {
     if (errandRes.data) {
       form.baseFee = errandRes.data.baseFee || 450;
       form.expressFee = errandRes.data.expressFee || 850;
+      form.roomDeliveryFee = errandRes.data.roomDeliveryFee || 350;
+      form.dropoffServiceFee = errandRes.data.dropoffServiceFee || 300;
+      form.platformFee = errandRes.data.platformFee || 50;
       form.convenienceFee = errandRes.data.convenienceFee ?? 50;
       form.commissionFlatFee = errandRes.data.commissionFlatFee ?? 50;
       form.platformProcessingFee = errandRes.data.platformProcessingFee ?? 500;
@@ -769,6 +775,9 @@ const saveSettings = async () => {
     await admin_api.updateCustomErrandSettings({
       baseFee: Number(form.baseFee),
       expressFee: Number(form.expressFee),
+      roomDeliveryFee: Number(form.roomDeliveryFee),
+      dropoffServiceFee: Number(form.dropoffServiceFee),
+      platformFee: Number(form.platformFee),
       convenienceFee: Number(form.convenienceFee),
       commissionFlatFee: Number(form.commissionFlatFee),
       customErrandCommissionPercentage: Number(form.customErrandCommissionPercentage),
