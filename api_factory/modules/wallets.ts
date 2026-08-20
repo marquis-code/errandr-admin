@@ -5,8 +5,20 @@ export const wallets_api = {
     return GATEWAY_ENDPOINT_WITH_AUTH.get('/wallets/mine');
   },
 
-  getTransactions: (page: number = 1, limit: number = 50) => {
-    return GATEWAY_ENDPOINT_WITH_AUTH.get(`/wallets/all?page=${page}&limit=${limit}`);
+  getTransactions: (page: number = 1, limit: number = 50, query?: Record<string, any>) => {
+    let url = `/wallets/all?page=${page}&limit=${limit}`;
+    if (query) {
+      if (query.startDate) url += `&startDate=${query.startDate}`;
+      if (query.endDate) url += `&endDate=${query.endDate}`;
+      if (query.status) url += `&status=${query.status}`;
+      if (query.search) url += `&search=${query.search}`;
+      if (query.sortBy) url += `&sortBy=${query.sortBy}`;
+      if (query.sortOrder) url += `&sortOrder=${query.sortOrder}`;
+      if (query.exportAsCsv) url += `&exportAsCsv=${query.exportAsCsv}`;
+    }
+    const isExport = query?.exportAsCsv;
+    const config = isExport ? { responseType: 'blob' as 'blob' } : {};
+    return GATEWAY_ENDPOINT_WITH_AUTH.get(url, config);
   },
 
   updatePreferences: (payload: { preference: string; bankDetails?: any }) => {

@@ -3,7 +3,7 @@
   <div class="min-h-screen bg-[#F8FAFC] font-sans selection:bg-[#FF5C1A]/20 selection:text-[#FF5C1A]">
     
     <!-- Desktop Sidebar -->
-    <aside class="hidden lg:flex flex-col bg-[#0F172A] min-h-screen fixed left-0 top-0 z-50 transition-all duration-300 shadow-[4px_0_24px_rgba(0,0,0,0.05)] border-r border-white/5" :class="isSidebarMinimized ? 'w-20' : 'w-[280px]'">
+    <aside class="hidden lg:flex flex-col bg-black min-h-screen fixed left-0 top-0 z-50 transition-all duration-300 shadow-[4px_0_24px_rgba(0,0,0,0.05)] border-r border-white/5" :class="isSidebarMinimized ? 'w-20' : 'w-[280px]'">
       <!-- Logo Section -->
       <div class="h-20 flex items-center relative border-b border-white/10" :class="isSidebarMinimized ? 'justify-center px-0' : 'px-6'">
         <div class="flex items-center gap-3 group cursor-pointer w-full">
@@ -73,7 +73,7 @@
       </div>
 
       <!-- User Profile & Logout -->
-      <div class="mt-auto border-t border-white/10 bg-[#0F172A] p-4">
+      <div class="mt-auto border-t border-white/10 bg-black p-4">
         <div class="flex items-center justify-between mb-4 px-2" v-if="!isSidebarMinimized">
            <div class="flex items-center gap-3">
              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF5C1A]/20 to-[#FF7A45]/20 border border-[#FF5C1A]/30 flex items-center justify-center text-[#FF5C1A] font-bold relative">
@@ -126,8 +126,8 @@
 
     <!-- Mobile Sidebar -->
     <Transition name="slide">
-      <aside v-if="showMobileMenu" class="lg:hidden w-[85vw] max-w-[320px] bg-[#0F172A] min-h-screen fixed left-0 top-0 z-50 shadow-2xl flex flex-col">
-        <div class="p-6 border-b border-white/5 flex items-center justify-between bg-[#0F172A]">
+      <aside v-if="showMobileMenu" class="lg:hidden w-[85vw] max-w-[320px] bg-black min-h-screen fixed left-0 top-0 z-50 shadow-2xl flex flex-col">
+        <div class="p-6 border-b border-white/5 flex items-center justify-between bg-black">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-gradient-to-br from-[#FF5C1A] to-[#FF7A45] rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-sm">E</div>
             <span class="text-white font-heading font-bold text-xl tracking-tight">Errander</span>
@@ -164,7 +164,7 @@
           </nav>
         </div>
 
-        <div class="p-6 border-t border-white/5 bg-[#0F172A]">
+        <div class="p-6 border-t border-white/5 bg-black">
           <button @click="handleLogoutClick" class="flex items-center justify-center w-full px-5 py-3.5 text-sm font-semibold text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl transition-all hover:bg-rose-500 hover:text-white hover:shadow-lg hover:shadow-rose-500/20">
             <LogOut class="w-4 h-4 mr-2" />
             Sign Out

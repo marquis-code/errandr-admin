@@ -552,6 +552,60 @@
     </div>
 
     <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- TAB 5: ERRANDERS -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div v-show="activeTab === 'erranders'" class="space-y-8">
+      <div class="bg-white p-6 sm:p-8 rounded-[2rem] border border-gray-100 shadow-sm space-y-6">
+        <div class="flex items-center gap-3 border-b border-gray-50 pb-4">
+          <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center">
+            <Briefcase class="w-5 h-5" />
+          </div>
+          <div>
+            <h3 class="text-sm font-medium text-gray-900 lowercase">errander operations</h3>
+            <p class="text-xs font-bold text-gray-400 lowercase">configure errander operational limits</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">max concurrent orders</label>
+              <button @click="showInfo('maxConcurrentOrders')" class="w-4 h-4 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-[#FF5C1A]/10 hover:text-[#FF5C1A] transition-colors">
+                <Info class="w-3 h-3" />
+              </button>
+            </div>
+            <input 
+              v-model.number="erranderForm.maxConcurrentOrders"
+              type="number" required min="0"
+              class="w-full bg-gray-50 border border-gray-100 text-gray-900 text-sm rounded-2xl focus:ring-[#FF5C1A] focus:border-[#FF5C1A] block px-5 py-3.5 transition-all outline-none" 
+            />
+            
+            <div v-if="activeInfo === 'maxConcurrentOrders'" class="bg-gray-900 text-white p-4 rounded-xl text-xs space-y-2 relative mt-2 animate-scale-in">
+              <div class="absolute -top-1.5 left-10 w-3 h-3 bg-gray-900 rotate-45"></div>
+              <p>the maximum number of orders an errander can accept at the same time.</p>
+              <ul class="list-disc pl-4 space-y-1 text-gray-300">
+                <li>0 means infinite (no limit)</li>
+                <li>any number above 0 enforces a hard cap</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end pt-6 border-t border-gray-50">
+          <button 
+            @click="confirmSave('erranders')" 
+            :disabled="savingErrander"
+            class="px-8 py-4 bg-gray-900 text-white rounded-2xl text-xs font-medium lowercase hover:bg-[#FF5C1A] transition-all shadow-xl shadow-gray-100 disabled:opacity-50 flex items-center gap-2"
+          >
+            <Loader2 v-if="savingErrander" class="w-4 h-4 animate-spin" />
+            <Save v-else class="w-4 h-4" />
+            <span>{{ savingErrander ? 'saving...' : 'save errander settings' }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
     <!-- CONFIRMATION MODAL -->
     <!-- ═══════════════════════════════════════════════════════ -->
     <Teleport to="body">
@@ -594,7 +648,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue';
-import { Zap, Loader2, Truck, DollarSign, Tag, Bell, Megaphone, Moon, Info, AlertTriangle, CheckCircle, Calculator, Save, ShieldAlert } from 'lucide-vue-next';
+import { Zap, Loader2, Truck, DollarSign, Tag, Bell, Megaphone, Moon, Info, AlertTriangle, CheckCircle, Calculator, Save, ShieldAlert, Briefcase } from 'lucide-vue-next';
 import { admin_api } from '@/api_factory/modules/admin';
 import { useCustomToast } from '@/composables/core/useCustomToast';
 
@@ -609,6 +663,7 @@ const tabs = [
   { id: 'comms', label: 'communications', icon: Bell },
   { id: 'adverts', label: 'adverts', icon: Megaphone },
   { id: 'campaigns', label: 'campaigns', icon: Moon },
+  { id: 'erranders', label: 'erranders', icon: Briefcase },
 ];
 
 // ─── Info Tooltips ────────────────
@@ -622,6 +677,11 @@ const saving = ref(false);
 const savingComms = ref(false);
 const savingAdvert = ref(false);
 const savingExamBrethren = ref(false);
+const savingErrander = ref(false);
+
+const erranderForm = reactive({
+  maxConcurrentOrders: 0,
+});
 
 const form = reactive({
   baseFee: 450,
@@ -704,6 +764,9 @@ const confirmSave = (type: string) => {
     confirmModal.message = 'you are about to update the exam brethren campaign. this controls free delivery during late night hours (10pm-2am).';
     confirmModal.changes.push(`campaign: <strong>${examBrethrenForm.isActive ? 'active — free delivery 10pm-2am' : 'inactive'}</strong>`);
     if (examBrethrenForm.isActive) confirmModal.changes.push('note: delivery fees will be waived between 10pm and 2am. this cost is absorbed by the platform.');
+  } else if (type === 'erranders') {
+    confirmModal.message = 'you are about to update errander configuration. this affects how many orders they can accept at once.';
+    confirmModal.changes.push(`max concurrent orders: <strong>${erranderForm.maxConcurrentOrders === 0 ? 'infinite (0)' : erranderForm.maxConcurrentOrders}</strong>`);
   }
 
   confirmModal.show = true;
@@ -717,16 +780,18 @@ const executeConfirmedSave = async () => {
   else if (type === 'comms') await saveCommunicationsSettings();
   else if (type === 'adverts') await saveAdvertSettings();
   else if (type === 'campaigns') await saveExamBrethrenSettings();
+  else if (type === 'erranders') await saveErranderSettings();
 };
 
 // ─── Load Settings ────────────────
 const loadSettings = async () => {
   try {
-    const [errandRes, commsRes, advertRes, examBrethrenRes] = await Promise.all([
+    const [errandRes, commsRes, advertRes, examBrethrenRes, erranderSettingsRes] = await Promise.all([
       admin_api.getCustomErrandSettings(),
       admin_api.getCommunicationsSettings(),
       admin_api.getAdvertSettings(),
-      admin_api.getExamBrethrenSettings()
+      admin_api.getExamBrethrenSettings(),
+      admin_api.getErranderSettings()
     ]);
     
     if (errandRes.data) {
@@ -761,6 +826,10 @@ const loadSettings = async () => {
     
     if (examBrethrenRes.data) {
       examBrethrenForm.isActive = examBrethrenRes.data.isActive ?? false;
+    }
+
+    if (erranderSettingsRes.data) {
+      erranderForm.maxConcurrentOrders = erranderSettingsRes.data.maxConcurrentOrders ?? 0;
     }
   } catch (e: any) {
     console.error('Failed to load settings:', e);
@@ -842,6 +911,21 @@ const saveExamBrethrenSettings = async () => {
     showToast({ title: 'error', message: e.response?.data?.message || 'failed to save exam brethren settings.', toastType: 'error' });
   } finally {
     savingExamBrethren.value = false;
+  }
+};
+
+const saveErranderSettings = async () => {
+  savingErrander.value = true;
+  try {
+    await admin_api.updateErranderSettings({
+      maxConcurrentOrders: Number(erranderForm.maxConcurrentOrders),
+    });
+    showToast({ title: 'success', message: 'errander settings updated!', toastType: 'success' });
+  } catch (e: any) {
+    console.error('Failed to save errander settings:', e);
+    showToast({ title: 'error', message: e.response?.data?.message || 'failed to save errander settings.', toastType: 'error' });
+  } finally {
+    savingErrander.value = false;
   }
 };
 

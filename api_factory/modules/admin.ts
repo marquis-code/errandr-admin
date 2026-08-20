@@ -49,14 +49,38 @@ export const admin_api = {
     return GATEWAY_ENDPOINT_WITH_AUTH.delete(`/admin/vendors/${id}`);
   },
 
-  getRecentOrders: (page: number = 1, limit: number = 10, startDate?: string, endDate?: string, status?: string, customerId?: string, vendorId?: string) => {
+  cancelOrder: (id: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.post(`/orders/${id}/cancel`);
+  },
+
+  assignOrder: (id: string, payload: { erranderId: string }) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.post(`/orders/${id}/admin-assign`, payload);
+  },
+
+  getErranderSettings: () => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get('/settings/erranders');
+  },
+
+  updateErranderSettings: (payload: { maxConcurrentOrders: number }) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put('/settings/erranders', payload);
+  },
+
+  getRecentOrders: (page: number = 1, limit: number = 10, query?: Record<string, any>) => {
     let url = `/admin/orders/recent?page=${page}&limit=${limit}`;
-    if (startDate) url += `&startDate=${startDate}`;
-    if (endDate) url += `&endDate=${endDate}`;
-    if (status) url += `&status=${status}`;
-    if (customerId) url += `&customerId=${customerId}`;
-    if (vendorId) url += `&vendorId=${vendorId}`;
-    return GATEWAY_ENDPOINT_WITH_AUTH.get(url);
+    if (query) {
+      if (query.startDate) url += `&startDate=${query.startDate}`;
+      if (query.endDate) url += `&endDate=${query.endDate}`;
+      if (query.status) url += `&status=${query.status}`;
+      if (query.customerId) url += `&customerId=${query.customerId}`;
+      if (query.vendorId) url += `&vendorId=${query.vendorId}`;
+      if (query.search) url += `&search=${query.search}`;
+      if (query.sortBy) url += `&sortBy=${query.sortBy}`;
+      if (query.sortOrder) url += `&sortOrder=${query.sortOrder}`;
+      if (query.exportAsCsv) url += `&exportAsCsv=${query.exportAsCsv}`;
+    }
+    const isExport = query?.exportAsCsv;
+    const config = isExport ? { responseType: 'blob' as 'blob' } : {};
+    return GATEWAY_ENDPOINT_WITH_AUTH.get(url, config);
   },
 
   getCustomErrandSettings: () => {

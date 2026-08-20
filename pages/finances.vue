@@ -13,7 +13,7 @@
       </div>
       <div class="flex items-center gap-2 shrink-0">
         <DateRangePicker v-model:start="startDate" v-model:end="endDate" />
-        <button class="px-4 py-3 bg-white hover:bg-gray-50 border border-gray-100 rounded-xl text-sm font-semibold text-gray-700 transition-colors flex items-center gap-2 shadow-sm h-[52px]">
+        <button @click="triggerExport" class="px-4 py-3 bg-white hover:bg-gray-50 border border-gray-100 rounded-xl text-sm font-semibold text-gray-700 transition-colors flex items-center gap-2 shadow-sm h-[52px]">
           <Download class="w-4 h-4" /> Export
         </button>
       </div>
@@ -124,23 +124,23 @@
 
         <!-- Right Column: AI Actionable Insights -->
         <div class="lg:col-span-4">
-          <div class="bg-gradient-to-b from-indigo-900 to-indigo-950 p-6 rounded-2xl border border-indigo-800 shadow-xl relative overflow-hidden h-full flex flex-col">
-            <div class="absolute -left-12 -bottom-12 w-48 h-48 bg-indigo-500 rounded-full blur-3xl opacity-20"></div>
+          <div class="bg-gradient-to-b from-black to-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl relative overflow-hidden h-full flex flex-col">
+            <div class="absolute -left-12 -bottom-12 w-48 h-48 bg-[#FF5C1A] rounded-full blur-3xl opacity-10"></div>
             <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-[#FF5C1A] to-transparent opacity-50"></div>
             
             <div class="flex items-center gap-2 mb-6 z-10">
-              <div class="p-2 bg-indigo-800/50 rounded-lg border border-indigo-700/50">
-                <Sparkles class="w-4 h-4 text-indigo-300" />
+              <div class="p-2 bg-[#FF5C1A]/10 rounded-lg border border-[#FF5C1A]/20">
+                <Sparkles class="w-4 h-4 text-[#FF5C1A]" />
               </div>
               <div>
                 <h3 class="text-sm font-bold text-white font-heading">Actionable Insights</h3>
-                <p class="text-[10px] font-medium text-indigo-300">System generated recommendations</p>
+                <p class="text-[10px] font-medium text-gray-400">System generated recommendations</p>
               </div>
             </div>
 
             <div class="space-y-4 z-10 flex-1">
               <template v-if="loading && !stats">
-                <div v-for="i in 3" :key="`insight-skel-${i}`" class="h-20 bg-indigo-800/30 animate-pulse rounded-xl border border-indigo-700/30"></div>
+                <div v-for="i in 3" :key="`insight-skel-${i}`" class="h-20 bg-gray-800/50 animate-pulse rounded-xl border border-gray-700/50"></div>
               </template>
               <template v-else>
                 <div v-if="revenueGrowth < 0" class="p-4 bg-rose-500/10 rounded-xl border border-rose-500/20 hover:bg-rose-500/20 transition-colors cursor-pointer group">
@@ -167,10 +167,10 @@
 
                 <div class="p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors cursor-pointer group">
                   <div class="flex items-start gap-3">
-                    <div class="mt-0.5"><UserPlus class="w-4 h-4 text-indigo-300" /></div>
+                    <div class="mt-0.5"><UserPlus class="w-4 h-4 text-[#FF5C1A]" /></div>
                     <div>
-                      <p class="text-xs font-bold text-indigo-100 mb-1 group-hover:text-white">Acquisition Strategy</p>
-                      <p class="text-[10px] font-medium text-indigo-300/80 leading-relaxed">Top spender is highly active. Create a referral code for them to invite more high-value peers.</p>
+                      <p class="text-xs font-bold text-gray-200 mb-1 group-hover:text-white">Acquisition Strategy</p>
+                      <p class="text-[10px] font-medium text-gray-400 leading-relaxed">Top spender is highly active. Create a referral code for them to invite more high-value peers.</p>
                     </div>
                   </div>
                 </div>
@@ -202,54 +202,86 @@
       <div v-else class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="border-b border-gray-100 bg-gray-50/50">
-              <th class="py-3 px-5 font-semibold text-gray-500 text-[11px] uppercase tracking-wide whitespace-nowrap">Date</th>
-              <th class="py-3 px-4 font-semibold text-gray-500 text-[11px] uppercase tracking-wide whitespace-nowrap">User</th>
-              <th class="py-3 px-4 font-semibold text-gray-500 text-[11px] uppercase tracking-wide whitespace-nowrap">Amount</th>
-              <th class="py-3 px-4 font-semibold text-gray-500 text-[11px] uppercase tracking-wide whitespace-nowrap text-center">Type</th>
-              <th class="py-3 px-4 font-semibold text-gray-500 text-[11px] uppercase tracking-wide whitespace-nowrap">Description</th>
-              <th class="py-3 px-5 font-semibold text-gray-500 text-[11px] uppercase tracking-wide whitespace-nowrap text-right">Details</th>
+            <tr class="bg-black text-white border-b border-gray-800">
+              <th @click="sortBy('createdAt')" class="py-4 px-6 font-bold text-gray-300 text-[10px] uppercase tracking-widest whitespace-nowrap cursor-pointer hover:text-white transition-colors group">
+                <div class="flex items-center gap-1">Date <ArrowUp v-if="sortKey === 'createdAt' && sortOrder === 'asc'" class="w-3 h-3"/><ArrowDown v-if="sortKey === 'createdAt' && sortOrder === 'desc'" class="w-3 h-3"/></div>
+              </th>
+              <th @click="sortBy('user')" class="py-4 px-5 font-bold text-gray-300 text-[10px] uppercase tracking-widest whitespace-nowrap cursor-pointer hover:text-white transition-colors">
+                <div class="flex items-center gap-1">User <ArrowUp v-if="sortKey === 'user' && sortOrder === 'asc'" class="w-3 h-3"/><ArrowDown v-if="sortKey === 'user' && sortOrder === 'desc'" class="w-3 h-3"/></div>
+              </th>
+              <th @click="sortBy('amount')" class="py-4 px-5 font-bold text-gray-300 text-[10px] uppercase tracking-widest whitespace-nowrap cursor-pointer hover:text-white transition-colors">
+                <div class="flex items-center gap-1">Amount <ArrowUp v-if="sortKey === 'amount' && sortOrder === 'asc'" class="w-3 h-3"/><ArrowDown v-if="sortKey === 'amount' && sortOrder === 'desc'" class="w-3 h-3"/></div>
+              </th>
+              <th @click="sortBy('type')" class="py-4 px-5 font-bold text-gray-300 text-[10px] uppercase tracking-widest whitespace-nowrap text-center cursor-pointer hover:text-white transition-colors">
+                <div class="flex items-center justify-center gap-1">Type <ArrowUp v-if="sortKey === 'type' && sortOrder === 'asc'" class="w-3 h-3"/><ArrowDown v-if="sortKey === 'type' && sortOrder === 'desc'" class="w-3 h-3"/></div>
+              </th>
+              <th @click="sortBy('status')" class="py-4 px-5 font-bold text-gray-300 text-[10px] uppercase tracking-widest whitespace-nowrap text-center cursor-pointer hover:text-white transition-colors">
+                <div class="flex items-center justify-center gap-1">Status <ArrowUp v-if="sortKey === 'status' && sortOrder === 'asc'" class="w-3 h-3"/><ArrowDown v-if="sortKey === 'status' && sortOrder === 'desc'" class="w-3 h-3"/></div>
+              </th>
+              <th @click="sortBy('description')" class="py-4 px-5 font-bold text-gray-300 text-[10px] uppercase tracking-widest whitespace-nowrap cursor-pointer hover:text-white transition-colors">
+                <div class="flex items-center gap-1">Description <ArrowUp v-if="sortKey === 'description' && sortOrder === 'asc'" class="w-3 h-3"/><ArrowDown v-if="sortKey === 'description' && sortOrder === 'desc'" class="w-3 h-3"/></div>
+              </th>
+              <th @click="sortBy('reference')" class="py-4 px-5 font-bold text-gray-300 text-[10px] uppercase tracking-widest whitespace-nowrap cursor-pointer hover:text-white transition-colors">
+                <div class="flex items-center gap-1">Reference <ArrowUp v-if="sortKey === 'reference' && sortOrder === 'asc'" class="w-3 h-3"/><ArrowDown v-if="sortKey === 'reference' && sortOrder === 'desc'" class="w-3 h-3"/></div>
+              </th>
+              <th class="py-4 px-6 font-bold text-gray-300 text-[10px] uppercase tracking-widest whitespace-nowrap text-right">Details</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
-            <tr v-for="tx in filteredTransactions" :key="tx._id" class="hover:bg-gray-50/50 transition-colors group cursor-pointer" @click="selectedTransaction = tx">
-              <td class="py-3 px-5 whitespace-nowrap">
+            <tr v-for="tx in filteredTransactions" :key="tx._id" class="hover:bg-[#FF5C1A]/5 transition-colors group cursor-pointer border-b border-gray-50 last:border-0" @click="selectedTransaction = tx">
+              <td class="py-4 px-6 whitespace-nowrap">
                 <div class="flex flex-col">
-                  <span class="text-xs font-semibold text-gray-900">{{ new Date(tx.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}</span>
-                  <span class="text-[10px] font-medium text-gray-500">{{ new Date(tx.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</span>
+                  <span class="text-xs font-bold text-gray-900">{{ new Date(tx.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}</span>
+                  <span class="text-[10px] font-semibold text-gray-500">{{ new Date(tx.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</span>
                 </div>
               </td>
-              <td class="py-3 px-4 min-w-[200px]">
-                <div class="flex items-center gap-2">
-                  <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 text-xs font-bold border border-indigo-100 shrink-0">
+              <td class="py-4 px-5 min-w-[200px]">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-xl bg-[#FF5C1A]/10 flex items-center justify-center text-[#FF5C1A] text-sm font-black border border-[#FF5C1A]/20 shrink-0">
                     {{ tx.wallet?.owner?.firstName?.[0] || 'U' }}
                   </div>
                   <div class="min-w-0">
-                    <p class="text-xs font-semibold text-gray-900 leading-none mb-0.5 truncate">{{ tx.wallet?.owner?.firstName }} {{ tx.wallet?.owner?.lastName }}</p>
-                    <p class="text-[10px] font-medium text-gray-500 truncate">{{ tx.wallet?.owner?.email }}</p>
+                    <p class="text-xs font-bold text-gray-900 leading-tight mb-0.5 truncate">{{ tx.wallet?.owner?.firstName }} {{ tx.wallet?.owner?.lastName }}</p>
+                    <p class="text-[10px] font-semibold text-gray-500 truncate">{{ tx.wallet?.owner?.email }}</p>
                   </div>
                 </div>
               </td>
-              <td class="py-3 px-4">
-                <div class="inline-flex items-center gap-1.5 pr-2 py-1 pl-1 bg-white border border-gray-100 rounded-md">
-                  <div :class="tx.type === 'credit' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'" class="w-5 h-5 border rounded flex items-center justify-center text-[10px] font-bold shrink-0">
-                    {{ tx.type === 'credit' ? '+' : '-' }}
+              <td class="py-4 px-5">
+                <div class="inline-flex items-center gap-2 pr-3 py-1.5 pl-1.5 bg-white border border-gray-100 rounded-lg shadow-sm group-hover:border-[#FF5C1A]/30 transition-all">
+                  <div :class="tx.type === 'credit' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'" class="w-6 h-6 border rounded-md flex items-center justify-center text-[11px] font-black shrink-0">
+                    <ArrowDownLeft v-if="tx.type === 'credit'" class="w-3.5 h-3.5" />
+                    <ArrowUpRight v-else class="w-3.5 h-3.5" />
                   </div>
-                  <p :class="tx.type === 'credit' ? 'text-emerald-600' : 'text-rose-600'" class="text-xs font-bold tabular-nums">
+                  <p :class="tx.type === 'credit' ? 'text-emerald-600' : 'text-rose-600'" class="text-sm font-black tabular-nums">
                     ₦{{ (tx.amount || 0).toLocaleString() }}
                   </p>
                 </div>
               </td>
-              <td class="py-3 px-4 text-center">
+              <td class="py-4 px-5 text-center">
                 <div class="flex justify-center">
-                  <StatusBadge :status="tx.type" class="scale-75 origin-center" />
+                  <StatusBadge :status="tx.type" class="scale-90 origin-center" />
                 </div>
               </td>
-              <td class="py-3 px-4 max-w-[200px]">
-                <p class="text-[11px] font-medium text-gray-500 truncate">{{ tx.description }}</p>
+              <td class="py-4 px-5 text-center">
+                <div class="flex justify-center">
+                  <span :class="{
+                    'bg-amber-50 text-amber-600 border-amber-200': tx.status === 'pending',
+                    'bg-emerald-50 text-emerald-600 border-emerald-200': tx.status === 'completed',
+                    'bg-rose-50 text-rose-600 border-rose-200': tx.status === 'failed',
+                    'bg-gray-50 text-gray-600 border-gray-200': !tx.status
+                  }" class="px-2.5 py-1 rounded-md border text-[10px] font-bold uppercase tracking-wider">
+                    {{ tx.status || 'completed' }}
+                  </span>
+                </div>
               </td>
-              <td class="py-3 px-5 text-right">
-                <div class="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-100 text-gray-500 group-hover:bg-gray-100 transition-colors">
+              <td class="py-4 px-5 max-w-[200px]">
+                <p class="text-[11px] font-semibold text-gray-700 truncate" :title="tx.description">{{ tx.description }}</p>
+              </td>
+              <td class="py-4 px-5">
+                <p class="text-[11px] font-mono font-bold text-gray-600 truncate max-w-[120px] bg-gray-50 px-2 py-1 rounded">{{ tx.reference || (tx.order ? 'Order #' + tx.order.slice(-6) : 'N/A') }}</p>
+              </td>
+              <td class="py-4 px-6 text-right">
+                <div class="inline-flex items-center gap-1 px-2.5 py-2 rounded-xl bg-gray-50 border border-gray-100 text-gray-500 group-hover:bg-black group-hover:text-white transition-colors">
                   <ChevronRight class="w-4 h-4" />
                 </div>
               </td>
@@ -298,129 +330,148 @@
     <!-- SideDrawer for Transaction Details -->
     <SideDrawer :isOpen="!!selectedTransaction" @close="selectedTransaction = null">
       <template v-if="selectedTransaction">
-        <div class="flex flex-col items-center justify-center pt-8 pb-6 border-b border-gray-100">
-          <div class="relative mb-3">
-            <div class="w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center text-white text-xl font-bold">
+        <div class="flex flex-col items-center justify-center pt-4 pb-3 border-b border-gray-100 relative">
+          <div class="absolute top-2 right-2" v-if="selectedTransaction.status">
+            <span :class="{
+              'bg-amber-100 text-amber-700': selectedTransaction.status === 'pending',
+              'bg-emerald-100 text-emerald-700': selectedTransaction.status === 'completed',
+              'bg-rose-100 text-rose-700': selectedTransaction.status === 'failed',
+            }" class="px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
+              {{ selectedTransaction.status }}
+            </span>
+          </div>
+
+          <div class="relative mb-2 mt-4">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-br from-black to-gray-800 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-black/20 border-2 border-gray-800">
               {{ selectedTransaction.wallet?.owner?.firstName?.[0] || 'U' }}
+            </div>
+            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2">
+              <StatusBadge :status="selectedTransaction.type" class="scale-75" />
             </div>
           </div>
           
-          <h3 class="text-lg font-semibold text-gray-900 font-heading mb-0.5">{{ selectedTransaction.wallet?.owner?.firstName }} {{ selectedTransaction.wallet?.owner?.lastName }}</h3>
-          <p class="text-[11px] font-medium text-gray-500 mb-6">{{ selectedTransaction.wallet?.owner?.email }}</p>
+          <h3 class="text-lg font-bold text-gray-900 font-heading mb-0.5 mt-1">{{ selectedTransaction.wallet?.owner?.firstName }} {{ selectedTransaction.wallet?.owner?.lastName }}</h3>
+          <p class="text-[10px] font-medium text-gray-500 mb-4 bg-gray-100 px-2 py-0.5 rounded-full">{{ selectedTransaction.wallet?.owner?.email }}</p>
           
-          <div class="flex flex-col items-center justify-center w-4/5 bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-            <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Amount</p>
-            <p :class="selectedTransaction.type === 'credit' ? 'text-emerald-600' : 'text-rose-600'" class="text-xl font-bold mb-2 tabular-nums">
-              {{ selectedTransaction.type === 'credit' ? '+' : '-' }}₦{{ (selectedTransaction.amount || 0).toLocaleString() }}
-            </p>
-            <StatusBadge :status="selectedTransaction.type" class="scale-75" />
+          <div class="w-full px-4">
+            <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-4 text-center shadow-lg relative overflow-hidden">
+              <div class="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+              <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1 relative z-10">Amount</p>
+              <p :class="selectedTransaction.type === 'credit' ? 'text-emerald-400' : 'text-rose-400'" class="text-2xl font-black mb-0.5 tabular-nums tracking-tight relative z-10">
+                {{ selectedTransaction.type === 'credit' ? '+' : '-' }}₦{{ (selectedTransaction.amount || 0).toLocaleString() }}
+              </p>
+            </div>
           </div>
         </div>
 
-        <div class="p-6 space-y-6 pb-24 bg-gray-50/30">
-          <div class="space-y-3">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Transaction Details</h4>
-            <div class="space-y-2">
-              <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                <div class="flex items-center justify-between mb-1">
-                  <span class="text-xs font-semibold text-gray-500">Transaction ID</span>
-                  <Copy class="w-3.5 h-3.5 text-gray-400 cursor-pointer hover:text-gray-900 transition-colors" />
-                </div>
-                <span class="text-xs font-semibold text-gray-900 break-all font-mono">{{ selectedTransaction._id }}</span>
-              </div>
-              
-              <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                <span class="text-xs font-semibold text-gray-500">Date & Time</span>
-                <div class="text-right">
-                  <p class="text-xs font-semibold text-gray-900">{{ new Date(selectedTransaction.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}</p>
-                  <p class="text-[10px] font-medium text-gray-500">{{ new Date(selectedTransaction.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</p>
+        <div class="p-4 space-y-4 pb-24 bg-gray-50/50">
+          <div class="space-y-2">
+            <h4 class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-200 pb-1.5">
+              <FileText class="w-3.5 h-3.5" />
+              Transaction Details
+            </h4>
+            
+            <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+              <div class="flex items-center justify-between p-3 border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
+                <span class="text-[11px] font-semibold text-gray-500">Transaction ID</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-[11px] font-bold text-gray-900 font-mono select-all">{{ selectedTransaction._id }}</span>
+                  <Copy class="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 cursor-pointer hover:text-[#FF5C1A] transition-all" />
                 </div>
               </div>
               
-              <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                <div class="flex items-start gap-2">
-                  <FileText class="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
-                  <div class="space-y-0.5">
-                    <span class="text-xs font-semibold text-gray-500">Description</span>
-                    <p class="text-xs font-medium text-gray-700 leading-relaxed">{{ selectedTransaction.description }}</p>
+              <div class="flex items-center justify-between p-3 border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                <span class="text-[11px] font-semibold text-gray-500">Date</span>
+                <span class="text-[11px] font-bold text-gray-900">{{ new Date(selectedTransaction.createdAt).toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' }) }}</span>
+              </div>
+
+              <div class="flex items-center justify-between p-3 border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                <span class="text-[11px] font-semibold text-gray-500">Time</span>
+                <span class="text-[11px] font-bold text-gray-900">{{ new Date(selectedTransaction.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }}</span>
+              </div>
+              
+              <div class="p-3 bg-gray-50/50">
+                <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wide block mb-0.5">Description</span>
+                <p class="text-xs font-semibold text-gray-800 leading-snug">{{ selectedTransaction.description }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-2" v-if="selectedTransaction.order || selectedTransaction.reference">
+            <h4 class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-200 pb-1.5">
+              <Package class="w-3.5 h-3.5" />
+              Related Records
+            </h4>
+
+            <div class="grid grid-cols-1 gap-2">
+              <div v-if="selectedTransaction.order" class="flex items-center justify-between p-3 rounded-lg border border-gray-100 shadow-sm bg-white cursor-pointer hover:border-[#FF5C1A]/30 hover:shadow-md transition-all group">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-[#FF5C1A]/10 flex items-center justify-center group-hover:bg-[#FF5C1A]/20 transition-colors">
+                    <Package class="w-4 h-4 text-[#FF5C1A]" />
+                  </div>
+                  <div>
+                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Linked Order</span>
+                    <span class="text-xs font-black text-gray-900 font-mono">#{{ selectedTransaction.order.slice(-10) }}</span>
+                  </div>
+                </div>
+                <div class="w-7 h-7 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-black group-hover:text-white text-gray-400 transition-colors">
+                  <ChevronRight class="w-3 h-3" />
+                </div>
+              </div>
+              
+              <div v-if="selectedTransaction.reference" class="flex items-center justify-between p-3 rounded-lg border border-gray-100 shadow-sm bg-white">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center">
+                    <FileText class="w-4 h-4 text-gray-500" />
+                  </div>
+                  <div>
+                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wider block mb-0.5">Payment Reference</span>
+                    <span class="text-[11px] font-bold text-gray-900 font-mono">{{ selectedTransaction.reference }}</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="space-y-3" v-if="selectedTransaction.order">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Linked Order</h4>
-            <div class="flex items-center justify-between p-4 rounded-xl border border-gray-100 shadow-sm bg-white cursor-pointer hover:bg-gray-50 transition-colors">
-              <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center">
-                  <Package class="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <span class="text-xs font-semibold text-gray-900 block leading-none mb-0.5">Order</span>
-                  <span class="text-[10px] font-semibold text-[#FF5C1A]">#{{ selectedTransaction.order.slice(-12) }}</span>
-                </div>
-              </div>
-              <ChevronRight class="w-4 h-4 text-gray-400" />
-            </div>
-          </div>
-
           <!-- Payout Details & Metadata -->
-          <div class="space-y-3" v-if="selectedTransaction.metadata">
-            <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Additional Details</h4>
-            <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm space-y-3">
-              <div class="flex justify-between items-center" v-if="selectedTransaction.metadata.bankCode">
-                <span class="text-xs font-medium text-gray-500">Bank Code</span>
-                <span class="text-xs font-bold text-gray-900">{{ selectedTransaction.metadata.bankCode }}</span>
-              </div>
-              <div class="flex justify-between items-center" v-if="selectedTransaction.metadata.accountNumber">
-                <span class="text-xs font-medium text-gray-500">Account Number</span>
-                <span class="text-xs font-bold text-gray-900 font-mono">{{ selectedTransaction.metadata.accountNumber }}</span>
-              </div>
-              <div class="flex justify-between items-center" v-if="selectedTransaction.metadata.userName">
-                <span class="text-xs font-medium text-gray-500">Account Name</span>
-                <span class="text-xs font-bold text-gray-900">{{ selectedTransaction.metadata.userName }}</span>
-              </div>
-              <div class="flex justify-between items-center" v-if="selectedTransaction.metadata.paystackReference">
-                <span class="text-xs font-medium text-gray-500">Paystack Ref</span>
-                <span class="text-xs font-bold text-[#FF5C1A] font-mono">{{ selectedTransaction.metadata.paystackReference }}</span>
-              </div>
-              <div class="flex justify-between items-center" v-if="selectedTransaction.metadata.transferCode">
-                <span class="text-xs font-medium text-gray-500">Transfer Code</span>
-                <span class="text-xs font-bold text-gray-900 font-mono">{{ selectedTransaction.metadata.transferCode }}</span>
-              </div>
-              <div class="flex justify-between items-center" v-if="selectedTransaction.metadata.userEmail">
-                <span class="text-xs font-medium text-gray-500">Email</span>
-                <span class="text-xs font-bold text-gray-900">{{ selectedTransaction.metadata.userEmail }}</span>
+          <div class="space-y-2" v-if="selectedTransaction.metadata && Object.keys(selectedTransaction.metadata).length > 0">
+            <h4 class="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-200 pb-1.5">
+              <Sparkles class="w-3.5 h-3.5" />
+              Metadata
+            </h4>
+            <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden divide-y divide-gray-50">
+              <div class="flex justify-between items-center p-2.5 hover:bg-gray-50 transition-colors" v-for="(value, key) in selectedTransaction.metadata" :key="key">
+                <span class="text-[10px] font-semibold text-gray-500 capitalize">{{ key.replace(/([A-Z])/g, ' $1').trim() }}</span>
+                <span class="text-[10px] font-bold text-gray-900 text-right truncate max-w-[200px]" :title="String(value)">{{ value }}</span>
               </div>
             </div>
           </div>
           
           <!-- Actions -->
-          <div class="sticky bottom-0 -mx-6 -mb-8 mt-6 p-4 bg-white border-t border-gray-100 z-10 flex flex-col gap-2">
+          <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-gray-100 z-20 flex flex-col gap-2">
             <template v-if="selectedTransaction.type === 'debit' && selectedTransaction.status === 'pending'">
               <button 
                 @click="handleApprovePayout(selectedTransaction._id)" 
-                class="w-full py-3 px-4 rounded-lg text-white font-semibold text-xs bg-emerald-600 hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2"
+                class="w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-lg shadow-emerald-500/30 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
               >
                 Approve (Auto Payout)
               </button>
               <button 
                 @click="handleMarkAsPaid(selectedTransaction._id)" 
-                class="w-full py-3 px-4 rounded-lg text-emerald-700 font-semibold text-xs bg-emerald-50 hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2 border border-emerald-200"
+                class="w-full py-3 px-4 rounded-xl text-emerald-700 font-bold text-sm bg-emerald-50 hover:bg-emerald-100 transition-colors flex items-center justify-center gap-2 border border-emerald-200"
               >
                 Mark as Paid Manually
               </button>
               <button 
                 @click="handleRejectPayout(selectedTransaction._id)" 
-                class="w-full py-3 px-4 rounded-lg text-white font-semibold text-xs bg-rose-600 hover:bg-rose-700 transition-colors flex items-center justify-center gap-2"
+                class="w-full py-3 px-4 rounded-xl text-rose-600 font-bold text-sm bg-rose-50 hover:bg-rose-100 transition-colors flex items-center justify-center gap-2 border border-rose-200 mt-2"
               >
                 Reject Payout
               </button>
             </template>
             <template v-else>
-              <button @click="handleDownloadReceipt(selectedTransaction._id)" class="w-full py-3 px-4 rounded-lg text-white font-semibold text-xs bg-gray-900 hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
-                <Download class="w-3.5 h-3.5" /> Download Receipt
+              <button @click="handleDownloadReceipt(selectedTransaction._id)" class="w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm bg-gray-900 hover:bg-black shadow-lg shadow-gray-900/20 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                <Download class="w-4 h-4" /> Download Official Receipt
               </button>
             </template>
           </div>
@@ -432,7 +483,7 @@
 
 <script setup lang="ts">
 import { useAdminFinances } from '@/composables/modules/admin';
-import { Download, Wallet, TrendingUp, TrendingDown, ArrowDownLeft, Search, ListFilter, ChevronRight, ChevronLeft, Copy, FileText, Package, Star, Calendar, Sparkles, UserPlus } from 'lucide-vue-next';
+import { Download, Wallet, TrendingUp, TrendingDown, ArrowDownLeft, ArrowUpRight, ArrowUp, ArrowDown, Search, ListFilter, ChevronRight, ChevronLeft, Copy, FileText, Package, Star, Calendar, Sparkles, UserPlus } from 'lucide-vue-next';
 import { onMounted, ref, computed } from 'vue';
 import SideDrawer from '@/components/ui/SideDrawer.vue';
 import EmptyState from '@/components/core/EmptyState.vue';
@@ -446,7 +497,7 @@ definePageMeta({
 
 useHead({ title: 'Finances - Errander Admin' });
 
-const { stats, transactions, totalTransactions, currentPage, fetchTransactions, loading, fetchFinances, approvePayout, rejectPayout, markPayoutAsPaid, downloadReceipt } = useAdminFinances();
+const { stats, transactions, totalTransactions, currentPage, fetchTransactions, loading, fetchFinances, approvePayout, rejectPayout, markPayoutAsPaid, downloadReceipt, exportTransactions } = useAdminFinances();
 
 const searchQuery = ref('');
 const selectedTransaction = ref<any>(null);
@@ -476,24 +527,38 @@ const netBalance = computed(() => {
   return transactions.value.reduce((acc: number, t: any) => acc + (t.type === 'credit' ? t.amount : -t.amount), 0);
 });
 
-const filteredTransactions = computed(() => {
-  return transactions.value.filter((tx: any) => {
-    const q = searchQuery.value.toLowerCase();
-    const matchesSearch = !q || 
-      tx.description?.toLowerCase().includes(q) || 
-      tx.wallet?.owner?.firstName?.toLowerCase().includes(q) ||
-      tx.wallet?.owner?.lastName?.toLowerCase().includes(q);
-      
-    let matchesDate = true;
-    if (startDate.value || endDate.value) {
-      const txDate = new Date(tx.createdAt).getTime();
-      if (startDate.value && txDate < new Date(startDate.value).getTime()) matchesDate = false;
-      if (endDate.value && txDate > new Date(endDate.value).getTime() + 86400000) matchesDate = false;
-    }
-      
-    return matchesSearch && matchesDate;
-  });
-});
+const sortKey = ref('');
+const sortOrder = ref<'asc' | 'desc'>('desc');
+
+const buildQuery = () => {
+  return {
+    search: searchQuery.value,
+    startDate: startDate.value,
+    endDate: endDate.value,
+    sortBy: sortKey.value,
+    sortOrder: sortOrder.value
+  };
+};
+
+const triggerExport = async () => {
+  await exportTransactions(buildQuery());
+};
+
+const sortBy = (key: string) => {
+  if (sortKey.value === key) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortKey.value = key;
+    sortOrder.value = 'asc';
+  }
+};
+
+watch([searchQuery, startDate, endDate, sortKey, sortOrder], () => {
+  // Reset to page 1 on filter change
+  fetchTransactions(1, 50, buildQuery());
+}, { deep: true });
+
+const filteredTransactions = computed(() => transactions.value);
 
 const totalPages = computed(() => Math.ceil((totalTransactions.value || 0) / 50));
 
@@ -507,7 +572,7 @@ const revenueGrowth = computed(() => {
 
 const handlePageChange = async (page: number) => {
   if (page < 1 || page > totalPages.value) return;
-  await fetchTransactions(page, 50);
+  await fetchTransactions(page, 50, buildQuery());
 };
 
 const displayedPages = computed(() => {
@@ -519,7 +584,9 @@ const displayedPages = computed(() => {
   return [1, '...', current - 1, current, current + 1, '...', total];
 });
 
-onMounted(fetchFinances);
+onMounted(() => {
+  fetchFinances(); // Initial load
+});
 </script>
 
 <style scoped>

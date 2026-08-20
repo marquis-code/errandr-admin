@@ -125,15 +125,37 @@ export const useAdminFinances = () => {
   const totalTransactions = ref(0);
   const currentPage = ref(1);
 
-  const fetchTransactions = async (page = 1, limit = 50) => {
+  const fetchTransactions = async (page = 1, limit = 50, query?: any) => {
     loading.value = true;
     try {
-      const res = await wallets_api.getTransactions(page, limit);
+      const res = await wallets_api.getTransactions(page, limit, query);
       transactions.value = res.data.transactions || [];
       totalTransactions.value = res.data.total || 0;
       currentPage.value = page;
     } catch (e: any) {
       console.error(e);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const exportTransactions = async (query?: any) => {
+    loading.value = true;
+    const { showToast } = useCustomToast();
+    try {
+      const exportQuery = { ...query, exportAsCsv: 'true' };
+      const res = await wallets_api.getTransactions(1, 10000, exportQuery);
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `transactions-export.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast({ title: 'Success', message: 'Transactions exported successfully', toastType: 'success' });
+    } catch (e: any) {
+      console.error(e);
+      showToast({ title: 'Error', message: 'Failed to export transactions', toastType: 'error' });
     } finally {
       loading.value = false;
     }
@@ -214,5 +236,5 @@ export const useAdminFinances = () => {
     }
   };
 
-  return { loading, stats, transactions, totalTransactions, currentPage, fetchTransactions, fetchFinances, approvePayout, rejectPayout, markPayoutAsPaid, downloadReceipt };
+  return { loading, stats, transactions, totalTransactions, currentPage, fetchTransactions, fetchFinances, approvePayout, rejectPayout, markPayoutAsPaid, downloadReceipt, exportTransactions };
 };

@@ -269,7 +269,7 @@
             </div>
             <h3 class="text-base font-bold mb-1.5 tracking-tight text-white">Platform Settings</h3>
             <p class="text-gray-400 text-xs font-medium leading-relaxed mb-5">Manage platform configurations, fees, and operational hours.</p>
-            <NuxtLink to="/admin/settings" class="block text-center w-full py-3 bg-[#FF5C1A] text-white rounded-xl font-bold text-xs hover:bg-[#E54D12] transition-all shadow-md shadow-[#FF5C1A]/20 active:scale-95">
+            <NuxtLink to="/settings" class="block text-center w-full py-3 bg-[#FF5C1A] text-white rounded-xl font-bold text-xs hover:bg-[#E54D12] transition-all shadow-md shadow-[#FF5C1A]/20 active:scale-95">
               Manage Settings
             </NuxtLink>
           </div>
@@ -392,7 +392,7 @@ const recentActivity = computed(() => {
       erranderName: order.errander ? `${order.errander.firstName} ${order.errander.lastName}` : 'Unassigned',
       total: order.total || order.totalAmount || 0,
       deliveryFee: order.deliveryFee || 0,
-      platformShare: order.platformShare || 0,
+      platformShare: (order.serviceFee || 0) + ((order.deliveryFee || 0) - (order.erranderPayout || 0)),
       address: order.deliveryAddress || order.specificAddress || 'No address provided',
       time: formatTimeAgo(order.createdAt),
       status: order.status || 'completed',
