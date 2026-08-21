@@ -77,6 +77,7 @@ export const admin_api = {
       if (query.status) url += `&status=${query.status}`;
       if (query.customerId) url += `&customerId=${query.customerId}`;
       if (query.vendorId) url += `&vendorId=${query.vendorId}`;
+      if (query.erranderId) url += `&erranderId=${query.erranderId}`;
       if (query.search) url += `&search=${query.search}`;
       if (query.sortBy) url += `&sortBy=${query.sortBy}`;
       if (query.sortOrder) url += `&sortOrder=${query.sortOrder}`;

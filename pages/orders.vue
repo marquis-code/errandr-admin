@@ -119,6 +119,13 @@
           class="flex-1 shadow-none"
           position="standalone"
         />
+        <SelectInput 
+          v-model="selectedErrander" 
+          :options="dispatcherOptions" 
+          label="Filter by Errander" 
+          class="flex-1 shadow-none"
+          position="standalone"
+        />
       </div>
       
       <div class="flex overflow-x-auto pb-2 hide-scrollbar gap-1 bg-white p-1 rounded-xl border border-gray-100 shadow-none">
@@ -554,11 +561,12 @@ const orderStats = ref({
 });
 
 // Filters
-const selectedStatus = ref('all');
 const startDate = ref('');
 const endDate = ref('');
+const selectedStatus = ref('all');
 const selectedCustomer = ref('');
 const selectedVendor = ref('');
+const selectedErrander = ref('');
 
 const selectedOrder = ref<any>(null);
 const modalOrder = ref<any>(null);
@@ -621,7 +629,8 @@ const fetchOrders = async () => {
         endDate: endDate.value || undefined,
         status: selectedStatus.value !== 'all' ? selectedStatus.value : undefined,
         customerId: selectedCustomer.value || undefined,
-        vendorId: selectedVendor.value || undefined
+        vendorId: selectedVendor.value || undefined,
+        erranderId: selectedErrander.value || undefined
       }
     );
     const payload = res.data.data || res.data;
@@ -646,7 +655,7 @@ const changePage = (page: number) => {
   }
 };
 
-watch([selectedStatus, selectedCustomer, selectedVendor], () => {
+watch([selectedStatus, selectedCustomer, selectedVendor, selectedErrander], () => {
   currentPage.value = 1;
   fetchOrders();
 });
@@ -656,6 +665,7 @@ const clearFilters = () => {
   endDate.value = '';
   selectedCustomer.value = '';
   selectedVendor.value = '';
+  selectedErrander.value = '';
   selectedStatus.value = 'all';
   currentPage.value = 1;
   fetchOrders();
