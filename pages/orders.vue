@@ -163,10 +163,11 @@
               <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-wider w-[25%]">Logistics</th>
               <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-wider text-right">Financials</th>
               <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-wider text-right">Status</th>
+              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-wider text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-50/80">
-            <tr v-for="order in orders" :key="order._id" class="hover:bg-gray-50/50 transition-colors group cursor-pointer" @click="selectedOrder = order">
+            <tr v-for="order in orders" :key="order._id" class="hover:bg-gray-50/50 transition-colors group">
               <!-- Customer & Order -->
               <td class="px-6 py-4">
                 <div class="flex items-start gap-3">
@@ -245,6 +246,30 @@
                   </span>
                   
                   <span class="text-[10px] font-bold text-gray-400">{{ formatTimeAgo(order.createdAt) }}</span>
+                </div>
+              </td>
+
+              <!-- Actions Dropdown -->
+              <td class="px-6 py-4 text-right relative">
+                <button @click.stop="activeDropdown === order._id ? activeDropdown = null : activeDropdown = order._id" class="px-3 py-1.5 bg-gray-100 text-gray-700 text-[11px] font-bold rounded-lg hover:bg-gray-200 transition-colors inline-flex items-center gap-1">
+                  Actions
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                
+                <div v-if="activeDropdown === order._id" class="absolute right-6 top-14 w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-20 py-1.5 text-left animate-fade-in-up">
+                  <button @click.stop="selectedOrder = order; activeDropdown = null" class="w-full px-4 py-2 text-[11px] font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 text-left transition-colors">
+                    View Profile
+                  </button>
+                  <button @click.stop="openModal(order, 'status')" class="w-full px-4 py-2 text-[11px] font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 text-left transition-colors">
+                    Update Order Status
+                  </button>
+                  <button @click.stop="openModal(order, 'dispatcher')" class="w-full px-4 py-2 text-[11px] font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 text-left transition-colors">
+                    Assign Dispatcher
+                  </button>
+                  <div class="border-t border-gray-50 my-1.5"></div>
+                  <button v-if="['pending', 'processing', 'confirmed', 'scheduled', 'preparing'].includes(order.status)" @click.stop="handleCancelOrder(order._id)" class="w-full px-4 py-2 text-[11px] font-bold text-red-600 hover:bg-red-50 text-left transition-colors">
+                    Cancel Order
+                  </button>
                 </div>
               </td>
             </tr>
@@ -444,7 +469,7 @@
     </SideDrawer>
 
     <!-- Action Modal -->
-    <div v-if="showActionModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm" @click.self="showActionModal = false">
+    <div v-if="showActionModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm" @click.self="showActionModal = false">
       <div class="bg-white rounded-2xl w-full max-w-md p-6 space-y-6 animate-fade-in-up">
         <div class="flex justify-between items-center border-b border-gray-100 pb-4">
           <h3 class="text-lg font-bold text-gray-900">Order Actions</h3>
@@ -462,7 +487,8 @@
                 <option v-for="status in updateStatuses" :key="status" :value="status">{{ status.replace(/_/g, ' ') }}</option>
               </select>
               <button @click="handleUpdateStatus" :disabled="isUpdatingStatus || !selectedOrderUpdateStatus" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50">
-                Update
+                <Loader2 v-if="isUpdatingStatus" class="w-4 h-4 animate-spin" />
+                <span v-else>Update</span>
               </button>
             </div>
           </div>
@@ -478,14 +504,15 @@
                 position="top"
               />
               <button @click="handleAssignDispatcher" :disabled="isAssigning || !assigningErranderId" class="px-4 py-2 bg-[#FF5C1A] text-white rounded-lg text-sm font-bold hover:bg-[#e04f15] transition-colors disabled:opacity-50 h-[42px] self-end">
-                Assign
+                <Loader2 v-if="isAssigning" class="w-4 h-4 animate-spin" />
+                <span v-else>Assign</span>
               </button>
             </div>
           </div>
 
           <button 
-            v-if="['pending', 'processing', 'confirmed', 'scheduled', 'preparing'].includes(selectedOrder?.status)"
-            @click="handleCancelOrder(selectedOrder?._id)" 
+            v-if="['pending', 'processing', 'confirmed', 'scheduled', 'preparing'].includes(modalOrder?.status)"
+            @click="handleCancelOrder(modalOrder?._id)" 
             class="w-full py-2.5 mt-2 bg-red-50 text-red-600 rounded-lg text-sm font-bold hover:bg-red-100 transition-colors"
           >
             Cancel Order
@@ -533,9 +560,17 @@ const selectedCustomer = ref('');
 const selectedVendor = ref('');
 
 const selectedOrder = ref<any>(null);
+const modalOrder = ref<any>(null);
+const activeDropdown = ref<string | null>(null);
 const statuses = ['all', 'pending', 'processing', 'completed', 'cancelled'];
 const updateStatuses = ['pending', 'confirmed', 'preparing', 'ready_for_pickup', 'picked_up', 'in_transit', 'delivered', 'cancelled'];
 const showActionModal = ref(false);
+
+const openModal = (order: any, type: 'status' | 'dispatcher') => {
+  modalOrder.value = order;
+  activeDropdown.value = null;
+  showActionModal.value = true;
+};
 
 // Dropdown options
 const customerOptions = ref<any[]>([]);
@@ -566,8 +601,8 @@ const fetchDropdowns = async () => {
     
     const dList = dispatchersRes.data?.data?.dispatchers || dispatchersRes.data?.dispatchers || dispatchersRes.data || [];
     dispatcherOptions.value = dList.map((d: any) => ({
-      label: `${d.firstName || ''} ${d.lastName || ''} - ${d.phone || 'No phone'}`,
-      value: d._id
+      label: `${d.user?.firstName || d.firstName || ''} ${d.user?.lastName || d.lastName || ''} - ${d.user?.phone || d.phone || 'No phone'}`,
+      value: d.user?._id || d._id
     }));
   } catch (e) {
     console.error('Failed to load dropdowns', e);
@@ -666,7 +701,7 @@ const handleCancelOrder = async (orderId: string) => {
       await admin_api.cancelOrder(orderId, { reason });
       alert('Order cancelled successfully.');
       fetchOrders();
-      selectedOrder.value = null;
+      modalOrder.value = null;
       showActionModal.value = false;
     } catch (error: any) {
       alert(error.response?.data?.message || 'Failed to cancel order.');
@@ -678,10 +713,10 @@ const handleAssignDispatcher = async () => {
   if (!assigningErranderId.value) return;
   isAssigning.value = true;
   try {
-    await admin_api.assignOrder(selectedOrder.value._id, { erranderId: assigningErranderId.value });
+    await admin_api.assignOrder(modalOrder.value._id, { erranderId: assigningErranderId.value });
     alert('Dispatcher assigned successfully.');
     fetchOrders();
-    selectedOrder.value = null;
+    modalOrder.value = null;
     showActionModal.value = false;
     assigningErranderId.value = '';
   } catch (error: any) {
@@ -692,16 +727,17 @@ const handleAssignDispatcher = async () => {
 };
 
 const handleUpdateStatus = async () => {
-  if (!selectedOrderUpdateStatus.value) return;
+  if (!selectedOrderUpdateStatus.value || !modalOrder.value?._id) return;
   isUpdatingStatus.value = true;
   try {
-    await admin_api.updateOrderStatus(selectedOrder.value._id, { status: selectedOrderUpdateStatus.value });
+    const res = await admin_api.updateOrderStatus(modalOrder.value._id, { status: selectedOrderUpdateStatus.value });
     alert('Status updated successfully.');
     fetchOrders();
-    selectedOrder.value = null;
+    modalOrder.value = null;
     showActionModal.value = false;
     selectedOrderUpdateStatus.value = '';
   } catch (error: any) {
+    console.error('Update status error:', error);
     alert(error.response?.data?.message || 'Failed to update status.');
   } finally {
     isUpdatingStatus.value = false;
@@ -711,6 +747,11 @@ const handleUpdateStatus = async () => {
 onMounted(() => {
   fetchDropdowns();
   fetchOrders();
+  
+  // Close dropdown on outside click
+  window.addEventListener('click', () => {
+    activeDropdown.value = null;
+  });
 });
 </script>
 
