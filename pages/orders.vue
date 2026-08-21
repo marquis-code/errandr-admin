@@ -436,10 +436,40 @@
         </div>
       </template>
       
-      <div v-if="selectedOrder && ['pending', 'processing', 'confirmed'].includes(selectedOrder.status)" class="p-6 border-t border-gray-100 flex gap-3">
+      <div v-if="selectedOrder" class="p-6 border-t border-gray-100 flex flex-col gap-4">
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Update Order Status</label>
+          <div class="flex gap-2">
+            <select v-model="selectedOrderUpdateStatus" class="flex-1 bg-white border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2">
+              <option value="">Select status</option>
+              <option v-for="status in statuses.filter(s => s !== 'all')" :key="status" :value="status">{{ status }}</option>
+            </select>
+            <button @click="handleUpdateStatus" :disabled="isUpdatingStatus || !selectedOrderUpdateStatus" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50">
+              Update
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Assign Dispatcher</label>
+          <div class="flex gap-2">
+            <SelectInput 
+              v-model="assigningErranderId" 
+              :options="dispatcherOptions" 
+              label="Select Dispatcher" 
+              class="flex-1"
+              position="top"
+            />
+            <button @click="handleAssignDispatcher" :disabled="isAssigning || !assigningErranderId" class="px-4 py-2 bg-[#FF5C1A] text-white rounded-lg text-sm font-bold hover:bg-[#e04f15] transition-colors disabled:opacity-50 h-[42px] self-end">
+              Assign
+            </button>
+          </div>
+        </div>
+
         <button 
+          v-if="['pending', 'processing', 'confirmed'].includes(selectedOrder.status)"
           @click="handleCancelOrder(selectedOrder._id)" 
-          class="flex-1 py-2.5 bg-red-50 text-red-600 rounded-lg text-sm font-bold hover:bg-red-100 transition-colors"
+          class="w-full py-2.5 mt-2 bg-red-50 text-red-600 rounded-lg text-sm font-bold hover:bg-red-100 transition-colors"
         >
           Cancel Order
         </button>
@@ -495,12 +525,15 @@ const dispatcherOptions = ref<any[]>([]);
 const assigningErranderId = ref('');
 const isAssigning = ref(false);
 
+const selectedOrderUpdateStatus = ref('');
+const isUpdatingStatus = ref(false);
+
 const fetchDropdowns = async () => {
   try {
     const [usersRes, vendorsRes, dispatchersRes] = await Promise.all([
-      admin_api.getUsers(),
-      admin_api.getVendors(),
-      admin_api.getDispatchers(1, 1000)
+      admin_api.getUsers().catch(e => ({ data: { users: [] } })),
+      admin_api.getVendors().catch(e => ({ data: { vendors: [] } })),
+      admin_api.getDispatchers(1, 1000).catch(e => ({ data: { dispatchers: [] } }))
     ]);
     customerOptions.value = (usersRes.data?.users || usersRes.data || []).map((u: any) => ({
       label: `${u.firstName || ''} ${u.lastName || ''} - ${u.email}`,
@@ -631,6 +664,22 @@ const handleAssignDispatcher = async () => {
     alert(error.response?.data?.message || 'Failed to assign dispatcher.');
   } finally {
     isAssigning.value = false;
+  }
+};
+
+const handleUpdateStatus = async () => {
+  if (!selectedOrderUpdateStatus.value) return;
+  isUpdatingStatus.value = true;
+  try {
+    await admin_api.updateOrderStatus(selectedOrder.value._id, { status: selectedOrderUpdateStatus.value });
+    alert('Status updated successfully.');
+    fetchOrders();
+    selectedOrder.value = null;
+    selectedOrderUpdateStatus.value = '';
+  } catch (error: any) {
+    alert(error.response?.data?.message || 'Failed to update status.');
+  } finally {
+    isUpdatingStatus.value = false;
   }
 };
 
