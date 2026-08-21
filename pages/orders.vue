@@ -103,42 +103,35 @@
     </div>
 
     <!-- Controls (Dropdowns instead of raw search) -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-      <div class="flex flex-1 gap-3 max-w-2xl">
-        <SelectInput 
-          v-model="selectedCustomer" 
-          :options="customerOptions" 
-          label="Filter by Customer" 
-          class="flex-1 shadow-none"
-          position="standalone"
-        />
-        <SelectInput 
-          v-model="selectedVendor" 
-          :options="vendorOptions" 
-          label="Filter by Vendor" 
-          class="flex-1 shadow-none"
-          position="standalone"
-        />
-        <SelectInput 
-          v-model="selectedErrander" 
-          :options="dispatcherOptions" 
-          label="Filter by Errander" 
-          class="flex-1 shadow-none"
-          position="standalone"
-        />
-      </div>
-      
-      <div class="flex overflow-x-auto pb-2 hide-scrollbar gap-1 bg-white p-1 rounded-xl border border-gray-100 shadow-none">
-        <button 
-          v-for="status in statuses" 
-          :key="status"
-          @click="selectedStatus = status"
-          class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap shrink-0 capitalize shadow-none"
-          :class="selectedStatus === status ? 'bg-gray-900 text-white' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'"
-        >
-          {{ status }}
-        </button>
-      </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 w-full">
+      <SelectInput 
+        v-model="selectedCustomer" 
+        :options="customerOptions" 
+        label="Filter by Customer" 
+        class="shadow-none"
+        position="standalone"
+      />
+      <SelectInput 
+        v-model="selectedVendor" 
+        :options="vendorOptions" 
+        label="Filter by Vendor" 
+        class="shadow-none"
+        position="standalone"
+      />
+      <SelectInput 
+        v-model="selectedErrander" 
+        :options="dispatcherOptions" 
+        label="Filter by Errander" 
+        class="shadow-none"
+        position="standalone"
+      />
+      <SelectInput 
+        v-model="selectedStatus" 
+        :options="statusOptions" 
+        label="Filter by Status" 
+        class="shadow-none"
+        position="standalone"
+      />
     </div>
 
     <!-- Table Section -->
@@ -572,7 +565,19 @@ const selectedErrander = ref('');
 const selectedOrder = ref<any>(null);
 const modalOrder = ref<any>(null);
 const activeDropdown = ref<string | null>(null);
-const statuses = ['all', 'pending', 'processing', 'completed', 'cancelled'];
+
+const statusOptions = [
+  { label: 'All Statuses', value: 'all' },
+  { label: 'Pending', value: 'pending' },
+  { label: 'Confirmed', value: 'confirmed' },
+  { label: 'Preparing', value: 'preparing' },
+  { label: 'Ready For Pickup', value: 'ready_for_pickup' },
+  { label: 'Picked Up', value: 'picked_up' },
+  { label: 'In Transit', value: 'in_transit' },
+  { label: 'Delivered', value: 'delivered' },
+  { label: 'Cancelled', value: 'cancelled' }
+];
+
 const updateStatuses = ['pending', 'confirmed', 'preparing', 'ready_for_pickup', 'picked_up', 'in_transit', 'delivered', 'cancelled'];
 const showActionModal = ref(false);
 
