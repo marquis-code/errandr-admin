@@ -258,7 +258,7 @@
                 
                 <div v-if="activeDropdown === order._id" class="absolute right-6 top-14 w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-20 py-1.5 text-left animate-fade-in-up">
                   <button @click.stop="selectedOrder = order; activeDropdown = null" class="w-full px-4 py-2 text-[11px] font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 text-left transition-colors">
-                    View Profile
+                    Profile
                   </button>
                   <button @click.stop="openModal(order, 'status')" class="w-full px-4 py-2 text-[11px] font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 text-left transition-colors">
                     Update Order Status
