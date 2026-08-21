@@ -437,50 +437,68 @@
       </template>
       
       <div v-if="selectedOrder" class="p-6 border-t border-gray-100 flex flex-col gap-4">
-        <div class="space-y-2">
-          <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Update Order Status</label>
-          <div class="flex gap-2">
-            <select v-model="selectedOrderUpdateStatus" class="flex-1 bg-white border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2">
-              <option value="">Select status</option>
-              <option v-for="status in statuses.filter(s => s !== 'all')" :key="status" :value="status">{{ status }}</option>
-            </select>
-            <button @click="handleUpdateStatus" :disabled="isUpdatingStatus || !selectedOrderUpdateStatus" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50">
-              Update
-            </button>
-          </div>
-        </div>
-
-        <div class="space-y-2">
-          <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Assign Dispatcher</label>
-          <div class="flex gap-2">
-            <SelectInput 
-              v-model="assigningErranderId" 
-              :options="dispatcherOptions" 
-              label="Select Dispatcher" 
-              class="flex-1"
-              position="top"
-            />
-            <button @click="handleAssignDispatcher" :disabled="isAssigning || !assigningErranderId" class="px-4 py-2 bg-[#FF5C1A] text-white rounded-lg text-sm font-bold hover:bg-[#e04f15] transition-colors disabled:opacity-50 h-[42px] self-end">
-              Assign
-            </button>
-          </div>
-        </div>
-
-        <button 
-          v-if="['pending', 'processing', 'confirmed'].includes(selectedOrder.status)"
-          @click="handleCancelOrder(selectedOrder._id)" 
-          class="w-full py-2.5 mt-2 bg-red-50 text-red-600 rounded-lg text-sm font-bold hover:bg-red-100 transition-colors"
-        >
-          Cancel Order
+        <button @click="showActionModal = true" class="w-full py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors shadow-sm">
+          Take Action
         </button>
       </div>
     </SideDrawer>
+
+    <!-- Action Modal -->
+    <div v-if="showActionModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm" @click.self="showActionModal = false">
+      <div class="bg-white rounded-2xl w-full max-w-md p-6 space-y-6 animate-fade-in-up">
+        <div class="flex justify-between items-center border-b border-gray-100 pb-4">
+          <h3 class="text-lg font-bold text-gray-900">Order Actions</h3>
+          <button @click="showActionModal = false" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="space-y-2">
+            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Update Order Status</label>
+            <div class="flex gap-2">
+              <select v-model="selectedOrderUpdateStatus" class="flex-1 bg-white border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2">
+                <option value="">Select status</option>
+                <option v-for="status in updateStatuses" :key="status" :value="status">{{ status.replace(/_/g, ' ') }}</option>
+              </select>
+              <button @click="handleUpdateStatus" :disabled="isUpdatingStatus || !selectedOrderUpdateStatus" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50">
+                Update
+              </button>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Assign Dispatcher</label>
+            <div class="flex gap-2">
+              <SelectInput 
+                v-model="assigningErranderId" 
+                :options="dispatcherOptions" 
+                label="Select Dispatcher" 
+                class="flex-1"
+                position="top"
+              />
+              <button @click="handleAssignDispatcher" :disabled="isAssigning || !assigningErranderId" class="px-4 py-2 bg-[#FF5C1A] text-white rounded-lg text-sm font-bold hover:bg-[#e04f15] transition-colors disabled:opacity-50 h-[42px] self-end">
+                Assign
+              </button>
+            </div>
+          </div>
+
+          <button 
+            v-if="['pending', 'processing', 'confirmed', 'scheduled', 'preparing'].includes(selectedOrder?.status)"
+            @click="handleCancelOrder(selectedOrder?._id)" 
+            class="w-full py-2.5 mt-2 bg-red-50 text-red-600 rounded-lg text-sm font-bold hover:bg-red-100 transition-colors"
+          >
+            Cancel Order
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { admin_api } from '@/api_factory/modules/admin';
-import { ShoppingBag, DollarSign, Activity, Calendar, Store, Truck, CheckCircle, Clock, XCircle, Loader2 } from 'lucide-vue-next';
+import { ShoppingBag, DollarSign, Activity, Calendar, Store, Truck, CheckCircle, Clock, XCircle, Loader2, X } from 'lucide-vue-next';
 import { onMounted, ref, computed, watch } from 'vue';
 import SideDrawer from '@/components/ui/SideDrawer.vue';
 import SelectInput from '@/components/ui/SelectInput.vue';
@@ -516,6 +534,8 @@ const selectedVendor = ref('');
 
 const selectedOrder = ref<any>(null);
 const statuses = ['all', 'pending', 'processing', 'completed', 'cancelled'];
+const updateStatuses = ['pending', 'confirmed', 'preparing', 'ready_for_pickup', 'picked_up', 'in_transit', 'delivered', 'cancelled'];
+const showActionModal = ref(false);
 
 // Dropdown options
 const customerOptions = ref<any[]>([]);
@@ -533,7 +553,7 @@ const fetchDropdowns = async () => {
     const [usersRes, vendorsRes, dispatchersRes] = await Promise.all([
       admin_api.getUsers().catch(e => ({ data: { users: [] } })),
       admin_api.getVendors().catch(e => ({ data: { vendors: [] } })),
-      admin_api.getDispatchers(1, 1000).catch(e => ({ data: { dispatchers: [] } }))
+      admin_api.getDispatchers(1, 10).catch(e => ({ data: { dispatchers: [] } }))
     ]);
     customerOptions.value = (usersRes.data?.users || usersRes.data || []).map((u: any) => ({
       label: `${u.firstName || ''} ${u.lastName || ''} - ${u.email}`,
@@ -560,11 +580,13 @@ const fetchOrders = async () => {
     const res = await admin_api.getRecentOrders(
       currentPage.value,
       limit.value,
-      startDate.value || undefined,
-      endDate.value || undefined,
-      selectedStatus.value !== 'all' ? selectedStatus.value : undefined,
-      selectedCustomer.value || undefined,
-      selectedVendor.value || undefined
+      {
+        startDate: startDate.value || undefined,
+        endDate: endDate.value || undefined,
+        status: selectedStatus.value !== 'all' ? selectedStatus.value : undefined,
+        customerId: selectedCustomer.value || undefined,
+        vendorId: selectedVendor.value || undefined
+      }
     );
     const payload = res.data.data || res.data;
     orders.value = payload.orders || [];
@@ -645,6 +667,7 @@ const handleCancelOrder = async (orderId: string) => {
       alert('Order cancelled successfully.');
       fetchOrders();
       selectedOrder.value = null;
+      showActionModal.value = false;
     } catch (error: any) {
       alert(error.response?.data?.message || 'Failed to cancel order.');
     }
@@ -659,6 +682,7 @@ const handleAssignDispatcher = async () => {
     alert('Dispatcher assigned successfully.');
     fetchOrders();
     selectedOrder.value = null;
+    showActionModal.value = false;
     assigningErranderId.value = '';
   } catch (error: any) {
     alert(error.response?.data?.message || 'Failed to assign dispatcher.');
@@ -675,6 +699,7 @@ const handleUpdateStatus = async () => {
     alert('Status updated successfully.');
     fetchOrders();
     selectedOrder.value = null;
+    showActionModal.value = false;
     selectedOrderUpdateStatus.value = '';
   } catch (error: any) {
     alert(error.response?.data?.message || 'Failed to update status.');
@@ -697,6 +722,15 @@ onMounted(() => {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .hide-scrollbar::-webkit-scrollbar {
