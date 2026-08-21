@@ -598,7 +598,7 @@ const fetchDropdowns = async () => {
     const [usersRes, vendorsRes, dispatchersRes] = await Promise.all([
       admin_api.getUsers().catch(e => ({ data: { users: [] } })),
       admin_api.getVendors().catch(e => ({ data: { vendors: [] } })),
-      admin_api.getDispatchers(1, 10).catch(e => ({ data: { dispatchers: [] } }))
+      admin_api.getDispatchers(1, 100).catch(e => ({ data: { dispatchers: [] } }))
     ]);
     customerOptions.value = (usersRes.data?.users || usersRes.data || []).map((u: any) => ({
       label: `${u.firstName || ''} ${u.lastName || ''} - ${u.email}`,
