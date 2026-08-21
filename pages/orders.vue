@@ -524,9 +524,10 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted, watch } from 'vue';
 import { admin_api } from '@/api_factory/modules/admin';
+const { showToast } = useToast();
 import { ShoppingBag, DollarSign, Activity, Calendar, Store, Truck, CheckCircle, Clock, XCircle, Loader2, X } from 'lucide-vue-next';
-import { onMounted, ref, computed, watch } from 'vue';
 import SideDrawer from '@/components/ui/SideDrawer.vue';
 import SelectInput from '@/components/ui/SelectInput.vue';
 import DateRangePicker from '@/components/ui/DateRangePicker.vue';
@@ -699,12 +700,12 @@ const handleCancelOrder = async (orderId: string) => {
   if (reason) {
     try {
       await admin_api.cancelOrder(orderId, { reason });
-      alert('Order cancelled successfully.');
+      showToast({ title: 'Success', message: 'Order cancelled successfully.', toastType: 'success' });
       fetchOrders();
       modalOrder.value = null;
       showActionModal.value = false;
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Failed to cancel order.');
+      showToast({ title: 'Error', message: error.response?.data?.message || 'Failed to cancel order.', toastType: 'error' });
     }
   }
 };
@@ -714,13 +715,13 @@ const handleAssignDispatcher = async () => {
   isAssigning.value = true;
   try {
     await admin_api.assignOrder(modalOrder.value._id, { erranderId: assigningErranderId.value });
-    alert('Dispatcher assigned successfully.');
+    showToast({ title: 'Success', message: 'Dispatcher assigned successfully.', toastType: 'success' });
     fetchOrders();
     modalOrder.value = null;
     showActionModal.value = false;
     assigningErranderId.value = '';
   } catch (error: any) {
-    alert(error.response?.data?.message || 'Failed to assign dispatcher.');
+    showToast({ title: 'Error', message: error.response?.data?.message || 'Failed to assign dispatcher.', toastType: 'error' });
   } finally {
     isAssigning.value = false;
   }
@@ -731,14 +732,14 @@ const handleUpdateStatus = async () => {
   isUpdatingStatus.value = true;
   try {
     const res = await admin_api.updateOrderStatus(modalOrder.value._id, { status: selectedOrderUpdateStatus.value });
-    alert('Status updated successfully.');
+    showToast({ title: 'Success', message: 'Status updated successfully.', toastType: 'success' });
     fetchOrders();
     modalOrder.value = null;
     showActionModal.value = false;
     selectedOrderUpdateStatus.value = '';
   } catch (error: any) {
     console.error('Update status error:', error);
-    alert(error.response?.data?.message || 'Failed to update status.');
+    showToast({ title: 'Error', message: error.response?.data?.message || 'Failed to update status.', toastType: 'error' });
   } finally {
     isUpdatingStatus.value = false;
   }
