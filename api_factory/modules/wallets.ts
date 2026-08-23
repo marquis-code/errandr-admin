@@ -47,5 +47,9 @@ export const wallets_api = {
   
   downloadReceipt: (id: string) => {
     return GATEWAY_ENDPOINT_WITH_AUTH.get(`/wallets/transactions/${id}/receipt`, { responseType: 'blob' });
+  },
+
+  fundWalletByAdmin: (userId: string, amount: number, description?: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.post(`/wallets/admin/fund/${userId}`, { amount, description });
   }
 };

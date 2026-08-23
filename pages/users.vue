@@ -168,6 +168,13 @@
                     >
                       <Eye class="w-4 h-4" />
                     </button>
+                    <button 
+                      @click.stop="openFundModal(user)" 
+                      class="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
+                      title="Fund Wallet"
+                    >
+                      <Wallet class="w-4 h-4" />
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -433,13 +440,71 @@
       @cancel="confirmModal.isOpen = false"
       @confirm="executeAction"
     />
+
+    <!-- Funding Modal -->
+    <div v-if="fundModal.isOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+      <div class="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden" @click.stop>
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+          <h3 class="text-xl font-bold text-gray-900">Fund User Wallet</h3>
+          <button @click="fundModal.isOpen = false" class="p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-colors">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+        <div class="p-6 space-y-4">
+          <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-xl mb-2">
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0">
+              {{ fundModal.user?.firstName?.[0] || 'U' }}
+            </div>
+            <div>
+              <p class="text-sm font-bold text-gray-900">{{ fundModal.user?.firstName }} {{ fundModal.user?.lastName }}</p>
+              <p class="text-xs text-gray-500">{{ fundModal.user?.email }}</p>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Amount (₦)</label>
+            <input 
+              v-model.number="fundModal.amount"
+              type="number" 
+              placeholder="e.g. 500" 
+              class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-base font-medium focus:outline-none focus:ring-2 focus:ring-[#FF5C1A] focus:border-transparent transition-all"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Description (Optional)</label>
+            <input 
+              v-model="fundModal.description"
+              type="text" 
+              placeholder="e.g. Customer Service Refund" 
+              class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-base font-medium focus:outline-none focus:ring-2 focus:ring-[#FF5C1A] focus:border-transparent transition-all"
+            />
+          </div>
+        </div>
+        <div class="p-6 bg-gray-50 border-t border-gray-100 flex gap-3">
+          <button 
+            @click="fundModal.isOpen = false"
+            class="flex-1 py-3 px-4 rounded-xl font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </button>
+          <button 
+            @click="executeFundUser"
+            :disabled="fundModal.loading || !fundModal.amount"
+            class="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-[#FF5C1A] hover:bg-[#E04D12] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          >
+            <span v-if="fundModal.loading" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></span>
+            Fund Wallet
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { admin_api } from '@/api_factory/modules/admin';
+import { wallets_api } from '@/api_factory/modules/wallets';
 import { useAdminUsers } from '@/composables/modules/admin';
-import { Users as UsersIcon, Search, MoreHorizontal, UserCheck, UserX, Shield, Edit2, Activity, DollarSign, XCircle, UserX2, UserCheck2, MapPin } from 'lucide-vue-next';
+import { Users as UsersIcon, Search, MoreHorizontal, UserCheck, UserX, Shield, Edit2, Activity, DollarSign, XCircle, UserX2, UserCheck2, MapPin, X, Wallet, Eye } from 'lucide-vue-next';
 import { ref, computed, onMounted } from 'vue';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 import SideDrawer from '@/components/ui/SideDrawer.vue';
@@ -614,6 +679,48 @@ const executeAction = async () => {
     await fetchUsers();
   } catch (e) {
     console.error(e);
+  }
+};
+
+// Funding Logic
+const fundModal = ref({
+  isOpen: false,
+  user: null as any,
+  amount: null as number | null,
+  description: '',
+  loading: false
+});
+
+const openFundModal = (user: any) => {
+  fundModal.value = {
+    isOpen: true,
+    user,
+    amount: null,
+    description: '',
+    loading: false
+  };
+};
+
+const executeFundUser = async () => {
+  if (!fundModal.value.amount || fundModal.value.amount <= 0) return;
+  fundModal.value.loading = true;
+  try {
+    await wallets_api.fundWalletByAdmin(
+      fundModal.value.user._id, 
+      fundModal.value.amount, 
+      fundModal.value.description
+    );
+    showToast({ title: 'Success', message: 'Wallet funded successfully', toastType: 'success' });
+    fundModal.value.isOpen = false;
+    await fetchUsers(); // Refresh stats and list
+  } catch (error: any) {
+    showToast({ 
+      title: 'Error', 
+      message: error?.response?.data?.message || 'Failed to fund wallet', 
+      toastType: 'error' 
+    });
+  } finally {
+    fundModal.value.loading = false;
   }
 };
 </script>
