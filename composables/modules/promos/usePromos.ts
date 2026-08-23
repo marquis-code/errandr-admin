@@ -1,12 +1,28 @@
 import { ref } from 'vue'
 import { promos_api } from '@/api_factory/modules/promos'
+import { admin_api } from '@/api_factory/modules/admin'
 import { useCustomToast } from '@/composables/core/useCustomToast'
 
 export const usePromos = () => {
   const promos = ref<any[]>([])
   const loading = ref(false)
   const isSubmitting = ref(false)
+  const users = ref<any[]>([])
+  const vendors = ref<any[]>([])
   const { showToast } = useCustomToast()
+
+  const fetchDependencies = async () => {
+    try {
+      const [usersRes, vendorsRes] = await Promise.all([
+        admin_api.getUsers(),
+        admin_api.getVendors()
+      ])
+      users.value = usersRes.data?.users || usersRes.data || []
+      vendors.value = vendorsRes.data?.vendors || vendorsRes.data || []
+    } catch (e: any) {
+      console.error('Failed to load users/vendors', e)
+    }
+  }
 
   const fetchPromos = async () => {
     loading.value = true
@@ -66,9 +82,12 @@ export const usePromos = () => {
 
   return {
     promos,
+    users,
+    vendors,
     loading,
     isSubmitting,
     fetchPromos,
+    fetchDependencies,
     createPromo,
     toggleStatus
   }

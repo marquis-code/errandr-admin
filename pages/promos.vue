@@ -185,14 +185,26 @@
 
             <!-- Vendor Restrictions -->
             <div>
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Restrict to Vendors (Object IDs)</label>
-              <textarea v-model="form.applicableVendors" rows="2" placeholder="Comma separated vendor IDs. Leave empty for all." class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-sm font-mono focus:outline-none focus:border-parentPrimary focus:ring-1 focus:ring-parentPrimary"></textarea>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Restrict to Vendors</label>
+              <div class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-sm focus:outline-none focus:border-parentPrimary h-32 overflow-y-auto">
+                <label v-for="vendor in vendors" :key="vendor._id" class="flex items-center gap-2 p-1.5 hover:bg-gray-100 cursor-pointer rounded">
+                  <input type="checkbox" :value="vendor._id" v-model="form.applicableVendors" class="w-4 h-4 text-parentPrimary rounded border-gray-300 focus:ring-parentPrimary">
+                  <span class="text-xs text-gray-700 font-medium">{{ vendor.storeName || vendor.businessName || vendor.name || 'Unnamed Vendor' }}</span>
+                </label>
+                <div v-if="!vendors.length" class="text-xs text-gray-400 p-2 italic">Loading vendors...</div>
+              </div>
             </div>
 
             <!-- User Restrictions -->
             <div>
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Restrict to Users (Object IDs)</label>
-              <textarea v-model="form.applicableUsers" rows="2" placeholder="Comma separated user IDs. Leave empty for all." class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-sm font-mono focus:outline-none focus:border-parentPrimary focus:ring-1 focus:ring-parentPrimary"></textarea>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Restrict to Users</label>
+              <div class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-sm focus:outline-none focus:border-parentPrimary h-32 overflow-y-auto">
+                <label v-for="user in users" :key="user._id" class="flex items-center gap-2 p-1.5 hover:bg-gray-100 cursor-pointer rounded">
+                  <input type="checkbox" :value="user._id" v-model="form.applicableUsers" class="w-4 h-4 text-parentPrimary rounded border-gray-300 focus:ring-parentPrimary">
+                  <span class="text-xs text-gray-700 font-medium">{{ user.fname ? user.fname + ' ' + (user.lname || '') : user.email }}</span>
+                </label>
+                <div v-if="!users.length" class="text-xs text-gray-400 p-2 italic">Loading users...</div>
+              </div>
             </div>
           </div>
 
@@ -223,7 +235,7 @@ definePageMeta({
 })
 
 const { showToast } = useCustomToast()
-const { promos, loading, isSubmitting, fetchPromos, createPromo, toggleStatus: _toggleStatus } = usePromos()
+const { promos, users, vendors, loading, isSubmitting, fetchPromos, fetchDependencies, createPromo, toggleStatus: _toggleStatus } = usePromos()
 
 const searchQuery = ref('')
 const isModalOpen = ref(false)
@@ -237,8 +249,8 @@ const form = ref({
   maxUsageCount: 0,
   expiresAt: '',
   onlyForNewUsers: false,
-  applicableVendors: '',
-  applicableUsers: ''
+  applicableVendors: [] as string[],
+  applicableUsers: [] as string[]
 })
 
 const filteredPromos = computed(() => {
@@ -266,8 +278,8 @@ const openModal = () => {
     maxUsageCount: 0,
     expiresAt: '',
     onlyForNewUsers: false,
-    applicableVendors: '',
-    applicableUsers: ''
+    applicableVendors: [],
+    applicableUsers: []
   }
   isModalOpen.value = true
 }
@@ -288,8 +300,9 @@ const toggleStatus = async (promo: any) => {
 const submitForm = async () => {
   const payload = {
     ...form.value,
-    applicableVendors: form.value.applicableVendors.split(',').map(s => s.trim()).filter(s => s),
-    applicableUsers: form.value.applicableUsers.split(',').map(s => s.trim()).filter(s => s),
+    // Arrays are already populated nicely by checkboxes
+    applicableVendors: form.value.applicableVendors,
+    applicableUsers: form.value.applicableUsers,
     // Set to undefined if 0 or empty so schema defaults/optionals work correctly
     maxDiscountAmount: form.value.maxDiscountAmount || undefined,
     minOrderAmount: form.value.minOrderAmount || undefined,
@@ -306,5 +319,6 @@ const submitForm = async () => {
 
 onMounted(() => {
   fetchPromos()
+  fetchDependencies()
 })
 </script>
