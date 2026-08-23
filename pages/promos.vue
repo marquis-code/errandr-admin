@@ -1,0 +1,335 @@
+<template>
+  <div class="space-y-6">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div class="relative w-full sm:w-96">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Search class="h-4 w-4 text-gray-400" />
+        </div>
+        <input 
+          v-model="searchQuery" 
+          type="text" 
+          class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-parentPrimary/20 focus:border-parentPrimary transition-colors sm:text-sm" 
+          placeholder="Search promo codes..."
+        >
+      </div>
+      
+      <button 
+        @click="openModal()" 
+        class="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm"
+      >
+        <Plus class="w-4 h-4" />
+        Create Promo Code
+      </button>
+    </div>
+
+    <!-- Promo Codes Table -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50/50">
+              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Code</th>
+              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Discount</th>
+              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Usage</th>
+              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Limits</th>
+              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-wider">Status</th>
+              <th class="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-wider text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            <tr v-if="loading" v-for="i in 5" :key="i" class="animate-pulse">
+              <td class="px-6 py-4"><div class="h-4 bg-gray-100 rounded w-24"></div></td>
+              <td class="px-6 py-4"><div class="h-4 bg-gray-100 rounded w-16"></div></td>
+              <td class="px-6 py-4"><div class="h-4 bg-gray-100 rounded w-20"></div></td>
+              <td class="px-6 py-4"><div class="h-4 bg-gray-100 rounded w-24"></div></td>
+              <td class="px-6 py-4"><div class="h-4 bg-gray-100 rounded w-16"></div></td>
+              <td class="px-6 py-4"><div class="h-4 bg-gray-100 rounded w-8 ml-auto"></div></td>
+            </tr>
+            <tr v-else-if="filteredPromos.length === 0">
+              <td colspan="6" class="px-6 py-12 text-center">
+                <div class="flex flex-col items-center justify-center text-gray-400">
+                  <Tag class="w-12 h-12 mb-3 opacity-20" />
+                  <p class="text-sm font-medium text-gray-900">No promo codes found</p>
+                  <p class="text-xs">Create a new promo code to get started.</p>
+                </div>
+              </td>
+            </tr>
+            <tr v-else v-for="promo in filteredPromos" :key="promo._id" class="hover:bg-gray-50/50 transition-colors">
+              <td class="px-6 py-4">
+                <div class="flex flex-col">
+                  <span class="text-sm font-bold text-gray-900 font-mono tracking-tight">{{ promo.code }}</span>
+                  <span v-if="promo.onlyForNewUsers" class="text-[10px] font-bold text-amber-600">New Users Only</span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex flex-col">
+                  <span class="text-sm font-semibold text-gray-900">
+                    {{ promo.discountType === 'percentage' ? promo.value + '%' : '₦' + promo.value.toLocaleString() }}
+                  </span>
+                  <span v-if="promo.maxDiscountAmount" class="text-[10px] text-gray-500">Up to ₦{{ promo.maxDiscountAmount.toLocaleString() }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <div class="w-full bg-gray-100 rounded-full h-1.5 max-w-[60px]">
+                    <div class="bg-parentPrimary h-1.5 rounded-full" :style="{ width: getUsagePercentage(promo) + '%' }"></div>
+                  </div>
+                  <span class="text-xs font-medium text-gray-600">
+                    {{ promo.usageCount }}{{ promo.maxUsageCount ? '/' + promo.maxUsageCount : '' }}
+                  </span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex flex-col gap-1">
+                  <span v-if="promo.minOrderAmount" class="text-[10px] font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md inline-block w-max">
+                    Min: ₦{{ promo.minOrderAmount.toLocaleString() }}
+                  </span>
+                  <span v-if="promo.expiresAt" class="text-[10px] font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md inline-block w-max" :class="{'text-rose-600 bg-rose-50': isExpired(promo.expiresAt)}">
+                    Exp: {{ new Date(promo.expiresAt).toLocaleDateString() }}
+                  </span>
+                  <span v-if="!promo.minOrderAmount && !promo.expiresAt" class="text-xs text-gray-400">No limits</span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <button 
+                  @click="toggleStatus(promo)"
+                  class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+                  :class="promo.isActive ? 'bg-emerald-500' : 'bg-gray-200'"
+                >
+                  <span 
+                    class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                    :class="promo.isActive ? 'translate-x-4' : 'translate-x-0'"
+                  />
+                </button>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <button @click="copyCode(promo.code)" class="p-1.5 text-gray-400 hover:text-parentPrimary hover:bg-parentPrimary/10 rounded-lg transition-colors">
+                  <Copy class="w-4 h-4" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Create Promo Modal -->
+    <UiSideDrawer :is-open="isModalOpen" @close="closeModal" size="default">
+      <div class="space-y-6">
+        <div>
+          <h2 class="text-lg font-bold text-gray-900">Create Promo Code</h2>
+          <p class="text-xs text-gray-500">Configure robust discounts and restrictions.</p>
+        </div>
+
+        <form @submit.prevent="submitForm" class="space-y-5">
+          <!-- Code -->
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Promo Code *</label>
+            <input v-model="form.code" type="text" required placeholder="e.g. SUMMER50" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-sm font-mono uppercase focus:outline-none focus:border-parentPrimary focus:ring-1 focus:ring-parentPrimary">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Type -->
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Discount Type *</label>
+              <select v-model="form.discountType" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-sm focus:outline-none focus:border-parentPrimary focus:ring-1 focus:ring-parentPrimary">
+                <option value="percentage">Percentage (%)</option>
+                <option value="flat">Flat Amount (₦)</option>
+              </select>
+            </div>
+            
+            <!-- Value -->
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Value *</label>
+              <input v-model.number="form.value" type="number" required min="1" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-sm focus:outline-none focus:border-parentPrimary focus:ring-1 focus:ring-parentPrimary">
+            </div>
+          </div>
+
+          <!-- Max Discount (Percentage Only) -->
+          <div v-if="form.discountType === 'percentage'">
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Max Discount Cap (₦)</label>
+            <input v-model.number="form.maxDiscountAmount" type="number" min="0" placeholder="e.g. 1000 (0 for no limit)" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-sm focus:outline-none focus:border-parentPrimary focus:ring-1 focus:ring-parentPrimary">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Min Order -->
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Min Order Amount (₦)</label>
+              <input v-model.number="form.minOrderAmount" type="number" min="0" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-sm focus:outline-none focus:border-parentPrimary focus:ring-1 focus:ring-parentPrimary">
+            </div>
+            
+            <!-- Max Usage -->
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Max Global Usage</label>
+              <input v-model.number="form.maxUsageCount" type="number" min="0" placeholder="e.g. 100" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-sm focus:outline-none focus:border-parentPrimary focus:ring-1 focus:ring-parentPrimary">
+            </div>
+          </div>
+
+          <!-- Expiry -->
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Expiry Date</label>
+            <input v-model="form.expiresAt" type="datetime-local" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-sm focus:outline-none focus:border-parentPrimary focus:ring-1 focus:ring-parentPrimary">
+          </div>
+
+          <div class="border-t border-gray-100 pt-4 mt-4 space-y-4">
+            <h3 class="text-sm font-bold text-gray-900">Advanced Restrictions</h3>
+            
+            <!-- Only for New Users -->
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input v-model="form.onlyForNewUsers" type="checkbox" class="w-4 h-4 text-parentPrimary rounded border-gray-300 focus:ring-parentPrimary">
+              <div class="flex flex-col">
+                <span class="text-sm font-semibold text-gray-900">New Users Only</span>
+                <span class="text-xs text-gray-500">Only applies to users who have never completed an order.</span>
+              </div>
+            </label>
+
+            <!-- Vendor Restrictions -->
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Restrict to Vendors (Object IDs)</label>
+              <textarea v-model="form.applicableVendors" rows="2" placeholder="Comma separated vendor IDs. Leave empty for all." class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-sm font-mono focus:outline-none focus:border-parentPrimary focus:ring-1 focus:ring-parentPrimary"></textarea>
+            </div>
+
+            <!-- User Restrictions -->
+            <div>
+              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Restrict to Users (Object IDs)</label>
+              <textarea v-model="form.applicableUsers" rows="2" placeholder="Comma separated user IDs. Leave empty for all." class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-sm font-mono focus:outline-none focus:border-parentPrimary focus:ring-1 focus:ring-parentPrimary"></textarea>
+            </div>
+          </div>
+
+          <div class="pt-6">
+            <button 
+              type="submit" 
+              :disabled="isSubmitting"
+              class="w-full flex justify-center items-center gap-2 bg-gray-900 text-white py-3 px-4 rounded-xl text-sm font-bold hover:bg-gray-800 transition-colors disabled:opacity-70 disabled:cursor-not-allowed shadow-md"
+            >
+              <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin" />
+              <span>{{ isSubmitting ? 'Creating...' : 'Create Promo Code' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </UiSideDrawer>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { Search, Plus, Tag, Loader2, Copy } from 'lucide-vue-next'
+import { api } from '@/composables/core/useApi'
+import { useCustomToast } from '@/composables/core/useCustomToast'
+
+definePageMeta({
+  layout: 'admin'
+})
+
+const { showToast } = useCustomToast()
+const promos = ref<any[]>([])
+const loading = ref(true)
+const searchQuery = ref('')
+const isModalOpen = ref(false)
+const isSubmitting = ref(false)
+
+const form = ref({
+  code: '',
+  discountType: 'percentage',
+  value: 10,
+  minOrderAmount: 0,
+  maxDiscountAmount: 0,
+  maxUsageCount: 0,
+  expiresAt: '',
+  onlyForNewUsers: false,
+  applicableVendors: '',
+  applicableUsers: ''
+})
+
+const fetchPromos = async () => {
+  loading.value = true
+  try {
+    const { data } = await api.get('/promo-codes')
+    promos.value = data
+  } catch (e: any) {
+    showToast({ title: 'Error', message: e.message || 'Failed to fetch promo codes', toastType: 'error' })
+  } finally {
+    loading.value = false
+  }
+}
+
+const filteredPromos = computed(() => {
+  if (!searchQuery.value) return promos.value
+  const query = searchQuery.value.toLowerCase()
+  return promos.value.filter(p => p.code.toLowerCase().includes(query))
+})
+
+const getUsagePercentage = (promo: any) => {
+  if (!promo.maxUsageCount) return 0
+  return Math.min(100, Math.round((promo.usageCount / promo.maxUsageCount) * 100))
+}
+
+const isExpired = (dateString: string) => {
+  return new Date(dateString) < new Date()
+}
+
+const openModal = () => {
+  form.value = {
+    code: '',
+    discountType: 'percentage',
+    value: 10,
+    minOrderAmount: 0,
+    maxDiscountAmount: 0,
+    maxUsageCount: 0,
+    expiresAt: '',
+    onlyForNewUsers: false,
+    applicableVendors: '',
+    applicableUsers: ''
+  }
+  isModalOpen.value = true
+}
+
+const closeModal = () => {
+  isModalOpen.value = false
+}
+
+const copyCode = (code: string) => {
+  navigator.clipboard.writeText(code)
+  showToast({ title: 'Copied', message: 'Promo code copied to clipboard', toastType: 'success' })
+}
+
+const toggleStatus = async (promo: any) => {
+  try {
+    const { data } = await api.put(`/promo-codes/${promo._id}/toggle`)
+    promo.isActive = data.isActive
+    showToast({ title: 'Success', message: `Promo code ${promo.isActive ? 'activated' : 'deactivated'}`, toastType: 'success' })
+  } catch (e: any) {
+    showToast({ title: 'Error', message: 'Failed to toggle status', toastType: 'error' })
+  }
+}
+
+const submitForm = async () => {
+  isSubmitting.value = true
+  try {
+    const payload = {
+      ...form.value,
+      applicableVendors: form.value.applicableVendors.split(',').map(s => s.trim()).filter(s => s),
+      applicableUsers: form.value.applicableUsers.split(',').map(s => s.trim()).filter(s => s),
+      // Set to undefined if 0 or empty so schema defaults/optionals work correctly
+      maxDiscountAmount: form.value.maxDiscountAmount || undefined,
+      minOrderAmount: form.value.minOrderAmount || undefined,
+      maxUsageCount: form.value.maxUsageCount || undefined,
+      expiresAt: form.value.expiresAt ? new Date(form.value.expiresAt) : undefined
+    }
+    
+    await api.post('/promo-codes', payload)
+    showToast({ title: 'Created', message: 'Promo code created successfully', toastType: 'success' })
+    closeModal()
+    fetchPromos()
+  } catch (e: any) {
+    showToast({ title: 'Error', message: e.response?.data?.message || 'Failed to create promo code', toastType: 'error' })
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+onMounted(() => {
+  fetchPromos()
+})
+</script>
