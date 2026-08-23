@@ -161,7 +161,19 @@
 
           <!-- Runner Commission (Custom) -->
           <div class="space-y-2">
-            <div class="flex items-center gap-2">
+            <div class="col-span-2 md:col-span-1">
+              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">min custom errand fee (₦)</label>
+              <div class="mt-1.5 relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">₦</span>
+                <input 
+                  type="number" 
+                  v-model.number="form.minCustomErrandFee"
+                  class="w-full bg-white border border-gray-100 rounded-xl py-2 pl-8 pr-3 text-sm font-medium text-gray-900 focus:outline-none focus:border-[#FF5C1A] focus:ring-1 focus:ring-[#FF5C1A] transition-colors"
+                >
+              </div>
+            </div>
+
+            <div class="col-span-2 md:col-span-1">
               <label class="text-xs font-medium text-gray-400 ml-1 lowercase">custom errand commission (%)</label>
               <button @click="showInfo('customCommission')" class="w-4 h-4 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-[#FF5C1A]/10 hover:text-[#FF5C1A] transition-colors">
                 <Info class="w-3 h-3" />
@@ -692,6 +704,7 @@ const form = reactive({
   convenienceFee: 50,
   commissionFlatFee: 50,
   customErrandCommissionPercentage: 20,
+  minCustomErrandFee: 400,
   platformProcessingFee: 500,
   platformServiceFeePercentage: 5,
   foodMarkupPercentage: 5,
@@ -746,6 +759,7 @@ const confirmSave = (type: string) => {
     if (form.convenienceFee !== originalForm.convenienceFee) confirmModal.changes.push(`convenience fee: <strong>₦${originalForm.convenienceFee}</strong> → <strong>₦${form.convenienceFee}</strong>`);
     if (form.commissionFlatFee !== originalForm.commissionFlatFee) confirmModal.changes.push(`runner commission (food): <strong>₦${originalForm.commissionFlatFee}</strong> → <strong>₦${form.commissionFlatFee}</strong>`);
     if (form.customErrandCommissionPercentage !== originalForm.customErrandCommissionPercentage) confirmModal.changes.push(`runner commission (custom): <strong>${originalForm.customErrandCommissionPercentage}%</strong> → <strong>${form.customErrandCommissionPercentage}%</strong>`);
+    if (form.minCustomErrandFee !== originalForm.minCustomErrandFee) confirmModal.changes.push(`min custom errand fee: <strong>₦${originalForm.minCustomErrandFee}</strong> → <strong>₦${form.minCustomErrandFee}</strong>`);
     if (form.platformProcessingFee !== originalForm.platformProcessingFee) confirmModal.changes.push(`processing fee: <strong>₦${originalForm.platformProcessingFee}</strong> → <strong>₦${form.platformProcessingFee}</strong>`);
     if (form.platformServiceFeePercentage !== originalForm.platformServiceFeePercentage) confirmModal.changes.push(`service fee: <strong>${originalForm.platformServiceFeePercentage}%</strong> → <strong>${form.platformServiceFeePercentage}%</strong>`);
     if (form.foodMarkupPercentage !== originalForm.foodMarkupPercentage) confirmModal.changes.push(`food markup: <strong>${originalForm.foodMarkupPercentage}%</strong> → <strong>${form.foodMarkupPercentage}%</strong>`);
@@ -795,16 +809,19 @@ const loadSettings = async () => {
     ]);
     
     if (errandRes.data) {
-      form.baseFee = errandRes.data.baseFee || 450;
-      form.expressFee = errandRes.data.expressFee || 850;
-      form.roomDeliveryFee = errandRes.data.roomDeliveryFee || 350;
-      form.dropoffServiceFee = errandRes.data.dropoffServiceFee || 300;
-      form.platformFee = errandRes.data.platformFee || 50;
-      form.convenienceFee = errandRes.data.convenienceFee ?? 50;
-      form.commissionFlatFee = errandRes.data.commissionFlatFee ?? 50;
-      form.platformProcessingFee = errandRes.data.platformProcessingFee ?? 500;
-      form.platformServiceFeePercentage = errandRes.data.platformServiceFeePercentage ?? 5;
-      form.foodMarkupPercentage = errandRes.data.foodMarkupPercentage ?? 5;
+      const errandSettings = errandRes.data;
+      form.baseFee = errandSettings.baseFee || 450;
+      form.expressFee = errandSettings.expressFee || 850;
+      form.roomDeliveryFee = errandSettings.roomDeliveryFee || 350;
+      form.dropoffServiceFee = errandSettings.dropoffServiceFee || 300;
+      form.platformFee = errandSettings.platformFee || 50;
+      form.convenienceFee = errandSettings.convenienceFee ?? 50;
+      form.commissionFlatFee = errandSettings.commissionFlatFee ?? 50;
+      form.customErrandCommissionPercentage = Number(errandSettings.customErrandCommissionPercentage) || 20;
+      form.minCustomErrandFee = Number(errandSettings.minCustomErrandFee) || 400;
+      form.platformProcessingFee = Number(errandSettings.platformProcessingFee) || 500;
+      form.platformServiceFeePercentage = errandSettings.platformServiceFeePercentage ?? 5;
+      form.foodMarkupPercentage = errandSettings.foodMarkupPercentage ?? 5;
       // Snapshot the originals for change detection
       Object.assign(originalForm, { ...form });
     }
@@ -850,6 +867,7 @@ const saveSettings = async () => {
       convenienceFee: Number(form.convenienceFee),
       commissionFlatFee: Number(form.commissionFlatFee),
       customErrandCommissionPercentage: Number(form.customErrandCommissionPercentage),
+      minCustomErrandFee: Number(form.minCustomErrandFee),
       platformProcessingFee: Number(form.platformProcessingFee),
       platformServiceFeePercentage: Number(form.platformServiceFeePercentage),
       foodMarkupPercentage: Number(form.foodMarkupPercentage),
