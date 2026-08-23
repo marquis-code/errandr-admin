@@ -87,7 +87,22 @@
                   <span v-if="promo.expiresAt" class="text-[10px] font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md inline-block w-max" :class="{'text-rose-600 bg-rose-50': isExpired(promo.expiresAt)}">
                     Exp: {{ new Date(promo.expiresAt).toLocaleDateString() }}
                   </span>
-                  <span v-if="!promo.minOrderAmount && !promo.expiresAt" class="text-xs text-gray-400">No limits</span>
+                  
+                  <span v-if="promo.appliesToDeliveryFeeOnly" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md inline-block w-max">
+                    Delivery Fee Only
+                  </span>
+                  
+                  <span v-if="promo.applicableOrderTypes?.length" class="text-[10px] font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md inline-block w-max">
+                    {{ promo.applicableOrderTypes.length }} Order Type(s)
+                  </span>
+                  <span v-if="promo.applicableVendors?.length" class="text-[10px] font-medium text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md inline-block w-max">
+                    {{ promo.applicableVendors.length }} Vendor(s)
+                  </span>
+                  <span v-if="promo.applicableUsers?.length" class="text-[10px] font-medium text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md inline-block w-max">
+                    {{ promo.applicableUsers.length }} User(s)
+                  </span>
+
+                  <span v-if="!promo.minOrderAmount && !promo.expiresAt && !promo.appliesToDeliveryFeeOnly && !promo.applicableOrderTypes?.length && !promo.applicableVendors?.length && !promo.applicableUsers?.length" class="text-xs text-gray-400">No limits</span>
                 </div>
               </td>
               <td class="px-6 py-4">
@@ -174,9 +189,9 @@
           <div class="border-t border-gray-100 pt-4 mt-4 space-y-4">
             <h3 class="text-sm font-bold text-gray-900">Advanced Restrictions</h3>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            <div class="flex flex-col gap-4 mt-6">
               <!-- Order Type Restrictions -->
-              <div class="col-span-1 md:col-span-2">
+              <div>
                 <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Applicable Order Types</label>
                 <div class="flex flex-wrap gap-4 bg-gray-50 p-3 rounded-xl border border-gray-200">
                   <label class="flex items-center gap-2 cursor-pointer">
