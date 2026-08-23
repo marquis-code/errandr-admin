@@ -174,37 +174,62 @@
           <div class="border-t border-gray-100 pt-4 mt-4 space-y-4">
             <h3 class="text-sm font-bold text-gray-900">Advanced Restrictions</h3>
             
-            <!-- Only for New Users -->
-            <label class="flex items-center gap-3 cursor-pointer">
-              <input v-model="form.onlyForNewUsers" type="checkbox" class="w-4 h-4 text-parentPrimary rounded border-gray-300 focus:ring-parentPrimary">
-              <div class="flex flex-col">
-                <span class="text-sm font-semibold text-gray-900">New Users Only</span>
-                <span class="text-xs text-gray-500">Only applies to users who have never completed an order.</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+              <!-- Order Type Restrictions -->
+              <div class="col-span-1 md:col-span-2">
+                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Applicable Order Types</label>
+                <div class="flex flex-wrap gap-4 bg-gray-50 p-3 rounded-xl border border-gray-200">
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" value="inside_campus" v-model="form.applicableOrderTypes" class="w-4 h-4 text-parentPrimary rounded border-gray-300">
+                    <span class="text-sm text-gray-700">Inside Campus</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" value="outside_campus" v-model="form.applicableOrderTypes" class="w-4 h-4 text-parentPrimary rounded border-gray-300">
+                    <span class="text-sm text-gray-700">Outside Campus</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" value="custom_errand" v-model="form.applicableOrderTypes" class="w-4 h-4 text-parentPrimary rounded border-gray-300">
+                    <span class="text-sm text-gray-700">Custom Errand</span>
+                  </label>
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" value="group_order" v-model="form.applicableOrderTypes" class="w-4 h-4 text-parentPrimary rounded border-gray-300">
+                    <span class="text-sm text-gray-700">Group Order</span>
+                  </label>
+                </div>
+                <p class="text-[10px] text-gray-500 mt-1">Leave all unchecked to apply to any order type.</p>
               </div>
-            </label>
 
-            <!-- Vendor Restrictions -->
-            <div>
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Restrict to Vendors</label>
-              <div class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-sm focus:outline-none focus:border-parentPrimary h-32 overflow-y-auto">
-                <label v-for="vendor in vendors" :key="vendor._id" class="flex items-center gap-2 p-1.5 hover:bg-gray-100 cursor-pointer rounded">
-                  <input type="checkbox" :value="vendor._id" v-model="form.applicableVendors" class="w-4 h-4 text-parentPrimary rounded border-gray-300 focus:ring-parentPrimary">
-                  <span class="text-xs text-gray-700 font-medium">{{ vendor.storeName || vendor.businessName || vendor.name || 'Unnamed Vendor' }}</span>
-                </label>
-                <div v-if="!vendors.length" class="text-xs text-gray-400 p-2 italic">Loading vendors...</div>
+              <!-- Vendor Restrictions -->
+              <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Restrict to Vendors</label>
+                <SearchableMultiSelect 
+                  v-model="form.applicableVendors"
+                  :options="vendorOptions"
+                  placeholder="Search vendors..."
+                />
+              </div>
+
+              <!-- User Restrictions -->
+              <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Restrict to Users</label>
+                <SearchableMultiSelect 
+                  v-model="form.applicableUsers"
+                  :options="userOptions"
+                  placeholder="Search users..."
+                />
               </div>
             </div>
 
-            <!-- User Restrictions -->
-            <div>
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Restrict to Users</label>
-              <div class="w-full bg-gray-50 border border-gray-200 rounded-xl py-2 px-3 text-sm focus:outline-none focus:border-parentPrimary h-32 overflow-y-auto">
-                <label v-for="user in users" :key="user._id" class="flex items-center gap-2 p-1.5 hover:bg-gray-100 cursor-pointer rounded">
-                  <input type="checkbox" :value="user._id" v-model="form.applicableUsers" class="w-4 h-4 text-parentPrimary rounded border-gray-300 focus:ring-parentPrimary">
-                  <span class="text-xs text-gray-700 font-medium">{{ user.fname ? user.fname + ' ' + (user.lname || '') : user.email }}</span>
-                </label>
-                <div v-if="!users.length" class="text-xs text-gray-400 p-2 italic">Loading users...</div>
-              </div>
+            <div class="mt-6 flex flex-col gap-3">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" v-model="form.onlyForNewUsers" class="w-4 h-4 text-parentPrimary rounded border-gray-300 focus:ring-parentPrimary">
+                <span class="text-sm text-gray-700 font-medium">Only for New Users (0 completed orders)</span>
+              </label>
+
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" v-model="form.appliesToDeliveryFeeOnly" class="w-4 h-4 text-parentPrimary rounded border-gray-300 focus:ring-parentPrimary">
+                <span class="text-sm text-gray-700 font-medium">Apply Discount to Delivery Fee Only</span>
+              </label>
             </div>
           </div>
 
@@ -229,6 +254,7 @@ import { ref, computed, onMounted } from 'vue'
 import { Search, Plus, Tag, Loader2, Copy } from 'lucide-vue-next'
 import { useCustomToast } from '@/composables/core/useCustomToast'
 import { usePromos } from '@/composables/modules/promos/usePromos'
+import SearchableMultiSelect from '@/components/ui/SearchableMultiSelect.vue'
 
 definePageMeta({
   layout: 'admin'
@@ -249,8 +275,26 @@ const form = ref({
   maxUsageCount: 0,
   expiresAt: '',
   onlyForNewUsers: false,
+  appliesToDeliveryFeeOnly: false,
   applicableVendors: [] as string[],
-  applicableUsers: [] as string[]
+  applicableUsers: [] as string[],
+  applicableOrderTypes: [] as string[]
+})
+
+const vendorOptions = computed(() => {
+  return vendors.value.map(v => ({
+    label: v.storeName || v.businessName || v.name || 'Unnamed Vendor',
+    value: v._id,
+    sublabel: v.email || ''
+  }))
+})
+
+const userOptions = computed(() => {
+  return users.value.map(u => ({
+    label: u.fname ? u.fname + ' ' + (u.lname || '') : u.email,
+    value: u._id,
+    sublabel: u.phone || u.email || ''
+  }))
 })
 
 const filteredPromos = computed(() => {
@@ -278,8 +322,10 @@ const openModal = () => {
     maxUsageCount: 0,
     expiresAt: '',
     onlyForNewUsers: false,
+    appliesToDeliveryFeeOnly: false,
     applicableVendors: [],
-    applicableUsers: []
+    applicableUsers: [],
+    applicableOrderTypes: []
   }
   isModalOpen.value = true
 }
@@ -303,6 +349,8 @@ const submitForm = async () => {
     // Arrays are already populated nicely by checkboxes
     applicableVendors: form.value.applicableVendors,
     applicableUsers: form.value.applicableUsers,
+    applicableOrderTypes: form.value.applicableOrderTypes,
+    appliesToDeliveryFeeOnly: form.value.appliesToDeliveryFeeOnly,
     // Set to undefined if 0 or empty so schema defaults/optionals work correctly
     maxDiscountAmount: form.value.maxDiscountAmount || undefined,
     minOrderAmount: form.value.minOrderAmount || undefined,
