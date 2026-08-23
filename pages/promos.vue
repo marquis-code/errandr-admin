@@ -215,19 +215,18 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { Search, Plus, Tag, Loader2, Copy } from 'lucide-vue-next'
-import { api } from '@/composables/core/useApi'
 import { useCustomToast } from '@/composables/core/useCustomToast'
+import { usePromos } from '@/composables/modules/promos/usePromos'
 
 definePageMeta({
   layout: 'admin'
 })
 
 const { showToast } = useCustomToast()
-const promos = ref<any[]>([])
-const loading = ref(true)
+const { promos, loading, isSubmitting, fetchPromos, createPromo, toggleStatus: _toggleStatus } = usePromos()
+
 const searchQuery = ref('')
 const isModalOpen = ref(false)
-const isSubmitting = ref(false)
 
 const form = ref({
   code: '',
@@ -241,18 +240,6 @@ const form = ref({
   applicableVendors: '',
   applicableUsers: ''
 })
-
-const fetchPromos = async () => {
-  loading.value = true
-  try {
-    const { data } = await api.get('/promo-codes')
-    promos.value = data
-  } catch (e: any) {
-    showToast({ title: 'Error', message: e.message || 'Failed to fetch promo codes', toastType: 'error' })
-  } finally {
-    loading.value = false
-  }
-}
 
 const filteredPromos = computed(() => {
   if (!searchQuery.value) return promos.value
@@ -295,37 +282,25 @@ const copyCode = (code: string) => {
 }
 
 const toggleStatus = async (promo: any) => {
-  try {
-    const { data } = await api.put(`/promo-codes/${promo._id}/toggle`)
-    promo.isActive = data.isActive
-    showToast({ title: 'Success', message: `Promo code ${promo.isActive ? 'activated' : 'deactivated'}`, toastType: 'success' })
-  } catch (e: any) {
-    showToast({ title: 'Error', message: 'Failed to toggle status', toastType: 'error' })
-  }
+  await _toggleStatus(promo)
 }
 
 const submitForm = async () => {
-  isSubmitting.value = true
-  try {
-    const payload = {
-      ...form.value,
-      applicableVendors: form.value.applicableVendors.split(',').map(s => s.trim()).filter(s => s),
-      applicableUsers: form.value.applicableUsers.split(',').map(s => s.trim()).filter(s => s),
-      // Set to undefined if 0 or empty so schema defaults/optionals work correctly
-      maxDiscountAmount: form.value.maxDiscountAmount || undefined,
-      minOrderAmount: form.value.minOrderAmount || undefined,
-      maxUsageCount: form.value.maxUsageCount || undefined,
-      expiresAt: form.value.expiresAt ? new Date(form.value.expiresAt) : undefined
-    }
-    
-    await api.post('/promo-codes', payload)
-    showToast({ title: 'Created', message: 'Promo code created successfully', toastType: 'success' })
+  const payload = {
+    ...form.value,
+    applicableVendors: form.value.applicableVendors.split(',').map(s => s.trim()).filter(s => s),
+    applicableUsers: form.value.applicableUsers.split(',').map(s => s.trim()).filter(s => s),
+    // Set to undefined if 0 or empty so schema defaults/optionals work correctly
+    maxDiscountAmount: form.value.maxDiscountAmount || undefined,
+    minOrderAmount: form.value.minOrderAmount || undefined,
+    maxUsageCount: form.value.maxUsageCount || undefined,
+    expiresAt: form.value.expiresAt ? new Date(form.value.expiresAt) : undefined
+  }
+  
+  const success = await createPromo(payload)
+  if (success) {
     closeModal()
     fetchPromos()
-  } catch (e: any) {
-    showToast({ title: 'Error', message: e.response?.data?.message || 'Failed to create promo code', toastType: 'error' })
-  } finally {
-    isSubmitting.value = false
   }
 }
 
