@@ -175,6 +175,13 @@
                     >
                       <Wallet class="w-4 h-4" />
                     </button>
+                    <button 
+                      @click.stop="openDebitModal(user)" 
+                      class="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-colors"
+                      title="Manual Payout / Deduct"
+                    >
+                      <Wallet class="w-4 h-4" />
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -497,6 +504,65 @@
         </div>
       </div>
     </div>
+    <!-- Debit Modal -->
+    <div v-if="debitModal.isOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+      <div class="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden" @click.stop>
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+          <h3 class="text-xl font-bold text-gray-900">Manual Payout / Deduct</h3>
+          <button @click="debitModal.isOpen = false" class="p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-colors">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+        <div class="p-6 space-y-4">
+          <div class="p-3 bg-red-50 text-red-600 rounded-xl text-sm font-medium mb-2">
+            Use this to manually deduct funds if you've paid out the user directly outside of the system. An email will be sent to the user notifying them of this deduction.
+          </div>
+          <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl mb-2">
+            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold shrink-0">
+              {{ debitModal.user?.firstName?.[0] || 'U' }}
+            </div>
+            <div>
+              <p class="text-sm font-bold text-gray-900">{{ debitModal.user?.firstName }} {{ debitModal.user?.lastName }}</p>
+              <p class="text-xs text-gray-500">{{ debitModal.user?.email }}</p>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Amount to Deduct (₦)</label>
+            <input 
+              v-model.number="debitModal.amount"
+              type="number" 
+              placeholder="e.g. 500" 
+              class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-base font-medium focus:outline-none focus:ring-2 focus:ring-[#FF5C1A] focus:border-transparent transition-all"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Description / Note</label>
+            <textarea 
+              v-model="debitModal.description"
+              placeholder="e.g. Paid cash to user" 
+              class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#FF5C1A] focus:border-transparent transition-all resize-none"
+              rows="2"
+            ></textarea>
+          </div>
+        </div>
+        <div class="p-6 bg-gray-50 border-t border-gray-100 flex gap-3">
+          <button 
+            @click="debitModal.isOpen = false"
+            class="flex-1 py-3 px-4 rounded-xl font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </button>
+          <button 
+            @click="executeDebitUser"
+            :disabled="debitModal.loading || !debitModal.amount"
+            class="flex-1 py-3 px-4 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          >
+            <span v-if="debitModal.loading" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></span>
+            Process Debit
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -721,6 +787,47 @@ const executeFundUser = async () => {
     });
   } finally {
     fundModal.value.loading = false;
+  }
+};
+
+const debitModal = ref({
+  isOpen: false,
+  user: null as any,
+  amount: null as number | null,
+  description: '',
+  loading: false
+});
+
+const openDebitModal = (user: any) => {
+  debitModal.value = {
+    isOpen: true,
+    user,
+    amount: null,
+    description: '',
+    loading: false
+  };
+};
+
+const executeDebitUser = async () => {
+  if (!debitModal.value.amount || debitModal.value.amount <= 0) return;
+  debitModal.value.loading = true;
+  try {
+    await wallets_api.debitWalletByAdmin(
+      debitModal.value.user._id, 
+      debitModal.value.amount, 
+      debitModal.value.description
+    );
+    showToast({ title: 'Success', message: 'Wallet debited successfully', toastType: 'success' });
+    debitModal.value.isOpen = false;
+    await fetchUsers(); // Refresh stats and list
+  } catch (error: any) {
+    showToast({ 
+      title: 'Error', 
+      message: error?.response?.data?.message || 'Failed to debit wallet', 
+      toastType: 'error' 
+    });
+  } finally {
+    debitModal.value.loading = false;
   }
 };
 </script>
