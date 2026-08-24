@@ -191,7 +191,7 @@
                     <button @click.stop="activeDropdownId = null; selectedVendor = vendor; activeDrawerTab = 'transactions'" class="w-full text-left px-4 py-2 text-sm text-gray-900 hover:bg-gray-100 flex items-center gap-2 font-medium">
                       <Receipt class="w-4 h-4 text-emerald-500" /> View Transactions
                     </button>
-                    <button @click.stop="activeDropdownId = null; selectedVendor = vendor; showManualDebitModal = true" class="w-full text-left px-4 py-2 text-sm text-gray-900 hover:bg-gray-100 flex items-center gap-2 font-medium">
+                    <button @click.stop="activeDropdownId = null; vendorForPayout = vendor; showManualDebitModal = true" class="w-full text-left px-4 py-2 text-sm text-gray-900 hover:bg-gray-100 flex items-center gap-2 font-medium">
                       <DollarSign class="w-4 h-4 text-rose-500" /> Manual Payout
                     </button>
                     
@@ -635,7 +635,7 @@
       <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden">
         <div class="p-6 border-b border-gray-100 flex items-center justify-between">
           <h3 class="text-lg font-bold text-gray-900">Manual Payout / Deduct</h3>
-          <button @click="showManualDebitModal = false" class="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600">
+          <button @click="closeManualDebitModal" class="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600">
             <X class="w-5 h-5" />
           </button>
         </div>
@@ -701,6 +701,7 @@ const endDate = ref('');
 const activeDrawerTab = ref('overview');
 const activeDropdownId = ref<string | null>(null);
 
+const vendorForPayout = ref<any>(null);
 const showManualDebitModal = ref(false);
 const debitAmount = ref<number | null>(null);
 const debitReason = ref('');
@@ -713,8 +714,16 @@ const handleFileUpload = (e: any) => {
   }
 }
 
+const closeManualDebitModal = () => {
+  showManualDebitModal.value = false;
+  vendorForPayout.value = null;
+  debitAmount.value = null;
+  debitReason.value = '';
+  proofFile.value = null;
+}
+
 const submitManualDebit = async () => {
-  const ownerId = selectedVendor.value?.owner?._id || selectedVendor.value?.owner || selectedVendor.value?.user;
+  const ownerId = vendorForPayout.value?.owner?._id || vendorForPayout.value?.owner || vendorForPayout.value?.user;
   const finalId = typeof ownerId === 'object' ? ownerId._id : ownerId;
 
   if (!debitAmount.value || debitAmount.value <= 0) {
@@ -745,10 +754,7 @@ const submitManualDebit = async () => {
       proofOfTransaction: proofUrl
     });
     showToast({ title: "Success", message: 'Wallet debited successfully!', toastType: "success" });
-    showManualDebitModal.value = false;
-    debitAmount.value = null;
-    debitReason.value = '';
-    proofFile.value = null;
+    closeManualDebitModal();
   } catch (err: any) {
     console.error('Error debiting wallet', err);
     showToast({ title: "Error", message: err.response?.data?.message || 'Failed to debit wallet', toastType: "error" });
