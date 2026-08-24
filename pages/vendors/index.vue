@@ -191,6 +191,9 @@
                     <button @click.stop="activeDropdownId = null; selectedVendor = vendor; activeDrawerTab = 'transactions'" class="w-full text-left px-4 py-2 text-sm text-gray-900 hover:bg-gray-100 flex items-center gap-2 font-medium">
                       <Receipt class="w-4 h-4 text-emerald-500" /> View Transactions
                     </button>
+                    <button @click.stop="activeDropdownId = null; selectedVendor = vendor; showManualDebitModal = true" class="w-full text-left px-4 py-2 text-sm text-gray-900 hover:bg-gray-100 flex items-center gap-2 font-medium">
+                      <DollarSign class="w-4 h-4 text-rose-500" /> Manual Payout
+                    </button>
                     
                     <div class="h-px w-full bg-gray-100 my-1"></div>
                     
@@ -626,6 +629,41 @@
         </div>
       </template>
     </SideDrawer>
+    
+    <!-- Manual Debit Modal -->
+    <div v-if="showManualDebitModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden">
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+          <h3 class="text-lg font-bold text-gray-900">Manual Payout / Deduct</h3>
+          <button @click="showManualDebitModal = false" class="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+        <div class="p-6 space-y-4">
+          <p class="text-sm text-gray-600">Use this to manually deduct funds if you've paid out the vendor directly outside of the system.</p>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Amount (₦)</label>
+            <input v-model="debitAmount" type="number" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A]" placeholder="e.g. 5000">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Reason / Description</label>
+            <input v-model="debitReason" type="text" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A]" placeholder="e.g. Manual payout">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Proof of Transaction (Optional)</label>
+            <input type="file" @change="handleFileUpload" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#FF5C1A]/10 file:text-[#FF5C1A] hover:file:bg-[#FF5C1A]/20">
+          </div>
+          <button 
+            @click="submitManualDebit" 
+            :disabled="!debitAmount || isSubmittingDebit"
+            class="w-full py-3 bg-[#FF5C1A] text-white rounded-lg font-bold hover:bg-[#E54D12] transition-colors disabled:opacity-50 flex items-center justify-center"
+          >
+            <span v-if="isSubmittingDebit" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+            <span v-else>Process Debit</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -643,6 +681,7 @@ import SideDrawer from '@/components/ui/SideDrawer.vue';
 import DateRangePicker from '@/components/ui/DateRangePicker.vue';
 
 import { admin_api } from '@/api_factory/modules/admin';
+import { GATEWAY_ENDPOINT_WITH_AUTH } from '@/api_factory/axios.config';
 import { useCustomToast } from '@/composables/core/useCustomToast';
 
 definePageMeta({
@@ -661,6 +700,51 @@ const startDate = ref('');
 const endDate = ref('');
 const activeDrawerTab = ref('overview');
 const activeDropdownId = ref<string | null>(null);
+
+const showManualDebitModal = ref(false);
+const debitAmount = ref<number | null>(null);
+const debitReason = ref('');
+const isSubmittingDebit = ref(false);
+const proofFile = ref<File | null>(null);
+
+const handleFileUpload = (e: any) => {
+  if (e.target.files && e.target.files[0]) {
+    proofFile.value = e.target.files[0]
+  }
+}
+
+const submitManualDebit = async () => {
+  if (!debitAmount.value || debitAmount.value <= 0 || !selectedVendor.value?.owner?._id) return;
+  
+  isSubmittingDebit.value = true;
+  try {
+    let proofUrl = ''
+    if (proofFile.value) {
+      const formData = new FormData()
+      formData.append('file', proofFile.value)
+      const uploadRes = await GATEWAY_ENDPOINT_WITH_AUTH.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+      proofUrl = uploadRes.data?.url || uploadRes.data?.data?.url || ''
+    }
+
+    await GATEWAY_ENDPOINT_WITH_AUTH.post(`/wallets/admin/debit/${selectedVendor.value.owner._id}`, {
+      amount: debitAmount.value,
+      description: debitReason.value || 'Manual Payout / Adjustment',
+      proofOfTransaction: proofUrl
+    });
+    showToast({ title: "Success", message: 'Wallet debited successfully!', toastType: "success" });
+    showManualDebitModal.value = false;
+    debitAmount.value = null;
+    debitReason.value = '';
+    proofFile.value = null;
+  } catch (err: any) {
+    console.error('Error debiting wallet', err);
+    showToast({ title: "Error", message: err.response?.data?.message || 'Failed to debit wallet', toastType: "error" });
+  } finally {
+    isSubmittingDebit.value = false;
+  }
+}
 
 // Close dropdown when clicking outside
 const closeDropdown = () => {
