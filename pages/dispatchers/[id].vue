@@ -338,7 +338,7 @@ import TransactionsList from '@/components/TransactionsList.vue'
 
 const route = useRoute()
 const router = useRouter()
-const coreUi = useCoreUi()
+const { showToast } = useCustomToast()
 const profile = ref<any>(null)
 const loading = ref(true)
 const activeTab = ref('overview')
@@ -398,7 +398,7 @@ const submitManualDebit = async () => {
       description: debitReason.value || 'Manual Payout / Adjustment',
       proofOfTransaction: proofUrl
     });
-    coreUi.showToast('Wallet debited successfully!', 'success');
+    showToast({ title: 'Success', message: 'Wallet debited successfully!', toastType: 'success' });
     showManualDebitModal.value = false;
     debitAmount.value = null;
     debitReason.value = '';
@@ -406,7 +406,7 @@ const submitManualDebit = async () => {
     fetchProfile(); 
   } catch (err) {
     console.error('Error debiting wallet', err);
-    coreUi.showToast('Failed to debit wallet.', 'error');
+    showToast({ title: 'Error', message: 'Failed to debit wallet.', toastType: 'error' });
   } finally {
     isSubmittingDebit.value = false;
   }

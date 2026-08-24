@@ -158,11 +158,11 @@ const handleSave = async ({ id, data }: { id?: string, data: any }) => {
     } else {
       await api.post('/push-campaigns', data)
     }
-    useCoreUi().showToast('Campaign saved successfully!', 'success')
+    useCustomToast().showToast({ title: 'success', message: 'Campaign saved successfully!', toastType: 'success' })
     isModalOpen.value = false
     fetchCampaigns()
   } catch (err) {
-    useCoreUi().showToast('Failed to save campaign', 'error')
+    useCustomToast().showToast({ title: 'error', message: 'Failed to save campaign', toastType: 'error' })
   }
 }
 
@@ -204,19 +204,19 @@ const handleConfirmAction = async () => {
 const deleteCampaign = async (id: string) => {
   try {
     await api.delete(`/push-campaigns/${id}`)
-    useCoreUi().showToast('Campaign deleted successfully!', 'success')
+    useCustomToast().showToast({ title: 'success', message: 'Campaign deleted successfully!', toastType: 'success' })
     fetchCampaigns()
   } catch (err) {
-    useCoreUi().showToast('Failed to delete campaign', 'error')
+    useCustomToast().showToast({ title: 'error', message: 'Failed to delete campaign', toastType: 'error' })
   }
 }
 
 const triggerCampaign = async (id: string) => {
   try {
     await api.post(`/push-campaigns/${id}/trigger`)
-    useCoreUi().showToast('Campaign dispatched successfully!', 'success')
+    useCustomToast().showToast({ title: 'success', message: 'Campaign dispatched successfully!', toastType: 'success' })
   } catch (err) {
-    useCoreUi().showToast('Failed to trigger campaign', 'error')
+    useCustomToast().showToast({ title: 'error', message: 'Failed to trigger campaign', toastType: 'error' })
   }
 }
 
