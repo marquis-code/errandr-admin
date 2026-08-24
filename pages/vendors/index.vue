@@ -714,7 +714,18 @@ const handleFileUpload = (e: any) => {
 }
 
 const submitManualDebit = async () => {
-  if (!debitAmount.value || debitAmount.value <= 0 || !selectedVendor.value?.owner?._id) return;
+  const ownerId = selectedVendor.value?.owner?._id || selectedVendor.value?.owner || selectedVendor.value?.user;
+  const finalId = typeof ownerId === 'object' ? ownerId._id : ownerId;
+
+  if (!debitAmount.value || debitAmount.value <= 0) {
+    showToast({ title: 'Error', message: 'Please enter a valid amount', toastType: 'error' });
+    return;
+  }
+  
+  if (!finalId) {
+    showToast({ title: 'Error', message: 'Vendor owner information is missing', toastType: 'error' });
+    return;
+  }
   
   isSubmittingDebit.value = true;
   try {
@@ -728,7 +739,7 @@ const submitManualDebit = async () => {
       proofUrl = uploadRes.data?.url || uploadRes.data?.data?.url || ''
     }
 
-    await GATEWAY_ENDPOINT_WITH_AUTH.post(`/wallets/admin/debit/${selectedVendor.value.owner._id}`, {
+    await GATEWAY_ENDPOINT_WITH_AUTH.post(`/wallets/admin/debit/${finalId}`, {
       amount: debitAmount.value,
       description: debitReason.value || 'Manual Payout / Adjustment',
       proofOfTransaction: proofUrl
