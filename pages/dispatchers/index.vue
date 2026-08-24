@@ -70,7 +70,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
-            <tr v-for="errander in dispatchers" :key="errander._id" class="hover:bg-gray-50/50 transition-colors">
+            <tr v-for="errander in dispatchers" :key="errander._id" @click="$router.push(`/dispatchers/${errander._id}`)" class="hover:bg-gray-50/50 transition-colors cursor-pointer">
               <td class="px-6 py-4">
                 <div class="flex items-center gap-3">
                   <div class="w-10 h-10 bg-gray-100 rounded-full overflow-hidden shrink-0">
@@ -124,14 +124,14 @@
               <td class="px-6 py-4 text-right">
                 <div class="flex items-center justify-end gap-2">
                   <button 
-                    @click="openApproveModal(errander)" 
+                    @click.stop="openApproveModal(errander)" 
                     :disabled="processing === errander._id"
                     class="px-4 py-2 bg-[#FF5C1A]/10 text-[#FF5C1A] font-bold rounded-lg hover:bg-emerald-100 transition-colors disabled:opacity-50 text-sm"
                   >
                     Approve
                   </button>
                   <button 
-                    @click="openRejectModal(errander)" 
+                    @click.stop="openRejectModal(errander)" 
                     :disabled="processing === errander._id"
                     class="px-4 py-2 bg-red-50 text-red-600 font-bold rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50 text-sm"
                   >
@@ -270,7 +270,7 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-              <tr v-for="errander in filteredAllDispatchers" :key="errander._id" class="hover:bg-gray-50/50 transition-colors" :class="{'bg-red-50/20': selectedDispatchers.includes(errander._id)}">
+              <tr v-for="errander in filteredAllDispatchers" :key="errander._id" @click="$router.push(`/dispatchers/${errander._id}`)" class="hover:bg-gray-50/50 transition-colors cursor-pointer" :class="{'bg-red-50/20': selectedDispatchers.includes(errander._id)}">
                 <td class="px-6 py-4 text-center">
                   <input type="checkbox" v-model="selectedDispatchers" :value="errander._id" @click.stop class="rounded border-gray-300 text-red-600 focus:ring-red-500" />
                 </td>
