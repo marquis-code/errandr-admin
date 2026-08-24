@@ -269,9 +269,10 @@ const savePromo = async () => {
     await api.patch(`/vendors/admin/update/${props.vendorId}`, {
       prepaidPromo: promoForm.value
     });
+    useCoreUi().showToast('Promo settings updated successfully!', 'success');
   } catch (err) {
-    console.error('Failed to save promo', err);
-    alert('Failed to save promo settings');
+    console.error(err);
+    useCoreUi().showToast('Failed to save promo settings', 'error');
   }
 };
 
@@ -329,11 +330,12 @@ const saveChanges = async () => {
     }
     
     await api.patch(endpoint, payload);
+    useCoreUi().showToast('Settings updated successfully', 'success');
     isModalOpen.value = false;
     fetchMenuItems(); // refresh
   } catch (err) {
-    console.error('Failed to update', err);
-    alert('Failed to update settings');
+    console.error(err);
+    useCoreUi().showToast('Failed to update settings', 'error');
   } finally {
     saving.value = false;
   }

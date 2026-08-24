@@ -158,10 +158,11 @@ const handleSave = async ({ id, data }: { id?: string, data: any }) => {
     } else {
       await api.post('/push-campaigns', data)
     }
+    useCoreUi().showToast('Campaign saved successfully!', 'success')
     isModalOpen.value = false
     fetchCampaigns()
   } catch (err) {
-    alert('Failed to save campaign')
+    useCoreUi().showToast('Failed to save campaign', 'error')
   }
 }
 
@@ -203,18 +204,19 @@ const handleConfirmAction = async () => {
 const deleteCampaign = async (id: string) => {
   try {
     await api.delete(`/push-campaigns/${id}`)
+    useCoreUi().showToast('Campaign deleted successfully!', 'success')
     fetchCampaigns()
   } catch (err) {
-    alert('Failed to delete campaign')
+    useCoreUi().showToast('Failed to delete campaign', 'error')
   }
 }
 
 const triggerCampaign = async (id: string) => {
   try {
     await api.post(`/push-campaigns/${id}/trigger`)
-    alert('Campaign dispatched successfully!')
+    useCoreUi().showToast('Campaign dispatched successfully!', 'success')
   } catch (err) {
-    alert('Failed to trigger campaign')
+    useCoreUi().showToast('Failed to trigger campaign', 'error')
   }
 }
 

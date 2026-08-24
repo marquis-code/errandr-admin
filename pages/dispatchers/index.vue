@@ -324,12 +324,9 @@
                     
                     <!-- Dropdown Menu -->
                     <div v-if="activeDropdownId === errander._id" class="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
-                      <button @click.stop="activeDropdownId = null; openProfileDrawer(errander); activeDrawerTab = 'overview'" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                      <nuxt-link :to="`/dispatchers/${errander._id}`" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
                         <Eye class="w-4 h-4 text-gray-400" /> View Profile
-                      </button>
-                      <button @click.stop="activeDropdownId = null; openProfileDrawer(errander); enterEditMode()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                        <Edit class="w-4 h-4 text-gray-400" /> Edit Details
-                      </button>
+                      </nuxt-link>
                       
                       <div class="h-px w-full bg-gray-100 my-1"></div>
                       
@@ -636,15 +633,13 @@
             <div class="space-y-4">
               <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">Dispatcher Errands</h4>
               
-              <div v-if="!selectedProfile.batchOrders?.length" class="text-center py-8">
-                <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <FileText class="w-5 h-5 text-gray-400" />
-                </div>
-                <p class="text-sm font-bold text-gray-900">No errands found</p>
-                <p class="text-xs text-gray-500 mt-1">This dispatcher hasn't been assigned any errands yet.</p>
+              <div class="mt-8">
+                <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2 mb-4">Historical Errands</h4>
+                <TransactionsList :errander-id="selectedProfile.user?._id" />
               </div>
 
-              <div v-else class="space-y-3">
+              <div v-if="selectedProfile.batchOrders?.length" class="space-y-3 mt-6">
+                <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2 mb-4">Current Active Batch Orders</h4>
                 <div v-for="order in selectedProfile.batchOrders" :key="order._id || order" class="bg-gray-50 p-4 rounded-xl border border-gray-100/60 hover:border-[#FF5C1A]/30 transition-colors shadow-sm">
                   <div class="flex items-center justify-between mb-2">
                     <span class="font-mono text-xs font-bold text-gray-900">#{{ typeof order === 'string' ? order.slice(-6).toUpperCase() : (order._id?.slice(-6).toUpperCase() || 'UNKNOWN') }}</span>
@@ -771,7 +766,7 @@
 
 <script setup lang="ts">
 import { GATEWAY_ENDPOINT_WITH_AUTH as api } from '@/api_factory/axios.config';
-import { Bike, FileText, CheckCircle, XCircle, Search, User, MapPin, MoreHorizontal, Shield, Edit2, Star, Clock, AlertTriangle, AlertCircle, RefreshCw, Eye, Hash, Calendar, DollarSign, Image as ImageIcon } from 'lucide-vue-next';
+import { Bike, FileText, CheckCircle, XCircle, Search, User, MapPin, MoreHorizontal, Shield, Edit2, Star, Clock, AlertTriangle, AlertCircle, RefreshCw, Eye, Hash, Calendar, DollarSign, Image as ImageIcon, Receipt, Trash2, MoreVertical, Edit } from 'lucide-vue-next';
 import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 import SkeletonTable from '@/components/ui/SkeletonTable.vue';

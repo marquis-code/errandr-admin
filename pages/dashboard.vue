@@ -150,7 +150,7 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-50/50">
-                <tr v-for="activity in recentActivity" :key="activity.id" class="hover:bg-gray-50/30 transition-colors group">
+                <tr v-for="activity in recentActivity" :key="activity.id" @click="navigateTo(`/admin/orders?orderId=${activity.id}`)" class="hover:bg-gray-50/30 transition-colors group cursor-pointer">
                   <!-- Customer & Order -->
                   <td class="px-5 py-4">
                     <div class="flex items-start gap-3">
@@ -307,7 +307,7 @@ const recentOrders = ref<any[]>([])
 const fetchRecentOrders = async () => {
   ordersLoading.value = true
   try {
-    const res = await admin_api.getRecentOrders(5)
+    const res = await admin_api.getRecentOrders(1, 5)
     recentOrders.value = res.data.orders || res.data
   } catch (e) {
     console.error('Failed to fetch recent orders', e)

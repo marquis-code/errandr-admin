@@ -183,12 +183,22 @@
 
     <!-- Transaction Ledger -->
     <div class="bg-white rounded-xl border border-gray-100 overflow-hidden min-h-[400px] shadow-sm">
-      <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-        <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wide">Transactions</h3>
-        <button class="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-md text-xs font-semibold text-gray-600 border border-gray-100 hover:bg-gray-50 transition-colors shadow-sm">
-          <ListFilter class="w-3 h-3" />
-          Filter
-        </button>
+      <div class="border-b border-gray-100 bg-gray-50/50">
+        <div class="flex items-center justify-between p-4 pb-0 overflow-x-auto">
+          <div class="flex items-center gap-6">
+            <button @click="activeCategory = 'all'" :class="activeCategory === 'all' ? 'text-[#FF5C1A] border-b-2 border-[#FF5C1A] pb-4 font-bold' : 'text-gray-500 hover:text-gray-900 pb-4 font-semibold text-sm transition-colors'">All Transactions</button>
+            <button @click="activeCategory = 'deposits'" :class="activeCategory === 'deposits' ? 'text-[#FF5C1A] border-b-2 border-[#FF5C1A] pb-4 font-bold' : 'text-gray-500 hover:text-gray-900 pb-4 font-semibold text-sm transition-colors'">Deposits</button>
+            <button @click="activeCategory = 'withdrawals'" :class="activeCategory === 'withdrawals' ? 'text-[#FF5C1A] border-b-2 border-[#FF5C1A] pb-4 font-bold' : 'text-gray-500 hover:text-gray-900 pb-4 font-semibold text-sm transition-colors'">Withdrawals</button>
+            <button @click="activeCategory = 'payout_requests'" :class="activeCategory === 'payout_requests' ? 'text-rose-600 border-b-2 border-rose-600 pb-4 font-bold flex items-center gap-2' : 'text-gray-500 hover:text-gray-900 pb-4 font-semibold text-sm transition-colors flex items-center gap-2'">
+              Payout Requests
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+            </button>
+          </div>
+          <button class="mb-4 flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-md text-xs font-semibold text-gray-600 border border-gray-100 hover:bg-gray-50 transition-colors shadow-sm">
+            <ListFilter class="w-3 h-3" />
+            Filter
+          </button>
+        </div>
       </div>
 
       <div v-if="loading" class="p-5">
@@ -258,8 +268,9 @@
                 </div>
               </td>
               <td class="py-4 px-5 text-center">
-                <div class="flex justify-center">
+                <div class="flex flex-col items-center gap-1 justify-center">
                   <StatusBadge :status="tx.type" class="scale-90 origin-center" />
+                  <span v-if="tx.actionType === 'manual'" class="text-[9px] font-bold uppercase px-1.5 py-0.5 bg-purple-50 text-purple-600 rounded">Manual</span>
                 </div>
               </td>
               <td class="py-4 px-5 text-center">
@@ -275,7 +286,12 @@
                 </div>
               </td>
               <td class="py-4 px-5 max-w-[200px]">
-                <p class="text-[11px] font-semibold text-gray-700 truncate" :title="tx.description">{{ tx.description }}</p>
+                <div class="flex items-center gap-2">
+                  <p class="text-[11px] font-semibold text-gray-700 truncate" :title="tx.description">{{ tx.description }}</p>
+                  <a v-if="tx.proofOfTransaction" :href="tx.proofOfTransaction" target="_blank" @click.stop class="text-blue-500 hover:text-blue-700 bg-blue-50 p-1 rounded transition-colors shrink-0" title="View Receipt">
+                    <ExternalLink class="w-3.5 h-3.5" />
+                  </a>
+                </div>
               </td>
               <td class="py-4 px-5">
                 <p class="text-[11px] font-mono font-bold text-gray-600 truncate max-w-[120px] bg-gray-50 px-2 py-1 rounded">{{ tx.reference || (tx.order ? 'Order #' + tx.order.slice(-6) : 'N/A') }}</p>
@@ -394,6 +410,24 @@
                 <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wide block mb-0.5">Description</span>
                 <p class="text-xs font-semibold text-gray-800 leading-snug">{{ selectedTransaction.description }}</p>
               </div>
+
+              <div v-if="selectedTransaction.actionType" class="flex items-center justify-between p-3 border-t border-gray-50 hover:bg-gray-50/50 transition-colors">
+                <span class="text-[11px] font-semibold text-gray-500">Action Type</span>
+                <span class="text-[11px] font-bold text-gray-900 capitalize">{{ selectedTransaction.actionType }}</span>
+              </div>
+              
+              <div v-if="selectedTransaction.actionBy" class="flex items-center justify-between p-3 border-t border-gray-50 hover:bg-gray-50/50 transition-colors">
+                <span class="text-[11px] font-semibold text-gray-500">Action By (Admin ID)</span>
+                <span class="text-[11px] font-bold text-gray-900 font-mono">{{ selectedTransaction.actionBy }}</span>
+              </div>
+
+              <div v-if="selectedTransaction.proofOfTransaction" class="p-3 border-t border-gray-50 hover:bg-gray-50/50 transition-colors">
+                <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wide block mb-2">Proof of Transaction</span>
+                <a :href="selectedTransaction.proofOfTransaction" target="_blank" class="flex items-center justify-center gap-2 w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-bold transition-colors">
+                  <ExternalLink class="w-3.5 h-3.5" />
+                  View Receipt
+                </a>
+              </div>
             </div>
           </div>
 
@@ -448,7 +482,7 @@
           </div>
           
           <!-- Actions -->
-          <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-gray-100 z-20 flex flex-col gap-2">
+          <div class="sticky bottom-0 -mx-6 px-6 py-4 bg-white/95 backdrop-blur-md border-t border-gray-100 z-20 flex flex-col gap-2">
             <template v-if="selectedTransaction.type === 'debit' && selectedTransaction.status === 'pending'">
               <button 
                 @click="handleApprovePayout(selectedTransaction._id)" 
@@ -483,7 +517,7 @@
 
 <script setup lang="ts">
 import { useAdminFinances } from '@/composables/modules/admin';
-import { Download, Wallet, TrendingUp, TrendingDown, ArrowDownLeft, ArrowUpRight, ArrowUp, ArrowDown, Search, ListFilter, ChevronRight, ChevronLeft, Copy, FileText, Package, Star, Calendar, Sparkles, UserPlus } from 'lucide-vue-next';
+import { Download, Wallet, TrendingUp, TrendingDown, ArrowDownLeft, ArrowUpRight, ArrowUp, ArrowDown, Search, ListFilter, ChevronRight, ChevronLeft, Copy, FileText, Package, Star, Calendar, Sparkles, UserPlus, ExternalLink } from 'lucide-vue-next';
 import { onMounted, ref, computed } from 'vue';
 import SideDrawer from '@/components/ui/SideDrawer.vue';
 import EmptyState from '@/components/core/EmptyState.vue';
@@ -503,6 +537,7 @@ const searchQuery = ref('');
 const selectedTransaction = ref<any>(null);
 const startDate = ref('');
 const endDate = ref('');
+const activeCategory = ref('all');
 
 const handleApprovePayout = async (id: string) => {
   await approvePayout(id);
@@ -531,13 +566,23 @@ const sortKey = ref('');
 const sortOrder = ref<'asc' | 'desc'>('desc');
 
 const buildQuery = () => {
-  return {
+  const query: any = {
     search: searchQuery.value,
     startDate: startDate.value,
     endDate: endDate.value,
     sortBy: sortKey.value,
     sortOrder: sortOrder.value
   };
+
+  if (activeCategory.value === 'deposits') {
+    query.type = 'credit';
+  } else if (activeCategory.value === 'withdrawals') {
+    query.type = 'debit';
+  } else if (activeCategory.value === 'payout_requests') {
+    query.category = 'payout_requests';
+  }
+
+  return query;
 };
 
 const triggerExport = async () => {
@@ -553,7 +598,7 @@ const sortBy = (key: string) => {
   }
 };
 
-watch([searchQuery, startDate, endDate, sortKey, sortOrder], () => {
+watch([searchQuery, startDate, endDate, sortKey, sortOrder, activeCategory], () => {
   // Reset to page 1 on filter change
   fetchTransactions(1, 50, buildQuery());
 }, { deep: true });

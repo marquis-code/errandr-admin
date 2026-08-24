@@ -188,6 +188,9 @@
                     <button @click.stop="activeDropdownId = null; selectedVendor = vendor; activeDrawerTab = 'menu'" class="w-full text-left px-4 py-2 text-sm text-gray-900 hover:bg-gray-100 flex items-center gap-2 font-medium">
                       <LayoutList class="w-4 h-4 text-indigo-500" /> Manage Menu & Promos
                     </button>
+                    <button @click.stop="activeDropdownId = null; selectedVendor = vendor; activeDrawerTab = 'transactions'" class="w-full text-left px-4 py-2 text-sm text-gray-900 hover:bg-gray-100 flex items-center gap-2 font-medium">
+                      <Receipt class="w-4 h-4 text-emerald-500" /> View Transactions
+                    </button>
                     
                     <div class="h-px w-full bg-gray-100 my-1"></div>
                     
@@ -257,6 +260,7 @@
           <div class="flex space-x-2 mt-2 mb-4 w-5/6">
             <button @click="activeDrawerTab = 'overview'" :class="activeDrawerTab === 'overview' ? 'bg-[#FF5C1A] text-white' : 'bg-gray-100 text-gray-600'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors">Overview</button>
             <button @click="activeDrawerTab = 'menu'" :class="activeDrawerTab === 'menu' ? 'bg-[#FF5C1A] text-white' : 'bg-gray-100 text-gray-600'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors">Menu</button>
+            <button @click="activeDrawerTab = 'transactions'" :class="activeDrawerTab === 'transactions' ? 'bg-[#FF5C1A] text-white' : 'bg-gray-100 text-gray-600'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors">Transactions</button>
             <button @click="enterEditMode" :class="activeDrawerTab === 'edit' ? 'bg-[#FF5C1A] text-white' : 'bg-gray-100 text-gray-600'" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-colors">Edit</button>
           </div>
 
@@ -278,6 +282,13 @@
         <!-- Details -->
         <div class="p-6 space-y-6 pb-24 bg-gray-50/30">
           
+          <template v-if="activeDrawerTab === 'transactions'">
+            <div class="space-y-4">
+              <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">Recent Transactions</h4>
+              <TransactionsList :vendor-id="selectedVendor._id" />
+            </div>
+          </template>
+
           <template v-if="activeDrawerTab === 'overview'">
             
             <!-- Store & Contact Information -->
@@ -620,7 +631,7 @@
 
 <script setup lang="ts">
 import { useAdminVendors } from '@/composables/modules/admin';
-import { Search, Store, Eye, EyeOff, Trash2, CheckCircle, XCircle, RefreshCcw, Star, Globe, Copy, User, Mail, Phone, GraduationCap, Banknote, AlertCircle, Percent, MoreVertical, Edit, Loader2, LayoutList, Shield, Calendar, Clock, DollarSign, Image as ImageIcon, MapPin, Edit2 } from 'lucide-vue-next';
+import { Search, Store, Eye, EyeOff, Trash2, CheckCircle, XCircle, RefreshCcw, Star, Globe, Copy, User, Mail, Phone, GraduationCap, Banknote, AlertCircle, Percent, MoreVertical, Edit, Loader2, LayoutList, Shield, Calendar, Clock, DollarSign, Image as ImageIcon, MapPin, Edit2, Receipt } from 'lucide-vue-next';
 import { onMounted, ref, computed, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import VendorMenuManager from "@/components/vendors/VendorMenuManager.vue";

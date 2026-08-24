@@ -520,6 +520,40 @@
         </div>
       </div>
     </div>
+    <!-- Cancel Order Modal -->
+    <div v-if="showCancelModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm" @click.self="showCancelModal = false">
+      <div class="bg-white rounded-2xl w-full max-w-md p-6 space-y-6 animate-fade-in-up">
+        <div class="flex justify-between items-center border-b border-gray-100 pb-4">
+          <h3 class="text-lg font-bold text-gray-900">Cancel Order</h3>
+          <button @click="showCancelModal = false" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Reason for cancellation</label>
+            <textarea
+              v-model="cancelReasonInput"
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm resize-none h-24"
+              placeholder="e.g. Customer requested cancellation..."
+            ></textarea>
+          </div>
+          <div class="flex gap-3 pt-2">
+            <button @click="showCancelModal = false" class="flex-1 py-3 px-4 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors text-sm">
+              Keep Order
+            </button>
+            <button 
+              @click="confirmCancelOrder" 
+              :disabled="!cancelReasonInput.trim() || isCancellingOrder"
+              class="flex-1 py-3 px-4 bg-red-600 text-white font-medium rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 text-sm"
+            >
+              <Loader2 v-if="isCancellingOrder" class="w-4 h-4 animate-spin" />
+              Cancel Order
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -711,18 +745,34 @@ const formatWhatsAppNumber = (phone: string | undefined | null) => {
   return digits;
 };
 
-const handleCancelOrder = async (orderId: string) => {
-  const reason = window.prompt("Enter reason for cancelling this order:");
-  if (reason) {
-    try {
-      await admin_api.cancelOrder(orderId, { reason });
-      showToast({ title: 'Success', message: 'Order cancelled successfully.', toastType: 'success' });
-      fetchOrders();
-      modalOrder.value = null;
-      showActionModal.value = false;
-    } catch (error: any) {
-      showToast({ title: 'Error', message: error.response?.data?.message || 'Failed to cancel order.', toastType: 'error' });
-    }
+const showCancelModal = ref(false);
+const orderToCancelId = ref('');
+const cancelReasonInput = ref('');
+const isCancellingOrder = ref(false);
+
+const handleCancelOrder = (orderId: string) => {
+  orderToCancelId.value = orderId;
+  cancelReasonInput.value = '';
+  showCancelModal.value = true;
+};
+
+const confirmCancelOrder = async () => {
+  if (!cancelReasonInput.value.trim()) {
+    showToast({ title: 'Error', message: 'Please enter a cancellation reason', toastType: 'error' });
+    return;
+  }
+  isCancellingOrder.value = true;
+  try {
+    await admin_api.cancelOrder(orderToCancelId.value, { reason: cancelReasonInput.value });
+    showToast({ title: 'Success', message: 'Order cancelled successfully.', toastType: 'success' });
+    fetchOrders();
+    showCancelModal.value = false;
+    modalOrder.value = null;
+    showActionModal.value = false;
+  } catch (error: any) {
+    showToast({ title: 'Error', message: error.response?.data?.message || 'Failed to cancel order.', toastType: 'error' });
+  } finally {
+    isCancellingOrder.value = false;
   }
 };
 
@@ -768,7 +818,19 @@ onMounted(() => {
   // Close dropdown on outside click
   window.addEventListener('click', () => {
     activeDropdown.value = null;
-  });
+  
+  // Automatically open order from query parameter
+  const route = useRoute();
+  if (route.query.orderId) {
+    // Wait for orders to fetch then select it
+    watch(() => loading.value, (isLoading) => {
+      if (!isLoading && orders.value.length > 0) {
+        const found = orders.value.find(o => o._id === route.query.orderId);
+        if (found) selectedOrder.value = found;
+      }
+    });
+  }
+});
 });
 </script>
 

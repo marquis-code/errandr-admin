@@ -118,9 +118,14 @@
                 </button>
               </td>
               <td class="px-6 py-4 text-right">
-                <button @click="copyCode(promo.code)" class="p-1.5 text-gray-400 hover:text-parentPrimary hover:bg-parentPrimary/10 rounded-lg transition-colors">
-                  <Copy class="w-4 h-4" />
-                </button>
+                <div class="flex items-center justify-end gap-2">
+                  <button @click="editPromo(promo)" class="p-1.5 text-gray-400 hover:text-parentPrimary hover:bg-parentPrimary/10 rounded-lg transition-colors">
+                    <Edit class="w-4 h-4" />
+                  </button>
+                  <button @click="copyCode(promo.code)" class="p-1.5 text-gray-400 hover:text-parentPrimary hover:bg-parentPrimary/10 rounded-lg transition-colors">
+                    <Copy class="w-4 h-4" />
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -128,11 +133,11 @@
       </div>
     </div>
 
-    <!-- Create Promo Modal -->
+    <!-- Create/Edit Promo Modal -->
     <UiSideDrawer :is-open="isModalOpen" @close="closeModal" size="default">
       <div class="space-y-6">
         <div>
-          <h2 class="text-lg font-bold text-gray-900">Create Promo Code</h2>
+          <h2 class="text-lg font-bold text-gray-900">{{ isEditing ? 'Edit Promo Code' : 'Create Promo Code' }}</h2>
           <p class="text-xs text-gray-500">Configure robust discounts and restrictions.</p>
         </div>
 
@@ -255,7 +260,7 @@
               class="w-full flex justify-center items-center gap-2 bg-gray-900 text-white py-3 px-4 rounded-xl text-sm font-bold hover:bg-gray-800 transition-colors disabled:opacity-70 disabled:cursor-not-allowed shadow-md"
             >
               <Loader2 v-if="isSubmitting" class="w-4 h-4 animate-spin" />
-              <span>{{ isSubmitting ? 'Creating...' : 'Create Promo Code' }}</span>
+              <span>{{ isSubmitting ? (isEditing ? 'Saving...' : 'Creating...') : (isEditing ? 'Save Changes' : 'Create Promo Code') }}</span>
             </button>
           </div>
         </form>
@@ -266,7 +271,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { Search, Plus, Tag, Loader2, Copy } from 'lucide-vue-next'
+import { Search, Plus, Tag, Loader2, Copy, Edit } from 'lucide-vue-next'
 import { useCustomToast } from '@/composables/core/useCustomToast'
 import { usePromos } from '@/composables/modules/promos/usePromos'
 import SearchableMultiSelect from '@/components/ui/SearchableMultiSelect.vue'
@@ -276,10 +281,12 @@ definePageMeta({
 })
 
 const { showToast } = useCustomToast()
-const { promos, users, vendors, loading, isSubmitting, fetchPromos, fetchDependencies, createPromo, toggleStatus: _toggleStatus } = usePromos()
+const { promos, users, vendors, loading, isSubmitting, fetchPromos, fetchDependencies, createPromo, updatePromo, toggleStatus: _toggleStatus } = usePromos()
 
 const searchQuery = ref('')
 const isModalOpen = ref(false)
+const isEditing = ref(false)
+const editingPromoId = ref('')
 
 const form = ref({
   code: '',
@@ -328,6 +335,8 @@ const isExpired = (dateString: string) => {
 }
 
 const openModal = () => {
+  isEditing.value = false
+  editingPromoId.value = ''
   form.value = {
     code: '',
     discountType: 'percentage',
@@ -341,6 +350,26 @@ const openModal = () => {
     applicableVendors: [],
     applicableUsers: [],
     applicableOrderTypes: []
+  }
+  isModalOpen.value = true
+}
+
+const editPromo = (promo: any) => {
+  isEditing.value = true
+  editingPromoId.value = promo._id
+  form.value = {
+    code: promo.code || '',
+    discountType: promo.discountType || 'percentage',
+    value: promo.value || 0,
+    minOrderAmount: promo.minOrderAmount || 0,
+    maxDiscountAmount: promo.maxDiscountAmount || 0,
+    maxUsageCount: promo.maxUsageCount || 0,
+    expiresAt: promo.expiresAt ? new Date(promo.expiresAt).toISOString().slice(0, 16) : '',
+    onlyForNewUsers: promo.onlyForNewUsers || false,
+    appliesToDeliveryFeeOnly: promo.appliesToDeliveryFeeOnly || false,
+    applicableVendors: promo.applicableVendors ? promo.applicableVendors.map(v => typeof v === 'object' && v ? v._id : v) : [],
+    applicableUsers: promo.applicableUsers ? promo.applicableUsers.map(u => typeof u === 'object' && u ? u._id : u) : [],
+    applicableOrderTypes: promo.applicableOrderTypes || []
   }
   isModalOpen.value = true
 }
@@ -366,14 +395,20 @@ const submitForm = async () => {
     applicableUsers: form.value.applicableUsers,
     applicableOrderTypes: form.value.applicableOrderTypes,
     appliesToDeliveryFeeOnly: form.value.appliesToDeliveryFeeOnly,
-    // Set to undefined if 0 or empty so schema defaults/optionals work correctly
-    maxDiscountAmount: form.value.maxDiscountAmount || undefined,
-    minOrderAmount: form.value.minOrderAmount || undefined,
-    maxUsageCount: form.value.maxUsageCount || undefined,
-    expiresAt: form.value.expiresAt ? new Date(form.value.expiresAt) : undefined
+    // Set to null if 0 or empty so schema defaults/optionals work correctly and fields can be unset
+    maxDiscountAmount: form.value.maxDiscountAmount || null,
+    minOrderAmount: form.value.minOrderAmount || null,
+    maxUsageCount: form.value.maxUsageCount || null,
+    expiresAt: form.value.expiresAt ? new Date(form.value.expiresAt) : null
   }
   
-  const success = await createPromo(payload)
+  let success = false
+  if (isEditing.value) {
+    success = await updatePromo(editingPromoId.value, payload)
+  } else {
+    success = await createPromo(payload)
+  }
+
   if (success) {
     closeModal()
     fetchPromos()

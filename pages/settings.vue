@@ -159,6 +159,33 @@
             </div>
           </div>
 
+          <!-- Delivery Minimums -->
+          <div class="space-y-2 grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">min campus environs fee (₦)</label>
+              <div class="mt-1.5 relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">₦</span>
+                <input 
+                  type="number" 
+                  v-model.number="form.minCampusEnvironsFee"
+                  class="w-full bg-white border border-gray-100 rounded-xl py-2 pl-8 pr-3 text-sm font-medium text-gray-900 focus:outline-none focus:border-[#FF5C1A] focus:ring-1 focus:ring-[#FF5C1A] transition-colors"
+                >
+              </div>
+            </div>
+
+            <div class="col-span-1">
+              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">min far off-campus fee (₦)</label>
+              <div class="mt-1.5 relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">₦</span>
+                <input 
+                  type="number" 
+                  v-model.number="form.minOutsideCampusFee"
+                  class="w-full bg-white border border-gray-100 rounded-xl py-2 pl-8 pr-3 text-sm font-medium text-gray-900 focus:outline-none focus:border-[#FF5C1A] focus:ring-1 focus:ring-[#FF5C1A] transition-colors"
+                >
+              </div>
+            </div>
+          </div>
+
           <!-- Runner Commission (Custom) -->
           <div class="space-y-2">
             <div class="col-span-2 md:col-span-1">
@@ -705,6 +732,8 @@ const form = reactive({
   commissionFlatFee: 50,
   customErrandCommissionPercentage: 20,
   minCustomErrandFee: 400,
+  minOutsideCampusFee: 450,
+  minCampusEnvironsFee: 350,
   platformProcessingFee: 500,
   platformServiceFeePercentage: 5,
   foodMarkupPercentage: 5,
@@ -819,6 +848,8 @@ const loadSettings = async () => {
       form.commissionFlatFee = errandSettings.commissionFlatFee ?? 50;
       form.customErrandCommissionPercentage = Number(errandSettings.customErrandCommissionPercentage) || 20;
       form.minCustomErrandFee = Number(errandSettings.minCustomErrandFee) || 400;
+      form.minOutsideCampusFee = Number(errandSettings.minOutsideCampusFee) || 450;
+      form.minCampusEnvironsFee = Number(errandSettings.minCampusEnvironsFee) || 350;
       form.platformProcessingFee = Number(errandSettings.platformProcessingFee) || 500;
       form.platformServiceFeePercentage = errandSettings.platformServiceFeePercentage ?? 5;
       form.foodMarkupPercentage = errandSettings.foodMarkupPercentage ?? 5;

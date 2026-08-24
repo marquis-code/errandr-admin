@@ -9,5 +9,8 @@ export const promos_api = {
   },
   togglePromoStatus: (id: string) => {
     return GATEWAY_ENDPOINT_WITH_AUTH.put(`/promo-codes/${id}/toggle`);
+  },
+  updatePromoCode: (id: string, payload: any) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/promo-codes/${id}`, payload);
   }
 };

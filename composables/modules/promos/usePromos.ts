@@ -80,6 +80,28 @@ export const usePromos = () => {
     }
   }
 
+  const updatePromo = async (id: string, payload: any) => {
+    isSubmitting.value = true
+    try {
+      await promos_api.updatePromoCode(id, payload)
+      showToast({
+        title: 'Success',
+        message: 'Promo code updated successfully',
+        toastType: 'success'
+      })
+      return true
+    } catch (error: any) {
+      showToast({
+        title: 'Error',
+        message: error.response?.data?.message || 'Failed to update promo code',
+        toastType: 'error'
+      })
+      return false
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+
   return {
     promos,
     users,
@@ -89,6 +111,7 @@ export const usePromos = () => {
     fetchPromos,
     fetchDependencies,
     createPromo,
+    updatePromo,
     toggleStatus
   }
 }

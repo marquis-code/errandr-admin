@@ -15,6 +15,8 @@ export const wallets_api = {
       if (query.sortBy) url += `&sortBy=${query.sortBy}`;
       if (query.sortOrder) url += `&sortOrder=${query.sortOrder}`;
       if (query.exportAsCsv) url += `&exportAsCsv=${query.exportAsCsv}`;
+      if (query.type) url += `&type=${query.type}`;
+      if (query.category) url += `&category=${query.category}`;
     }
     const isExport = query?.exportAsCsv;
     const config = isExport ? { responseType: 'blob' as 'blob' } : {};
