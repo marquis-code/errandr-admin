@@ -222,6 +222,30 @@
             </div>
           </div>
 
+          <!-- Custom Errand Safety Buffer -->
+          <div class="space-y-2 relative">
+            <div class="col-span-2 md:col-span-1">
+              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">safety buffer (%)</label>
+              <button @click="showInfo('safetyBuffer')" class="w-4 h-4 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-[#FF5C1A]/10 hover:text-[#FF5C1A] transition-colors">
+                <Info class="w-3 h-3" />
+              </button>
+            </div>
+            <input 
+              v-model.number="form.customErrandSafetyBufferPercentage"
+              type="number" required min="0" max="100"
+              class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-base font-medium focus:bg-white focus:border-[#FF5C1A]/30 outline-none transition-all"
+            />
+            <p v-if="form.customErrandSafetyBufferPercentage !== originalForm.customErrandSafetyBufferPercentage" class="text-[10px] font-medium text-amber-600 bg-amber-50 px-3 py-1.5 rounded-xl flex items-center gap-1">
+              <AlertTriangle class="w-3 h-3" />
+              changing from {{ originalForm.customErrandSafetyBufferPercentage }}% → {{ form.customErrandSafetyBufferPercentage }}%.
+            </p>
+            <div v-if="activeInfo === 'safetyBuffer'" class="p-3 bg-blue-50 text-blue-800 rounded-xl text-[11px] font-medium leading-relaxed space-y-1 border border-blue-100">
+              <p class="font-semibold">what is this?</p>
+              <p>the percentage added to a custom errand's estimated item cost as a safety buffer for when actual prices exceed the estimate.</p>
+              <button @click="activeInfo = ''" class="text-blue-500 underline">dismiss</button>
+            </div>
+          </div>
+
           <!-- Platform Processing Fee -->
           <div class="space-y-2">
             <div class="flex items-center gap-2">
@@ -731,6 +755,7 @@ const form = reactive({
   convenienceFee: 50,
   commissionFlatFee: 50,
   customErrandCommissionPercentage: 20,
+  customErrandSafetyBufferPercentage: 20,
   minCustomErrandFee: 400,
   minOutsideCampusFee: 450,
   minCampusEnvironsFee: 350,
@@ -847,6 +872,7 @@ const loadSettings = async () => {
       form.convenienceFee = errandSettings.convenienceFee ?? 50;
       form.commissionFlatFee = errandSettings.commissionFlatFee ?? 50;
       form.customErrandCommissionPercentage = Number(errandSettings.customErrandCommissionPercentage) || 20;
+      form.customErrandSafetyBufferPercentage = Number(errandSettings.customErrandSafetyBufferPercentage) || 20;
       form.minCustomErrandFee = Number(errandSettings.minCustomErrandFee) || 400;
       form.minOutsideCampusFee = Number(errandSettings.minOutsideCampusFee) || 450;
       form.minCampusEnvironsFee = Number(errandSettings.minCampusEnvironsFee) || 350;
@@ -898,6 +924,7 @@ const saveSettings = async () => {
       convenienceFee: Number(form.convenienceFee),
       commissionFlatFee: Number(form.commissionFlatFee),
       customErrandCommissionPercentage: Number(form.customErrandCommissionPercentage),
+      customErrandSafetyBufferPercentage: Number(form.customErrandSafetyBufferPercentage),
       minCustomErrandFee: Number(form.minCustomErrandFee),
       platformProcessingFee: Number(form.platformProcessingFee),
       platformServiceFeePercentage: Number(form.platformServiceFeePercentage),
