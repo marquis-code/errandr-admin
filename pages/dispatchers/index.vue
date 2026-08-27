@@ -10,19 +10,19 @@
     <!-- Tabs -->
     <div class="flex items-center gap-6 border-b border-gray-100">
       <button 
+        @click="activeTab = 'all'"
+        class="pb-4 text-sm font-bold transition-colors border-b-2 relative -mb-[1px]"
+        :class="activeTab === 'all' ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'"
+      >
+        All Dispatchers
+      </button>
+      <button 
         @click="activeTab = 'verifications'"
         class="pb-4 text-sm font-bold transition-colors border-b-2 relative -mb-[1px]"
         :class="activeTab === 'verifications' ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'"
       >
         Pending Verifications
         <span v-if="total > 0" class="ml-2 inline-flex items-center justify-center bg-red-500 text-white text-[10px] w-5 h-5 rounded-full">{{ total }}</span>
-      </button>
-      <button 
-        @click="activeTab = 'all'"
-        class="pb-4 text-sm font-bold transition-colors border-b-2 relative -mb-[1px]"
-        :class="activeTab === 'all' ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700'"
-      >
-        All Dispatchers
       </button>
     </div>
 
@@ -766,7 +766,7 @@
 
 <script setup lang="ts">
 import { GATEWAY_ENDPOINT_WITH_AUTH as api } from '@/api_factory/axios.config';
-import { Bike, FileText, CheckCircle, XCircle, Search, User, MapPin, MoreHorizontal, Shield, Edit2, Star, Clock, AlertTriangle, AlertCircle, RefreshCw, Eye, Hash, Calendar, DollarSign, Image as ImageIcon, Receipt, Trash2, MoreVertical, Edit } from 'lucide-vue-next';
+import { Bike, FileText, CheckCircle, XCircle, Search, User, MapPin, MoreHorizontal, Shield, Edit2, Star, Clock, AlertTriangle, AlertCircle, RefreshCw, Eye, Hash, Calendar, DollarSign, Image as ImageIcon, Receipt, Trash2, MoreVertical, Edit, X } from 'lucide-vue-next';
 import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 import SkeletonTable from '@/components/ui/SkeletonTable.vue';
@@ -794,7 +794,7 @@ onUnmounted(() => {
 });
 
 // Tabs
-const activeTab = ref('verifications') // 'verifications' | 'all'
+const activeTab = ref('all') // 'verifications' | 'all'
 
 // Verifications state
 const dispatchers = ref<any[]>([])

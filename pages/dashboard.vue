@@ -150,7 +150,7 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-50/50">
-                <tr v-for="activity in recentActivity" :key="activity.id" @click="navigateTo(`/admin/orders?orderId=${activity.id}`)" class="hover:bg-gray-50/30 transition-colors group cursor-pointer">
+                <tr v-for="activity in recentActivity" :key="activity.id" @click="selectedOrder = recentOrders.find(o => o._id === activity.id)" class="hover:bg-gray-50/30 transition-colors group cursor-pointer">
                   <!-- Customer & Order -->
                   <td class="px-5 py-4">
                     <div class="flex items-start gap-3">
@@ -278,9 +278,17 @@
       </div>
     </div>
   </div>
+  <OrderDetailsDrawer 
+    v-if="selectedOrder" 
+    :is-open="!!selectedOrder" 
+    :order="selectedOrder" 
+    @close="selectedOrder = null" 
+    @takeAction="handleOrderAction" 
+  />
 </template>
 
 <script setup lang="ts">
+import OrderDetailsDrawer from '@/components/orders/OrderDetailsDrawer.vue'
 import { useAdminStats } from '@/composables/modules/admin'
 import { admin_api } from '@/api_factory/modules/admin'
 import { onMounted, ref, computed } from 'vue'
@@ -303,6 +311,11 @@ import RevenueChart from '@/components/core/RevenueChart.vue'
 const { stats, chartData, loading: statsLoading, fetchStats } = useAdminStats()
 const ordersLoading = ref(true)
 const recentOrders = ref<any[]>([])
+const selectedOrder = ref<any>(null)
+
+const handleOrderAction = (order: any) => {
+  navigateTo(`/admin/orders?orderId=${order._id || order.id}`)
+}
 
 const fetchRecentOrders = async () => {
   ordersLoading.value = true

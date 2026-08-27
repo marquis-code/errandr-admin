@@ -109,12 +109,56 @@
         </div>
 
         <!-- Activity Tab -->
-        <div v-if="activeTab === 'activity'" class="flex flex-col items-center justify-center py-12 text-center">
-          <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-            <Activity class="w-8 h-8 text-gray-400" />
+        <div v-if="activeTab === 'activity'">
+          <div v-if="ordersLoading" class="py-12 flex justify-center">
+            <div class="w-8 h-8 border-4 border-[#FF5C1A] border-t-transparent rounded-full animate-spin"></div>
           </div>
-          <h3 class="text-lg font-bold text-gray-900 mb-1">No Activity Found</h3>
-          <p class="text-sm text-gray-500 max-w-sm">Activity logs and order history will appear here once the user starts interacting with the platform.</p>
+          <div v-else-if="userOrders.length === 0" class="flex flex-col items-center justify-center py-12 text-center">
+            <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+              <Activity class="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-1">No Activity Found</h3>
+            <p class="text-sm text-gray-500 max-w-sm">Activity logs and order history will appear here once the user starts interacting with the platform.</p>
+          </div>
+          <div v-else class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-gray-100/60 bg-gray-50/50 text-[11px] uppercase tracking-wider text-gray-500">
+                  <th class="py-4 px-6 font-bold">Order ID</th>
+                  <th class="py-4 px-4 font-bold">Date</th>
+                  <th class="py-4 px-4 font-bold">Amount</th>
+                  <th class="py-4 px-4 font-bold">Status</th>
+                  <th class="py-4 px-6 font-bold text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                <tr v-for="order in userOrders" :key="order._id" class="hover:bg-gray-50 transition-colors">
+                  <td class="py-4 px-6 font-mono font-medium text-gray-900 text-sm">
+                    {{ order.orderNumber || order._id.slice(-8) }}
+                  </td>
+                  <td class="py-4 px-4 text-sm text-gray-500">
+                    {{ new Date(order.createdAt).toLocaleDateString() }}
+                  </td>
+                  <td class="py-4 px-4 font-bold text-gray-900 text-sm">
+                    ₦{{ (order.total || 0).toLocaleString() }}
+                  </td>
+                  <td class="py-4 px-4">
+                    <StatusBadge :status="order.status" class="scale-90 origin-left" />
+                  </td>
+                  <td class="py-4 px-6 text-right">
+                    <NuxtLink :to="`/orders?search=${order.orderNumber || order._id}`" class="text-[#FF5C1A] text-sm font-semibold hover:underline">
+                      View
+                    </NuxtLink>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Finances Tab -->
+        <div v-if="activeTab === 'finances'" class="space-y-6">
+          <UserFinances :userId="userId" userRole="student" />
         </div>
       </div>
     </div>
@@ -144,9 +188,10 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { admin_api } from '@/api_factory/modules/admin';
-import { ArrowLeft, UserX2, UserCheck2, Copy, Calendar, Activity } from 'lucide-vue-next';
+import { ArrowLeft, UserX2, UserCheck2, Copy, Calendar, Activity, Wallet } from 'lucide-vue-next';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 import ConfirmationModal from '@/components/ui/ConfirmationModal.vue';
+import UserFinances from '@/components/users/UserFinances.vue';
 import { useCustomToast } from '@/composables/core/useCustomToast';
 
 definePageMeta({
@@ -161,9 +206,13 @@ const userId = route.params.id as string;
 const user = ref<any>(null);
 const loading = ref(true);
 
+const userOrders = ref<any[]>([]);
+const ordersLoading = ref(false);
+
 const tabs = [
   { key: 'overview', label: 'Overview' },
-  { key: 'activity', label: 'Activity & History' }
+  { key: 'activity', label: 'Activity & History' },
+  { key: 'finances', label: 'Finances & Payouts' }
 ];
 const activeTab = ref('overview');
 
@@ -185,6 +234,20 @@ const fetchUser = async () => {
     console.error(error);
   } finally {
     loading.value = false;
+  }
+};
+
+const fetchUserOrders = async () => {
+  ordersLoading.value = true;
+  try {
+    const res = await admin_api.getRecentOrders(1, 20, { customerId: userId });
+    if (res.data?.orders) {
+      userOrders.value = res.data.orders;
+    }
+  } catch (err) {
+    console.error('Error fetching user orders:', err);
+  } finally {
+    ordersLoading.value = false;
   }
 };
 
@@ -230,5 +293,6 @@ const copyToClipboard = (text: string) => {
 
 onMounted(() => {
   fetchUser();
+  fetchUserOrders();
 });
 </script>

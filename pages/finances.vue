@@ -27,9 +27,9 @@
       </div>
 
       <!-- Dashboard Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- Left Column: Primary Stats -->
-        <div class="lg:col-span-8 space-y-6">
+      <div class="flex flex-col gap-8">
+        <!-- Primary Stats Section -->
+        <div class="space-y-6 w-full">
           
           <!-- Loading State -->
           <template v-if="loading && !stats">
@@ -64,117 +64,322 @@
               </div>
             </div>
 
-            <!-- Financial Cards Grid (2x2) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <!-- Total Volume Card -->
-              <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-emerald-200 transition-all duration-300">
-                <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mb-4 border border-emerald-100 group-hover:scale-110 transition-transform duration-300">
-                  <Wallet class="w-5 h-5 text-emerald-600" />
-                </div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Volume</p>
-                <h2 class="text-2xl font-black text-gray-900 tabular-nums font-heading">₦{{ (stats?.totalVolume || 0).toLocaleString() }}</h2>
-                <div class="flex items-center gap-1.5 mt-2">
-                  <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wide">All time</span>
-                </div>
-              </div>
-
-              <!-- Commission Card -->
+            <!-- Financial Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <!-- Platform Revenue Card -->
               <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-[#FF5C1A]/30 transition-all duration-300">
                 <div class="absolute -right-6 -top-6 w-24 h-24 bg-[#FF5C1A]/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div class="w-10 h-10 rounded-xl bg-[#FF5C1A]/10 flex items-center justify-center mb-4 border border-[#FF5C1A]/20 group-hover:scale-110 transition-transform duration-300">
                   <TrendingUp class="w-5 h-5 text-[#FF5C1A]" />
                 </div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Platform Earnings</p>
-                <h2 class="text-2xl font-black text-[#FF5C1A] tabular-nums font-heading">₦{{ (stats?.totalCommissions || 0).toLocaleString() }}</h2>
-                <span class="text-[10px] font-bold text-gray-500 mt-2 block uppercase tracking-wide">Total service fees</span>
+                <div class="flex items-center gap-1.5 mb-1 relative group/tooltip w-fit">
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Platform Share (Net Profit)</p>
+                  <Info class="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                  <div class="absolute left-0 bottom-full mb-2 hidden group-hover/tooltip:block w-48 bg-gray-900 text-white text-[10px] p-2.5 rounded-lg shadow-xl z-20 font-medium leading-relaxed">
+                    Total net profit retained by the platform from all revenue streams.
+                  </div>
+                </div>
+                <h2 class="text-xl font-black text-[#FF5C1A] tabular-nums font-heading">₦{{ (stats?.totalCommissions || 0).toLocaleString() }}</h2>
+                <span class="text-[10px] font-bold text-gray-500 mt-2 block uppercase tracking-wide">Pure platform profit</span>
               </div>
 
-              <!-- Net Balance Card -->
+              <!-- Marketplace Platform Share Card -->
+              <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-[#FF5C1A]/30 transition-all duration-300">
+                <div class="absolute -right-6 -top-6 w-24 h-24 bg-[#FF5C1A]/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="w-10 h-10 rounded-xl bg-[#FF5C1A]/10 flex items-center justify-center mb-4 border border-[#FF5C1A]/20 group-hover:scale-110 transition-transform duration-300">
+                  <Package class="w-5 h-5 text-[#FF5C1A]" />
+                </div>
+                <div class="flex items-center gap-1.5 mb-1 relative group/tooltip w-fit">
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Marketplace Fees</p>
+                  <Info class="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                  <div class="absolute left-0 bottom-full mb-2 hidden group-hover/tooltip:block w-48 bg-gray-900 text-white text-[10px] p-2.5 rounded-lg shadow-xl z-20 font-medium leading-relaxed">
+                    Platform's accumulated share from marketplace food orders (Service Fees + N50 Delivery Cut + Markups).
+                  </div>
+                </div>
+                <h2 class="text-xl font-black text-[#FF5C1A] tabular-nums font-heading">₦{{ (stats?.platformMarketplace || 0).toLocaleString() }}</h2>
+                <span class="text-[10px] font-bold text-gray-500 mt-2 block uppercase tracking-wide">From marketplace orders</span>
+              </div>
+
+              <!-- Custom Errands Platform Share Card -->
+              <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-[#FF5C1A]/30 transition-all duration-300">
+                <div class="absolute -right-6 -top-6 w-24 h-24 bg-[#FF5C1A]/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="w-10 h-10 rounded-xl bg-[#FF5C1A]/10 flex items-center justify-center mb-4 border border-[#FF5C1A]/20 group-hover:scale-110 transition-transform duration-300">
+                  <Sparkles class="w-5 h-5 text-[#FF5C1A]" />
+                </div>
+                <div class="flex items-center gap-1.5 mb-1 relative group/tooltip w-fit">
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Custom Errand Fees</p>
+                  <Info class="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                  <div class="absolute left-0 bottom-full mb-2 hidden group-hover/tooltip:block w-48 bg-gray-900 text-white text-[10px] p-2.5 rounded-lg shadow-xl z-20 font-medium leading-relaxed">
+                    Platform's accumulated share specifically from Custom Errands percentage fees.
+                  </div>
+                </div>
+                <h2 class="text-xl font-black text-[#FF5C1A] tabular-nums font-heading">₦{{ (stats?.platformCustomErrands || 0).toLocaleString() }}</h2>
+                <span class="text-[10px] font-bold text-gray-500 mt-2 block uppercase tracking-wide">From custom errands</span>
+              </div>
+
+              <!-- Vendor Accrued Card -->
+              <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-emerald-200 transition-all duration-300">
+                <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mb-4 border border-emerald-100 group-hover:scale-110 transition-transform duration-300">
+                  <Store class="w-5 h-5 text-emerald-600" />
+                </div>
+                <div class="flex items-center gap-1.5 mb-1 relative group/tooltip w-fit">
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Vendor Earnings</p>
+                  <Info class="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                  <div class="absolute left-0 bottom-full mb-2 hidden group-hover/tooltip:block w-48 bg-gray-900 text-white text-[10px] p-2.5 rounded-lg shadow-xl z-20 font-medium leading-relaxed">
+                    Total lifetime earnings accrued directly to all vendor wallets from successful orders.
+                  </div>
+                </div>
+                <h2 class="text-xl font-black text-gray-900 tabular-nums font-heading">₦{{ (stats?.vendorAccrued || 0).toLocaleString() }}</h2>
+                <span class="text-[10px] font-bold text-emerald-600 mt-2 block uppercase tracking-wide">Total accrued by vendors</span>
+              </div>
+
+              <!-- Dispatcher Accrued Card -->
               <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-indigo-200 transition-all duration-300">
                 <div class="absolute -right-6 -top-6 w-24 h-24 bg-indigo-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mb-4 border border-indigo-100 group-hover:scale-110 transition-transform duration-300">
-                  <ArrowDownLeft class="w-5 h-5 text-indigo-600" />
+                  <Truck class="w-5 h-5 text-indigo-600" />
                 </div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Net Balance</p>
-                <h2 class="text-2xl font-black text-gray-900 tabular-nums font-heading">₦{{ (netBalance || 0).toLocaleString() }}</h2>
-                <span class="text-[10px] font-bold text-indigo-600 mt-2 block uppercase tracking-wide">Combined wallet balance</span>
+                <div class="flex items-center gap-1.5 mb-1 relative group/tooltip w-fit">
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Dispatcher Earnings</p>
+                  <Info class="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                  <div class="absolute left-0 bottom-full mb-2 hidden group-hover/tooltip:block w-48 bg-gray-900 text-white text-[10px] p-2.5 rounded-lg shadow-xl z-20 font-medium leading-relaxed">
+                    Total lifetime earnings accrued directly to all dispatcher/errander wallets from completed deliveries.
+                  </div>
+                </div>
+                <h2 class="text-xl font-black text-gray-900 tabular-nums font-heading">₦{{ (stats?.dispatcherAccrued || 0).toLocaleString() }}</h2>
+                <span class="text-[10px] font-bold text-indigo-600 mt-2 block uppercase tracking-wide">Total accrued by dispatchers</span>
               </div>
 
-              <!-- Highest Spender Card -->
-              <div class="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl relative overflow-hidden group hover:shadow-2xl transition-all duration-300">
-                <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/5 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-4 border border-white/10 group-hover:scale-110 transition-transform duration-300">
-                  <Star class="w-5 h-5 text-[#FF5C1A]" fill="currentColor" />
+              <!-- Vendor Payouts Card -->
+              <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-amber-200 transition-all duration-300">
+                <div class="absolute -right-6 -top-6 w-24 h-24 bg-amber-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center mb-4 border border-amber-100 group-hover:scale-110 transition-transform duration-300">
+                  <ArrowUpRight class="w-5 h-5 text-amber-600" />
                 </div>
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Top Spender</p>
-                <div v-if="stats?.highestPurchaseUser">
-                  <h2 class="text-xl font-black text-white tabular-nums font-heading truncate">{{ stats.highestPurchaseUser.owner?.firstName }} {{ stats.highestPurchaseUser.owner?.lastName }}</h2>
-                  <span class="text-[10px] font-bold text-[#FF5C1A] mt-2 block uppercase tracking-wide">₦{{ (stats.highestPurchaseUser.totalSpent || 0).toLocaleString() }} Lifetime</span>
+                <div class="flex items-center gap-1.5 mb-1 relative group/tooltip w-fit">
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Vendor Payouts</p>
+                  <Info class="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                  <div class="absolute left-0 bottom-full mb-2 hidden group-hover/tooltip:block w-48 bg-gray-900 text-white text-[10px] p-2.5 rounded-lg shadow-xl z-20 font-medium leading-relaxed">
+                    Total amount of money successfully withdrawn and paid out to vendors.
+                  </div>
                 </div>
-                <div v-else>
-                  <h2 class="text-xl font-black text-white tabular-nums font-heading">N/A</h2>
-                  <span class="text-[10px] font-bold text-gray-500 mt-2 block uppercase tracking-wide">No data yet</span>
+                <h2 class="text-xl font-black text-gray-900 tabular-nums font-heading">₦{{ (stats?.vendorPaidOut || 0).toLocaleString() }}</h2>
+                <span class="text-[10px] font-bold text-amber-600 mt-2 block uppercase tracking-wide">Paid to vendors</span>
+              </div>
+
+              <!-- Dispatcher Payouts Card -->
+              <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-fuchsia-200 transition-all duration-300">
+                <div class="absolute -right-6 -top-6 w-24 h-24 bg-fuchsia-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="w-10 h-10 rounded-xl bg-fuchsia-50 flex items-center justify-center mb-4 border border-fuchsia-100 group-hover:scale-110 transition-transform duration-300">
+                  <ArrowUpRight class="w-5 h-5 text-fuchsia-600" />
                 </div>
+                <div class="flex items-center gap-1.5 mb-1 relative group/tooltip w-fit">
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Dispatcher Payouts</p>
+                  <Info class="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                  <div class="absolute left-0 bottom-full mb-2 hidden group-hover/tooltip:block w-48 bg-gray-900 text-white text-[10px] p-2.5 rounded-lg shadow-xl z-20 font-medium leading-relaxed">
+                    Total amount of money successfully withdrawn and paid out to dispatchers.
+                  </div>
+                </div>
+                <h2 class="text-xl font-black text-gray-900 tabular-nums font-heading">₦{{ (stats?.dispatcherPaidOut || 0).toLocaleString() }}</h2>
+                <span class="text-[10px] font-bold text-fuchsia-600 mt-2 block uppercase tracking-wide">Paid to dispatchers</span>
+              </div>
+
+              <!-- Student Funding Card -->
+              <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-blue-200 transition-all duration-300">
+                <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mb-4 border border-blue-100 group-hover:scale-110 transition-transform duration-300">
+                  <Wallet class="w-5 h-5 text-blue-600" />
+                </div>
+                <div class="flex items-center gap-1.5 mb-1 relative group/tooltip w-fit">
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Student Funding</p>
+                  <Info class="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                  <div class="absolute left-0 bottom-full mb-2 hidden group-hover/tooltip:block w-48 bg-gray-900 text-white text-[10px] p-2.5 rounded-lg shadow-xl z-20 font-medium leading-relaxed">
+                    Total amount of money deposited/funded into student wallets via Paystack or direct top-ups.
+                  </div>
+                </div>
+                <h2 class="text-xl font-black text-gray-900 tabular-nums font-heading">₦{{ (stats?.studentFunding || 0).toLocaleString() }}</h2>
+                <span class="text-[10px] font-bold text-blue-600 mt-2 block uppercase tracking-wide">Total wallet top-ups</span>
+              </div>
+
+              <!-- Student Usage Card -->
+              <div class="bg-white/80 backdrop-blur-md p-6 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md hover:border-rose-200 transition-all duration-300">
+                <div class="absolute -right-6 -top-6 w-24 h-24 bg-rose-50 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center mb-4 border border-rose-100 group-hover:scale-110 transition-transform duration-300">
+                  <CreditCard class="w-5 h-5 text-rose-600" />
+                </div>
+                <div class="flex items-center gap-1.5 mb-1 relative group/tooltip w-fit">
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Wallet Usage</p>
+                  <Info class="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                  <div class="absolute left-0 bottom-full mb-2 hidden group-hover/tooltip:block w-48 bg-gray-900 text-white text-[10px] p-2.5 rounded-lg shadow-xl z-20 font-medium leading-relaxed">
+                    Total amount of money spent by students from their wallets to pay for orders and services.
+                  </div>
+                </div>
+                <h2 class="text-xl font-black text-gray-900 tabular-nums font-heading">₦{{ (stats?.studentUsage || 0).toLocaleString() }}</h2>
+                <span class="text-[10px] font-bold text-rose-600 mt-2 block uppercase tracking-wide">Total spent by students</span>
               </div>
             </div>
           </template>
         </div>
 
-        <!-- Right Column: AI Actionable Insights -->
-        <div class="lg:col-span-4">
-          <div class="bg-gradient-to-b from-black to-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl relative overflow-hidden h-full flex flex-col">
+        <!-- AI Actionable Insights Section -->
+        <div class="w-full">
+          <div class="bg-gradient-to-r from-black to-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl relative overflow-hidden flex flex-col md:flex-row gap-6">
             <div class="absolute -left-12 -bottom-12 w-48 h-48 bg-[#FF5C1A] rounded-full blur-3xl opacity-10"></div>
             <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-[#FF5C1A] to-transparent opacity-50"></div>
             
-            <div class="flex items-center gap-2 mb-6 z-10">
-              <div class="p-2 bg-[#FF5C1A]/10 rounded-lg border border-[#FF5C1A]/20">
-                <Sparkles class="w-4 h-4 text-[#FF5C1A]" />
-              </div>
-              <div>
+            <div class="flex flex-col justify-center min-w-[200px] z-10 border-r border-gray-800 pr-6">
+              <div class="flex items-center gap-2 mb-2">
+                <div class="p-2 bg-[#FF5C1A]/10 rounded-lg border border-[#FF5C1A]/20">
+                  <Sparkles class="w-4 h-4 text-[#FF5C1A]" />
+                </div>
                 <h3 class="text-sm font-bold text-white font-heading">Actionable Insights</h3>
-                <p class="text-[10px] font-medium text-gray-400">System generated recommendations</p>
               </div>
+              <p class="text-[10px] font-medium text-gray-400">System generated recommendations</p>
             </div>
 
-            <div class="space-y-4 z-10 flex-1">
+            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 z-10">
               <template v-if="loading && !stats">
                 <div v-for="i in 3" :key="`insight-skel-${i}`" class="h-20 bg-gray-800/50 animate-pulse rounded-xl border border-gray-700/50"></div>
               </template>
               <template v-else>
                 <div v-if="revenueGrowth < 0" class="p-4 bg-rose-500/10 rounded-xl border border-rose-500/20 hover:bg-rose-500/20 transition-colors cursor-pointer group">
-                  <div class="flex items-start gap-3">
+                  <div class="flex items-start gap-3 h-full">
                     <div class="mt-0.5"><TrendingDown class="w-4 h-4 text-rose-400" /></div>
-                    <div>
-                      <p class="text-xs font-bold text-rose-200 mb-1 group-hover:text-rose-100">Revenue is down {{ Math.abs(revenueGrowth).toFixed(1) }}%</p>
-                      <p class="text-[10px] font-medium text-rose-300/80 leading-relaxed">Consider launching a targeted push campaign to inactive users to boost order volume today.</p>
-                      <button class="mt-2 text-[10px] font-bold text-white bg-rose-500/20 px-3 py-1.5 rounded-lg border border-rose-500/30 hover:bg-rose-500/40 transition-colors">Create Campaign</button>
+                    <div class="flex flex-col h-full justify-between">
+                      <div>
+                        <p class="text-xs font-bold text-rose-200 mb-1 group-hover:text-rose-100">Revenue is down {{ Math.abs(revenueGrowth).toFixed(1) }}%</p>
+                        <p class="text-[10px] font-medium text-rose-300/80 leading-relaxed">Consider launching a targeted push campaign to inactive users to boost order volume today.</p>
+                      </div>
+                      <button class="mt-3 w-fit text-[10px] font-bold text-white bg-rose-500/20 px-3 py-1.5 rounded-lg border border-rose-500/30 hover:bg-rose-500/40 transition-colors">Create Campaign</button>
                     </div>
                   </div>
                 </div>
 
                 <div v-if="revenueGrowth > 10" class="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors cursor-pointer group">
-                  <div class="flex items-start gap-3">
+                  <div class="flex items-start gap-3 h-full">
                     <div class="mt-0.5"><TrendingUp class="w-4 h-4 text-emerald-400" /></div>
-                    <div>
-                      <p class="text-xs font-bold text-emerald-200 mb-1 group-hover:text-emerald-100">Strong Momentum (+{{ revenueGrowth.toFixed(1) }}%)</p>
-                      <p class="text-[10px] font-medium text-emerald-300/80 leading-relaxed">Great job! Consider adjusting vendor commission rates slightly to capitalize on high volume.</p>
-                      <button class="mt-2 text-[10px] font-bold text-white bg-emerald-500/20 px-3 py-1.5 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/40 transition-colors">Review Rates</button>
+                    <div class="flex flex-col h-full justify-between">
+                      <div>
+                        <p class="text-xs font-bold text-emerald-200 mb-1 group-hover:text-emerald-100">Strong Momentum (+{{ revenueGrowth.toFixed(1) }}%)</p>
+                        <p class="text-[10px] font-medium text-emerald-300/80 leading-relaxed">Great job! Consider adjusting vendor commission rates slightly to capitalize on high volume.</p>
+                      </div>
+                      <button class="mt-3 w-fit text-[10px] font-bold text-white bg-emerald-500/20 px-3 py-1.5 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/40 transition-colors">Review Rates</button>
                     </div>
                   </div>
                 </div>
 
                 <div class="p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors cursor-pointer group">
-                  <div class="flex items-start gap-3">
-                    <div class="mt-0.5"><UserPlus class="w-4 h-4 text-[#FF5C1A]" /></div>
-                    <div>
-                      <p class="text-xs font-bold text-gray-200 mb-1 group-hover:text-white">Acquisition Strategy</p>
-                      <p class="text-[10px] font-medium text-gray-400 leading-relaxed">Top spender is highly active. Create a referral code for them to invite more high-value peers.</p>
+                  <div class="flex items-start gap-3 h-full">
+                    <div class="mt-0.5"><Users class="w-4 h-4 text-amber-400" /></div>
+                    <div class="flex flex-col h-full justify-between">
+                      <div>
+                        <p class="text-xs font-bold text-amber-200 mb-1 group-hover:text-amber-100">Acquisition Strategy</p>
+                        <p class="text-[10px] font-medium text-amber-300/80 leading-relaxed">Top spender is highly active. Create a referral code for them to invite more high-value peers.</p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </template>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Performers Leaderboards -->
+      <div class="mt-8 space-y-4">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center border border-amber-100">
+            <Award class="w-4 h-4 text-amber-500" />
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-gray-900 font-heading tracking-tight">Top Performers</h3>
+            <p class="text-[10px] font-medium text-gray-500 uppercase tracking-widest">Platform Hall of Fame</p>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          <!-- Top Spender -->
+          <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:border-blue-200 transition-colors">
+            <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Top Spender</p>
+                <h4 class="font-bold text-gray-900 truncate mt-1 max-w-[150px]">{{ stats?.highestPurchaseUser?.owner?.firstName }} {{ stats?.highestPurchaseUser?.owner?.lastName }}</h4>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-black border border-blue-100">
+                {{ stats?.highestPurchaseUser?.owner?.firstName?.charAt(0) || '?' }}
+              </div>
+            </div>
+            <div class="pt-3 border-t border-gray-50 flex items-end justify-between">
+              <div>
+                <p class="text-[10px] font-medium text-gray-400">Total Spent</p>
+                <p class="font-black text-gray-900">₦{{ (stats?.highestPurchaseUser?.totalSpent || 0).toLocaleString() }}</p>
+              </div>
+              <span class="text-[9px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-wide">Student</span>
+            </div>
+          </div>
+
+          <!-- Highest Points -->
+          <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:border-amber-200 transition-colors">
+            <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Highest Points</p>
+                <h4 class="font-bold text-gray-900 truncate mt-1 max-w-[150px]">{{ stats?.highestPointsUser?.firstName }} {{ stats?.highestPointsUser?.lastName }}</h4>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-xs font-black border border-amber-100">
+                {{ stats?.highestPointsUser?.firstName?.charAt(0) || '?' }}
+              </div>
+            </div>
+            <div class="pt-3 border-t border-gray-50 flex items-end justify-between">
+              <div>
+                <p class="text-[10px] font-medium text-gray-400">Total Points</p>
+                <p class="font-black text-gray-900">{{ (stats?.highestPointsUser?.points || 0).toLocaleString() }} pt</p>
+              </div>
+              <span class="text-[9px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded uppercase tracking-wide">Rewards</span>
+            </div>
+          </div>
+
+          <!-- Top Vendor -->
+          <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:border-emerald-200 transition-colors">
+            <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Top Vendor</p>
+                <h4 class="font-bold text-gray-900 truncate mt-1 max-w-[150px]">{{ stats?.topVendor?.owner?.firstName }} {{ stats?.topVendor?.owner?.lastName }}</h4>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs font-black border border-emerald-100">
+                {{ stats?.topVendor?.owner?.firstName?.charAt(0) || '?' }}
+              </div>
+            </div>
+            <div class="pt-3 border-t border-gray-50 flex items-end justify-between">
+              <div>
+                <p class="text-[10px] font-medium text-gray-400">Total Earned</p>
+                <p class="font-black text-gray-900">₦{{ (stats?.topVendor?.totalEarned || 0).toLocaleString() }}</p>
+              </div>
+              <span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded uppercase tracking-wide">Vendor</span>
+            </div>
+          </div>
+
+          <!-- Top Errander -->
+          <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:border-indigo-200 transition-colors">
+            <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Top Dispatcher</p>
+                <h4 class="font-bold text-gray-900 truncate mt-1 max-w-[150px]">{{ stats?.topErrander?.owner?.firstName }} {{ stats?.topErrander?.owner?.lastName }}</h4>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-black border border-indigo-100">
+                {{ stats?.topErrander?.owner?.firstName?.charAt(0) || '?' }}
+              </div>
+            </div>
+            <div class="pt-3 border-t border-gray-50 flex items-end justify-between">
+              <div>
+                <p class="text-[10px] font-medium text-gray-400">Total Earned</p>
+                <p class="font-black text-gray-900">₦{{ (stats?.topErrander?.totalEarned || 0).toLocaleString() }}</p>
+              </div>
+              <span class="text-[9px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded uppercase tracking-wide">Errander</span>
             </div>
           </div>
         </div>
@@ -517,7 +722,7 @@
 
 <script setup lang="ts">
 import { useAdminFinances } from '@/composables/modules/admin';
-import { Download, Wallet, TrendingUp, TrendingDown, ArrowDownLeft, ArrowUpRight, ArrowUp, ArrowDown, Search, ListFilter, ChevronRight, ChevronLeft, Copy, FileText, Package, Star, Calendar, Sparkles, UserPlus, ExternalLink } from 'lucide-vue-next';
+import { Download, Wallet, TrendingUp, TrendingDown, ArrowDownLeft, ArrowUpRight, ArrowUp, ArrowDown, Search, ListFilter, ChevronRight, ChevronLeft, Copy, FileText, Package, Star, Calendar, Sparkles, UserPlus, ExternalLink, Info, Store, Truck, CreditCard } from 'lucide-vue-next';
 import { onMounted, ref, computed } from 'vue';
 import SideDrawer from '@/components/ui/SideDrawer.vue';
 import EmptyState from '@/components/core/EmptyState.vue';

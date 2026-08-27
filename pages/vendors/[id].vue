@@ -141,7 +141,12 @@
 
         <!-- Menu Tab -->
         <div v-if="activeTab === 'menu'" class="space-y-6">
-          <VendorMenuManager :vendorId="vendorId" />
+          <VendorMenuManager :vendorId="vendor._id" />
+        </div>
+
+        <!-- Finances Tab -->
+        <div v-if="activeTab === 'finances'" class="space-y-6">
+          <UserFinances v-if="vendor.owner" :userId="vendor.owner._id" userRole="vendor" />
         </div>
       </div>
     </div>
@@ -210,6 +215,7 @@ import { ArrowLeft, Store, Copy, Calendar, CheckCircle, XCircle, FileText, Dolla
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 import ConfirmationModal from '@/components/ui/ConfirmationModal.vue';
 import VendorMenuManager from '@/components/vendors/VendorMenuManager.vue';
+import UserFinances from '@/components/users/UserFinances.vue';
 import { useCustomToast } from '@/composables/core/useCustomToast';
 
 definePageMeta({
@@ -227,7 +233,8 @@ const loading = ref(true);
 const tabs = [
   { key: 'overview', label: 'Overview & Details' },
   { key: 'menu', label: 'Menu & Combos' },
-  { key: 'documents', label: 'Verification Documents' }
+  { key: 'documents', label: 'Verification Documents' },
+  { key: 'finances', label: 'Finances & Payouts' }
 ];
 const activeTab = ref('overview');
 

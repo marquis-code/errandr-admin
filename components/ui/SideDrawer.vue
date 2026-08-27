@@ -7,8 +7,8 @@
     <Transition name="drawer-slide">
       <div 
         v-if="isOpen" 
-        class="fixed right-0 top-0 bottom-0 z-[101] bg-white shadow-2xl overflow-y-auto flex flex-col"
-        :class="size === 'full' ? 'w-full' : 'w-full md:w-[460px]'"
+        class="fixed right-0 md:right-4 top-0 md:top-4 bottom-0 md:bottom-4 z-[101] bg-white shadow-2xl overflow-y-auto flex flex-col md:rounded-[1.25rem]"
+        :class="size === 'full' ? 'w-full md:w-[calc(100%-2rem)]' : 'w-full md:w-[460px]'"
       >
         <!-- Header -->
         <div class="flex items-center justify-end p-6 pb-2">

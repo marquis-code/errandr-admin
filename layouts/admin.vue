@@ -341,7 +341,8 @@ import {
  Gift,
  MessageSquare,
  Bell,
- Activity
+ Activity,
+ Banknote
 } from 'lucide-vue-next'
 import RouteSearchModal from '@/components/ui/RouteSearchModal.vue'
 
@@ -368,6 +369,7 @@ const navItems = [
  { path: '/orders', label: 'Orders', icon: Package },
  { path: '/referrals', label: 'Referrals', icon: Gift },
  { path: '/finances', label: 'Finances', icon: Wallet },
+ { path: '/ledger', label: 'Payouts & Ledger', icon: Banknote },
  { path: '/promos', label: 'Promo Codes', icon: Tag },
  { path: '/chats', label: 'Support Chats', icon: MessageSquare },
  { path: '/campaigns', label: 'Push Campaigns', icon: Bell },
@@ -385,6 +387,7 @@ const pageTitles: Record<string, { title: string; description: string }> = {
  '/chats': { title: 'Support Chats', description: 'Monitor and answer user questions in real-time' },
  '/campaigns': { title: 'Push Campaigns', description: 'Manage automated push notifications sent to users' },
  '/referrals': { title: 'Referral Program', description: 'Monitor affiliate and referral metrics' },
+ '/ledger': { title: 'Payouts & Ledger', description: 'Track all wallet funding and withdrawals across all users' },
  '/reports': { title: 'Platform Reports', description: 'Analytical insights and system health' },
  '/settings': { title: 'System Settings', description: 'Configure platform parameters and service fees' }
 }

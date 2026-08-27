@@ -62,6 +62,7 @@
             Active Orders
             <span v-if="profile.batchOrders?.length" class="bg-[#FF5C1A] text-white text-[10px] px-2 py-0.5 rounded-full font-bold">{{ profile.batchOrders.length }}</span>
           </button>
+          <button @click="activeTab = 'finances'" :class="activeTab === 'finances' ? 'text-[#FF5C1A] border-b-2 border-[#FF5C1A] font-bold' : 'text-gray-500 hover:text-gray-700 font-medium'" class="px-6 py-4 whitespace-nowrap transition-colors">Finances & Payouts</button>
         </div>
 
         <div class="p-6 bg-gray-50/30">
@@ -280,6 +281,14 @@
             </div>
           </div>
 
+          <!-- FINANCES TAB -->
+          <div v-else-if="activeTab === 'finances'" class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+            <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider mb-6 flex items-center gap-2">
+              <DollarSign class="w-4 h-4" /> Finances & Payouts
+            </h3>
+            <UserFinances v-if="profile.user?._id" :userId="profile.user._id" userRole="errander" />
+          </div>
+
         </div>
       </div>
     </div>
@@ -335,6 +344,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { GATEWAY_ENDPOINT_WITH_AUTH } from '@/api_factory/axios.config'
 import { ArrowLeft, User, Mail, Phone, DollarSign, Star, Shield, CheckCircle, FileText, Search, Receipt, Clock, MapPin, X } from 'lucide-vue-next'
 import TransactionsList from '@/components/TransactionsList.vue'
+import UserFinances from '@/components/users/UserFinances.vue'
 
 const route = useRoute()
 const router = useRouter()

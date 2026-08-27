@@ -17,6 +17,8 @@ export const wallets_api = {
       if (query.exportAsCsv) url += `&exportAsCsv=${query.exportAsCsv}`;
       if (query.type) url += `&type=${query.type}`;
       if (query.category) url += `&category=${query.category}`;
+      if (query.userRole) url += `&userRole=${query.userRole}`;
+      if (query.userId) url += `&userId=${query.userId}`;
     }
     const isExport = query?.exportAsCsv;
     const config = isExport ? { responseType: 'blob' as 'blob' } : {};
