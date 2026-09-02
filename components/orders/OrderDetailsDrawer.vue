@@ -111,11 +111,34 @@
         </div>
         
         <!-- Ordered Items -->
-        <div class="space-y-4 mt-6" v-if="order.items?.length">
+        <div class="space-y-4 mt-6" v-if="order.packs?.length || order.items?.length">
           <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">
             Ordered Items
           </h4>
-          <div class="space-y-3 px-2">
+          
+          <!-- Render Packs -->
+          <template v-if="order.packs?.length">
+            <div v-for="pack in order.packs" :key="pack.name" class="space-y-3 px-2 mb-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
+              <h5 class="text-[10px] font-bold text-[#FF5C1A] uppercase tracking-widest border-b border-gray-200 pb-1 mb-2">{{ pack.name }}</h5>
+              <div v-for="item in pack.items" :key="item.name" class="flex items-start justify-between mb-2 last:mb-0">
+                <div class="flex items-start gap-3">
+                  <span class="text-xs font-black text-[#FF5C1A] bg-[#FF5C1A]/10 px-2 py-0.5 rounded">{{ item.quantity }}x</span>
+                  <div class="flex flex-col">
+                    <span class="text-xs font-bold text-gray-900">{{ item.name }}</span>
+                    <div v-if="item.customizations?.length" class="mt-1 space-y-1">
+                      <p v-for="(custom, idx) in item.customizations" :key="idx" class="text-[10px] font-medium text-gray-500 flex items-center gap-1">
+                        <span class="text-gray-300">•</span> {{ custom.name }} <span class="font-semibold text-gray-700" v-if="custom.price > 0">(+₦{{ custom.price?.toLocaleString() }})</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <span class="text-xs font-black text-gray-900">₦{{ Number(item.subtotal || item.price || 0).toLocaleString() }}</span>
+              </div>
+            </div>
+          </template>
+
+          <!-- Fallback to raw items if no packs -->
+          <div v-else class="space-y-3 px-2">
             <div v-for="item in order.items" :key="item._id" class="flex items-start justify-between">
               <div class="flex items-start gap-3">
                 <span class="text-xs font-black text-[#FF5C1A] bg-[#FF5C1A]/10 px-2 py-0.5 rounded">{{ item.quantity }}x</span>
