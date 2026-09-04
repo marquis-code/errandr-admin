@@ -591,8 +591,12 @@ const fetchCampaignOrders = async () => {
 }
 
 const verifyPayment = async (orderId, action) => {
+  const isApproving = action === 'approve'
+  const confirmed = confirm(`Are you sure you want to ${isApproving ? 'APPROVE' : 'REJECT'} this payment?`)
+  if (!confirmed) return
+
   try {
-    await api.post(`/market-pool/campaigns/${orderId}/verify-payment`, { action })
+    await api.put(`/market-pool/orders/${orderId}/verify-payment`, { action })
     showToast({ title: 'Success', message: `Payment ${action}d successfully.`, toastType: 'success' })
     await fetchCampaignOrders()
   } catch (e) {
