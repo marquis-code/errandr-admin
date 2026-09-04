@@ -292,6 +292,9 @@
                   <button @click.stop="openModal(order, 'dispatcher')" class="w-full px-4 py-2 text-[11px] font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 text-left transition-colors">
                     Assign Dispatcher
                   </button>
+                  <button @click.stop="openIssueModal(order)" class="w-full px-4 py-2 text-[11px] font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 text-left transition-colors">
+                    Update Issues
+                  </button>
                   <div class="border-t border-gray-50 my-1.5"></div>
                   <button v-if="['pending', 'processing', 'confirmed', 'scheduled', 'preparing'].includes(order.status)" @click.stop="handleCancelOrder(order._id)" class="w-full px-4 py-2 text-[11px] font-bold text-red-600 hover:bg-red-50 text-left transition-colors">
                     Cancel Order
@@ -607,6 +610,42 @@
         </div>
       </div>
     </div>
+
+    <!-- Update Issues Modal -->
+    <div v-if="showIssueModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+      <div class="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden" @click.stop>
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-bold text-gray-900">Update Issues</h3>
+            <p class="text-xs text-gray-500 mt-1">Log missing items or complaints for support tracking</p>
+          </div>
+          <button @click="showIssueModal = false" class="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+        <div class="p-6">
+          <textarea
+            v-model="issueInput"
+            rows="4"
+            class="w-full text-sm border-gray-200 rounded-xl focus:ring-orange-500 focus:border-orange-500 p-3 bg-gray-50 placeholder:text-gray-400"
+            placeholder="e.g. Missing 2 pieces of meat, customer complained about delay..."
+          ></textarea>
+        </div>
+        <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-3">
+          <button @click="showIssueModal = false" class="px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
+            Cancel
+          </button>
+          <button 
+            @click="confirmUpdateIssues" 
+            :disabled="isUpdatingIssues"
+            class="px-4 py-2 text-sm font-bold text-white bg-orange-600 hover:bg-orange-700 rounded-xl transition-all shadow-sm hover:shadow-md disabled:opacity-50 flex items-center gap-2"
+          >
+            <Loader2 v-if="isUpdatingIssues" class="w-4 h-4 animate-spin" />
+            Save Issues
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -798,6 +837,9 @@ const formatWhatsAppNumber = (phone: string | undefined | null) => {
 };
 
 const showCancelModal = ref(false);
+const showIssueModal = ref(false);
+const issueInput = ref('');
+const isUpdatingIssues = ref(false);
 const orderToCancelId = ref('');
 const cancelReasonInput = ref('');
 const isCancellingOrder = ref(false);
@@ -825,6 +867,29 @@ const confirmCancelOrder = async () => {
     showToast({ title: 'Error', message: error.response?.data?.message || 'Failed to cancel order.', toastType: 'error' });
   } finally {
     isCancellingOrder.value = false;
+  }
+};
+
+const openIssueModal = (order: any) => {
+  modalOrder.value = order;
+  issueInput.value = order.issues || '';
+  showIssueModal.value = true;
+  activeDropdown.value = null;
+};
+
+const confirmUpdateIssues = async () => {
+  if (!modalOrder.value?._id) return;
+  isUpdatingIssues.value = true;
+  try {
+    await admin_api.updateOrderIssues(modalOrder.value._id, { issues: issueInput.value });
+    showToast({ title: 'Success', message: 'Issues updated successfully.', toastType: 'success' });
+    fetchOrders();
+    showIssueModal.value = false;
+    modalOrder.value = null;
+  } catch (error: any) {
+    showToast({ title: 'Error', message: error.response?.data?.message || 'Failed to update issues.', toastType: 'error' });
+  } finally {
+    isUpdatingIssues.value = false;
   }
 };
 

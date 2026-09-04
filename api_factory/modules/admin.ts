@@ -61,6 +61,10 @@ export const admin_api = {
     return GATEWAY_ENDPOINT_WITH_AUTH.put(`/orders/${id}/status`, payload);
   },
 
+  updateOrderIssues: (id: string, payload: { issues: string }) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/orders/${id}/issues`, payload);
+  },
+
   getErranderSettings: () => {
     return GATEWAY_ENDPOINT_WITH_AUTH.get('/settings/erranders');
   },
