@@ -156,13 +156,15 @@
       </div>
 
       <div v-else class="overflow-x-auto">
-        <table class="w-full text-left border-collapse min-w-[800px]">
+        <table class="w-full text-left border-collapse min-w-[1200px]">
           <thead>
             <tr class="border-b border-gray-100/50 bg-gray-50/20">
-              <th class="px-4 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-wider w-[30%]">Customer & Order</th>
-              <th class="px-4 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-wider w-[25%]">Logistics</th>
+              <th class="px-4 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-wider w-[20%]">Customer & Order</th>
+              <th class="px-4 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-wider w-[20%]">Logistics</th>
               <th class="px-4 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-wider text-right">Financials</th>
               <th class="px-4 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-wider text-right">Date</th>
+              <th class="px-4 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-wider w-[15%]">Issues</th>
+              <th class="px-4 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-wider w-[15%]">Cancel Reason</th>
               <th class="px-4 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-wider text-right">Status</th>
               <th class="px-4 py-2.5 text-[10px] font-black text-gray-400 uppercase tracking-wider text-right">Actions</th>
             </tr>
@@ -240,6 +242,20 @@
                   <span class="text-[9px] font-medium text-gray-500">{{ new Date(order.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) }}</span>
                   <span class="text-[10px] font-bold text-gray-400 mt-1">{{ formatTimeAgo(order.createdAt) }}</span>
                 </div>
+              </td>
+              
+              <!-- Issues -->
+              <td class="px-4 py-2.5 align-top">
+                <p class="text-[11px] text-gray-600 line-clamp-2 mt-0.5" :title="order.issues || 'No issues reported'">
+                  {{ order.issues || '-' }}
+                </p>
+              </td>
+
+              <!-- Cancel Reason -->
+              <td class="px-4 py-2.5 align-top">
+                <p class="text-[11px] text-gray-600 line-clamp-2 mt-0.5" :title="order.cancelReason || order.cancellationReason || order.reason || 'N/A'">
+                  {{ order.status === 'cancelled' ? (order.cancelReason || order.cancellationReason || order.reason || 'Cancelled without reason') : '-' }}
+                </p>
               </td>
               
               <!-- Status & Timeline -->
