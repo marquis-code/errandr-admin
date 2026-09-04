@@ -1,12 +1,12 @@
 <template>
-  <div class="p-6 bg-gray-50 min-h-screen">
+  <div class="p-6 bg-white min-h-screen">
     <div class="flex items-center justify-between mb-8">
       <div>
         <h1 class="text-2xl font-bold text-gray-900">Market Pool Management</h1>
         <p class="text-sm text-gray-500 mt-1">Manage weekly campaigns, aggregation, and refunds.</p>
       </div>
-      <button @click="showCreateModal = true" class="bg-primary text-white px-4 py-2 rounded-lg font-medium shadow-sm hover:bg-primary/90 transition-colors">
-        + Create Campaign
+      <button @click="showCreateModal = true" class="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg font-medium shadow-sm hover:bg-primary/90 transition-colors">
+        <Plus class="w-4 h-4" /> Create Campaign
       </button>
     </div>
 
@@ -71,15 +71,25 @@
             </tbody>
           </table>
         </div>
-        <div v-else class="text-sm text-gray-500 py-8 text-center bg-gray-50 rounded-lg">
-          No orders have been placed in this campaign yet.
+        <div v-else class="py-16 flex flex-col items-center justify-center text-center bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
+          <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm border border-gray-100">
+            <ShoppingCart class="w-8 h-8 text-gray-400" />
+          </div>
+          <h4 class="font-bold text-gray-900 text-lg tracking-tight mb-1">No Orders Yet</h4>
+          <p class="text-sm text-gray-500 max-w-sm">No students have placed orders in this campaign yet. Check back later once the pool starts filling up.</p>
         </div>
       </div>
     </div>
     
-    <div v-else-if="!loading" class="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-50">
-      <h3 class="text-lg font-medium text-gray-900">No Active Campaign</h3>
-      <p class="text-gray-500 mt-1">Create a new campaign to start the market pool.</p>
+    <div v-else-if="!loading" class="py-24 flex flex-col items-center justify-center text-center bg-white rounded-xl border border-dashed border-gray-200">
+      <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100">
+        <CalendarX class="w-10 h-10 text-gray-400" />
+      </div>
+      <h3 class="text-xl font-bold text-gray-900 tracking-tight">No Active Campaign</h3>
+      <p class="text-gray-500 mt-2 max-w-md">There is currently no active market pool campaign running. Create a new campaign to open the pool for students.</p>
+      <button @click="showCreateModal = true" class="mt-6 flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg font-bold shadow-sm hover:bg-primary/90 transition-colors">
+        <Plus class="w-4 h-4" /> Create Campaign
+      </button>
     </div>
 
     <!-- Create Campaign Modal -->
@@ -87,8 +97,8 @@
       <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-bold text-gray-900">Create New Campaign</h3>
-          <button @click="showCreateModal = false" class="text-gray-400 hover:text-gray-600">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          <button @click="showCreateModal = false" class="text-gray-400 hover:text-gray-600 p-1.5 hover:bg-gray-100 rounded-full transition-colors">
+            <X class="w-5 h-5" />
           </button>
         </div>
         <div class="space-y-4">
@@ -123,6 +133,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import { Plus, X, CalendarX, ShoppingCart } from 'lucide-vue-next'
 import { GATEWAY_ENDPOINT_WITH_AUTH as api } from '@/api_factory/axios.config'
 import { useCustomToast } from '@/composables/core/useCustomToast'
 
