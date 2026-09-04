@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6 animate-fade-in max-w-7xl mx-auto pb-20">
+  <div class="space-y-6 animate-fade-in container mx-auto pb-20">
     <!-- Header Section -->
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2">
       <div class="space-y-1">

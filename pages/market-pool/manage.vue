@@ -24,17 +24,23 @@
         </span>
       </div>
 
-      <div class="p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="font-bold text-gray-800">Aggregation Dashboard</h3>
-          <button @click="fetchAggregation" class="text-sm text-primary font-medium hover:underline">
-            Refresh Aggregation
-          </button>
+        <div class="flex gap-6 border-b border-gray-100 mb-6 px-6">
+          <button @click="activeTab = 'aggregation'" :class="['pb-3 font-semibold text-sm border-b-2 transition-colors', activeTab === 'aggregation' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700']">Aggregation Dashboard</button>
+          <button @click="activeTab = 'catalog'" :class="['pb-3 font-semibold text-sm border-b-2 transition-colors', activeTab === 'catalog' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700']">Manage Catalog</button>
+          <button @click="activeTab = 'requests'" :class="['pb-3 font-semibold text-sm border-b-2 transition-colors', activeTab === 'requests' ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700']">Student Requests</button>
         </div>
 
-        <div v-if="loadingAggregation" class="text-sm text-gray-500 py-4">Loading aggregation data...</div>
-        
-        <div v-else-if="aggregation.length > 0" class="overflow-x-auto">
+        <!-- Aggregation Tab -->
+        <div v-if="activeTab === 'aggregation'" class="p-6 pt-0">
+          <div class="flex items-center justify-end mb-4">
+            <button @click="fetchAggregation" class="text-sm text-primary font-medium hover:underline">
+              Refresh Aggregation
+            </button>
+          </div>
+
+          <div v-if="loadingAggregation" class="text-sm text-gray-500 py-4">Loading aggregation data...</div>
+          
+          <div v-else-if="aggregation.length > 0" class="overflow-x-auto">
           <table class="w-full text-left text-sm">
             <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
               <tr>
@@ -77,6 +83,57 @@
           </div>
           <h4 class="font-bold text-gray-900 text-lg tracking-tight mb-1">No Orders Yet</h4>
           <p class="text-sm text-gray-500 max-w-sm">No students have placed orders in this campaign yet. Check back later once the pool starts filling up.</p>
+        </div>
+        </div>
+        <!-- Catalog Tab -->
+        <div v-if="activeTab === 'catalog'" class="p-6 pt-0">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-gray-800">Current Catalog Items</h3>
+            <button @click="showAddItemModal = true" class="text-sm bg-primary text-white px-3 py-1.5 rounded-lg font-medium hover:bg-primary/90 flex items-center gap-1">
+              <Plus class="w-4 h-4" /> Add Item
+            </button>
+          </div>
+          <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+            <div v-for="item in catalogItems" :key="item._id" class="border border-gray-200 rounded-xl p-4 flex flex-col">
+              <div class="aspect-square bg-gray-100 rounded-lg mb-3 overflow-hidden flex items-center justify-center">
+                <img v-if="item.imageUrl" :src="item.imageUrl" class="w-full h-full object-cover" />
+                <ShoppingCart v-else class="w-8 h-8 text-gray-300" />
+              </div>
+              <h4 class="font-bold text-gray-900">{{ item.name }}</h4>
+              <p class="text-xs text-gray-500 mb-2">{{ item.studentQuantity }}</p>
+              <div class="mt-auto">
+                <p class="text-xs text-gray-500">Buffer Price: ₦{{ item.appPrice.toLocaleString() }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Requests Tab -->
+        <div v-if="activeTab === 'requests'" class="p-6 pt-0">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-gray-800">Custom Item Requests</h3>
+            <button @click="fetchCustomRequests" class="text-sm text-primary font-medium hover:underline">
+              Refresh
+            </button>
+          </div>
+          <div v-if="customRequests.length > 0" class="space-y-3">
+            <div v-for="req in customRequests" :key="req._id" class="border border-gray-200 rounded-xl p-4 flex justify-between items-center">
+              <div>
+                <h4 class="font-bold text-gray-900">{{ req.itemName }}</h4>
+                <p class="text-sm text-gray-600 mb-1">{{ req.description }}</p>
+                <div class="flex gap-3 text-xs text-gray-500">
+                  <span class="font-medium bg-gray-100 px-2 py-0.5 rounded">Qty: {{ req.desiredQuantity }}</span>
+                  <span>Requested by: {{ req.userId?.name }} ({{ req.userId?.phone }})</span>
+                </div>
+              </div>
+              <button @click="approveRequestToCatalog(req)" class="text-sm bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg font-medium hover:bg-blue-100">
+                Add to Catalog
+              </button>
+            </div>
+          </div>
+          <div v-else class="py-12 text-center text-gray-500">
+            No custom requests from students.
+          </div>
         </div>
       </div>
     </div>
@@ -157,12 +214,62 @@
       </div>
     </div>
 
+    <!-- Add Item Modal -->
+    <div v-if="showAddItemModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+      <div class="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden" @click.stop>
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+          <div>
+            <h3 class="text-lg font-bold text-gray-900">Add Catalog Item</h3>
+            <p class="text-xs text-gray-500 mt-1">Upload an image and define measurement units.</p>
+          </div>
+          <button @click="showAddItemModal = false" class="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+        
+        <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Item Image</label>
+            <input type="file" @change="handleImageUpload" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
+            <div v-if="uploadingImage" class="text-xs text-gray-500 mt-2">Uploading image...</div>
+            <img v-if="newItem.imageUrl" :src="newItem.imageUrl" class="mt-3 w-24 h-24 object-cover rounded-xl border border-gray-200" />
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Item Name</label>
+            <input v-model="newItem.name" type="text" placeholder="e.g. Sweet Potatoes" class="w-full bg-gray-50 border-gray-200 text-gray-900 rounded-xl focus:ring-primary px-3 py-2 border outline-none">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Description</label>
+            <textarea v-model="newItem.description" placeholder="e.g. Fresh from the farm" class="w-full bg-gray-50 border-gray-200 text-gray-900 rounded-xl focus:ring-primary px-3 py-2 border outline-none resize-none"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Measurement / Qty</label>
+              <input v-model="newItem.studentQuantity" type="text" placeholder="e.g. 1 Paint Bucket" class="w-full bg-gray-50 border-gray-200 text-gray-900 rounded-xl focus:ring-primary px-3 py-2 border outline-none">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">App Price (₦)</label>
+              <input v-model="newItem.appPrice" type="number" placeholder="e.g. 4500" class="w-full bg-gray-50 border-gray-200 text-gray-900 rounded-xl focus:ring-primary px-3 py-2 border outline-none">
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-3">
+          <button @click="showAddItemModal = false" class="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">Cancel</button>
+          <button @click="submitNewItem" :disabled="loading || uploadingImage" class="px-5 py-2.5 text-sm font-bold text-white bg-primary hover:bg-primary/90 rounded-xl transition-all shadow-sm flex items-center gap-2 disabled:opacity-50">Add Item</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { Plus, X, CalendarX, ShoppingCart, LayoutList } from 'lucide-vue-next'
+import { Plus, X, CalendarX, ShoppingCart, LayoutList, UploadCloud } from 'lucide-vue-next'
 import { GATEWAY_ENDPOINT_WITH_AUTH as api } from '@/api_factory/axios.config'
 import { useCustomToast } from '@/composables/core/useCustomToast'
 
@@ -172,13 +279,21 @@ definePageMeta({
 
 const { showToast } = useCustomToast()
 
+const activeTab = ref('aggregation')
 const loading = ref(true)
 const campaign = ref(null)
 const loadingAggregation = ref(false)
 const aggregation = ref([])
+const catalogItems = ref([])
+const customRequests = ref([])
+
 const showCreateModal = ref(false)
+const showAddItemModal = ref(false)
 const newCampaign = ref({ title: '', startDate: '', endDate: '' })
 const autoPopulate = ref(true)
+
+const newItem = ref({ name: '', description: '', studentQuantity: '', wholesaleEstimatedCost: 0, appPrice: '', imageUrl: '' })
+const uploadingImage = ref(false)
 
 const formatDateForInput = (date) => {
   const pad = (n) => n.toString().padStart(2, '0')
@@ -217,7 +332,8 @@ const fetchActiveCampaign = async () => {
     const res = await api.get('/market-pool/active')
     if (res.data?.campaign) {
       campaign.value = res.data.campaign
-      await fetchAggregation()
+      catalogItems.value = res.data.items || []
+      await Promise.all([fetchAggregation(), fetchCustomRequests()])
     }
   } catch (e) {
     console.error(e)
@@ -276,6 +392,70 @@ const fetchAggregation = async () => {
   } finally {
     loadingAggregation.value = false
   }
+}
+
+const fetchCustomRequests = async () => {
+  if (!campaign.value) return
+  try {
+    const res = await api.get(`/market-pool/campaigns/${campaign.value._id}/custom-requests`)
+    customRequests.value = res.data
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const handleImageUpload = async (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+  try {
+    uploadingImage.value = true
+    const formData = new FormData()
+    formData.append('file', file)
+    const res = await api.post('/upload/image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    newItem.value.imageUrl = res.data.secure_url
+    showToast({ title: 'Success', message: 'Image uploaded successfully!', toastType: 'success' })
+  } catch (e) {
+    console.error(e)
+    showToast({ title: 'Error', message: 'Failed to upload image', toastType: 'error' })
+  } finally {
+    uploadingImage.value = false
+  }
+}
+
+const submitNewItem = async () => {
+  if (!newItem.value.name || !newItem.value.studentQuantity || !newItem.value.appPrice) {
+    return showToast({ title: 'Error', message: 'Please fill in name, measurement, and price.', toastType: 'error' })
+  }
+  try {
+    loading.value = true
+    await api.post(`/market-pool/campaigns/${campaign.value._id}/items`, {
+      name: newItem.value.name,
+      description: newItem.value.description,
+      studentQuantity: newItem.value.studentQuantity,
+      appPrice: Number(newItem.value.appPrice),
+      wholesaleEstimatedCost: Number(newItem.value.appPrice) * 0.8, // Rough estimate 
+      imageUrl: newItem.value.imageUrl
+    })
+    showToast({ title: 'Success', message: 'Item added successfully', toastType: 'success' })
+    showAddItemModal.value = false
+    newItem.value = { name: '', description: '', studentQuantity: '', wholesaleEstimatedCost: 0, appPrice: '', imageUrl: '' }
+    await fetchActiveCampaign()
+  } catch (e) {
+    console.error(e)
+    showToast({ title: 'Error', message: 'Failed to add item', toastType: 'error' })
+  } finally {
+    loading.value = false
+  }
+}
+
+const approveRequestToCatalog = (req) => {
+  newItem.value.name = req.itemName
+  newItem.value.description = req.description
+  newItem.value.studentQuantity = req.desiredQuantity
+  activeTab.value = 'catalog'
+  showAddItemModal.value = true
 }
 
 const triggerRefund = async (itemId, itemName) => {
