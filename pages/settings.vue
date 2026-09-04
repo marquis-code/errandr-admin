@@ -246,6 +246,19 @@
             </div>
           </div>
 
+          <!-- Enable Transfer Fee Toggle -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-2xl hover:bg-white hover:border-[#FF5C1A]/30 transition-all cursor-pointer" @click="form.enableTransferFee = !form.enableTransferFee">
+              <div>
+                <label class="text-sm font-medium text-gray-900 lowercase cursor-pointer">enable bank transfer fee</label>
+                <p class="text-xs text-gray-500 mt-1">charge customers for P2P bank transfers to erranders</p>
+              </div>
+              <div class="relative w-11 h-6 bg-gray-200 rounded-full transition-colors" :class="{ 'bg-[#FF5C1A]': form.enableTransferFee }">
+                <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform" :class="{ 'translate-x-5': form.enableTransferFee }"></div>
+              </div>
+            </div>
+          </div>
+
           <!-- Platform Processing Fee -->
           <div class="space-y-2">
             <div class="flex items-center gap-2">
@@ -757,6 +770,7 @@ const form = reactive({
   customErrandCommissionPercentage: 20,
   customErrandSafetyBufferPercentage: 20,
   minCustomErrandFee: 400,
+  enableTransferFee: false,
   minOutsideCampusFee: 450,
   minCampusEnvironsFee: 350,
   platformProcessingFee: 500,
@@ -814,6 +828,7 @@ const confirmSave = (type: string) => {
     if (form.commissionFlatFee !== originalForm.commissionFlatFee) confirmModal.changes.push(`runner commission (food): <strong>₦${originalForm.commissionFlatFee}</strong> → <strong>₦${form.commissionFlatFee}</strong>`);
     if (form.customErrandCommissionPercentage !== originalForm.customErrandCommissionPercentage) confirmModal.changes.push(`runner commission (custom): <strong>${originalForm.customErrandCommissionPercentage}%</strong> → <strong>${form.customErrandCommissionPercentage}%</strong>`);
     if (form.minCustomErrandFee !== originalForm.minCustomErrandFee) confirmModal.changes.push(`min custom errand fee: <strong>₦${originalForm.minCustomErrandFee}</strong> → <strong>₦${form.minCustomErrandFee}</strong>`);
+    if (form.enableTransferFee !== originalForm.enableTransferFee) confirmModal.changes.push(`enable transfer fee: <strong>${originalForm.enableTransferFee}</strong> → <strong>${form.enableTransferFee}</strong>`);
     if (form.platformProcessingFee !== originalForm.platformProcessingFee) confirmModal.changes.push(`processing fee: <strong>₦${originalForm.platformProcessingFee}</strong> → <strong>₦${form.platformProcessingFee}</strong>`);
     if (form.platformServiceFeePercentage !== originalForm.platformServiceFeePercentage) confirmModal.changes.push(`service fee: <strong>${originalForm.platformServiceFeePercentage}%</strong> → <strong>${form.platformServiceFeePercentage}%</strong>`);
     if (form.foodMarkupPercentage !== originalForm.foodMarkupPercentage) confirmModal.changes.push(`food markup: <strong>${originalForm.foodMarkupPercentage}%</strong> → <strong>${form.foodMarkupPercentage}%</strong>`);
@@ -874,6 +889,7 @@ const loadSettings = async () => {
       form.customErrandCommissionPercentage = Number(errandSettings.customErrandCommissionPercentage) || 20;
       form.customErrandSafetyBufferPercentage = Number(errandSettings.customErrandSafetyBufferPercentage) || 20;
       form.minCustomErrandFee = Number(errandSettings.minCustomErrandFee) || 400;
+      form.enableTransferFee = errandSettings.enableTransferFee ?? false;
       form.minOutsideCampusFee = Number(errandSettings.minOutsideCampusFee) || 450;
       form.minCampusEnvironsFee = Number(errandSettings.minCampusEnvironsFee) || 350;
       form.platformProcessingFee = Number(errandSettings.platformProcessingFee) || 500;
@@ -926,6 +942,7 @@ const saveSettings = async () => {
       customErrandCommissionPercentage: Number(form.customErrandCommissionPercentage),
       customErrandSafetyBufferPercentage: Number(form.customErrandSafetyBufferPercentage),
       minCustomErrandFee: Number(form.minCustomErrandFee),
+      enableTransferFee: form.enableTransferFee,
       platformProcessingFee: Number(form.platformProcessingFee),
       platformServiceFeePercentage: Number(form.platformServiceFeePercentage),
       foodMarkupPercentage: Number(form.foodMarkupPercentage),
