@@ -123,12 +123,14 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import { GATEWAY_ENDPOINT_WITH_AUTH as api } from '@/api_factory/axios.config'
+import { useCustomToast } from '@/composables/core/useCustomToast'
 
 definePageMeta({
   layout: 'admin'
 })
 
-const { $api } = useNuxtApp()
+const { showToast } = useCustomToast()
 
 const loading = ref(true)
 const campaign = ref(null)
@@ -172,7 +174,7 @@ onMounted(async () => {
 const fetchActiveCampaign = async () => {
   try {
     loading.value = true
-    const res = await $api.get('/market-pool/active')
+    const res = await api.get('/market-pool/active')
     if (res.data?.campaign) {
       campaign.value = res.data.campaign
       await fetchAggregation()
@@ -186,11 +188,11 @@ const fetchActiveCampaign = async () => {
 
 const createCampaign = async () => {
   if (!newCampaign.value.title || !newCampaign.value.startDate || !newCampaign.value.endDate) {
-    return alert('Please fill in all fields')
+    return showToast({ title: 'Error', message: 'Please fill in all fields', toastType: 'error' })
   }
   try {
     loading.value = true
-    const res = await $api.post('/market-pool/campaigns', {
+    const res = await api.post('/market-pool/campaigns', {
       title: newCampaign.value.title,
       startDate: new Date(newCampaign.value.startDate),
       endDate: new Date(newCampaign.value.endDate)
@@ -208,15 +210,16 @@ const createCampaign = async () => {
       ]
       
       await Promise.all(standardCatalog.map(item => 
-        $api.post(`/market-pool/campaigns/${createdCampaign._id}/items`, item).catch(e => console.error('Failed to add item', e))
+        api.post(`/market-pool/campaigns/${createdCampaign._id}/items`, item).catch(e => console.error('Failed to add item', e))
       ))
     }
     
     showCreateModal.value = false
+    showToast({ title: 'Success', message: 'Campaign created successfully!', toastType: 'success' })
     await fetchActiveCampaign()
   } catch (e) {
     console.error(e)
-    alert('Failed to create campaign')
+    showToast({ title: 'Error', message: 'Failed to create campaign', toastType: 'error' })
   } finally {
     loading.value = false
   }
@@ -226,7 +229,7 @@ const fetchAggregation = async () => {
   if (!campaign.value) return
   try {
     loadingAggregation.value = true
-    const res = await $api.get(`/market-pool/campaigns/${campaign.value._id}/aggregation`)
+    const res = await api.get(`/market-pool/campaigns/${campaign.value._id}/aggregation`)
     aggregation.value = res.data
   } catch (e) {
     console.error(e)
@@ -240,12 +243,12 @@ const triggerRefund = async (itemId, itemName) => {
   if (!confirmed) return
   
   try {
-    await $api.post(`/market-pool/campaigns/${campaign.value._id}/refund-item`, { itemId })
-    alert(`Successfully refunded ${itemName} to all affected students.`)
+    await api.post(`/market-pool/campaigns/${campaign.value._id}/refund-item`, { itemId })
+    showToast({ title: 'Success', message: `Successfully refunded ${itemName} to all affected students.`, toastType: 'success' })
     await fetchAggregation()
   } catch (e) {
     console.error(e)
-    alert('Failed to process refunds')
+    showToast({ title: 'Error', message: 'Failed to process refunds', toastType: 'error' })
   }
 }
 
