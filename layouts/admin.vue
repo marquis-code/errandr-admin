@@ -342,7 +342,8 @@ import {
  MessageSquare,
  Bell,
  Activity,
- Banknote
+ Banknote,
+ ShoppingCart
 } from 'lucide-vue-next'
 import RouteSearchModal from '@/components/ui/RouteSearchModal.vue'
 
@@ -367,6 +368,7 @@ const navItems = [
  { path: '/dispatchers', label: 'Dispatchers', icon: ShieldCheck },
  { path: '/vendors', label: 'Vendors', icon: Store },
  { path: '/orders', label: 'Orders', icon: Package },
+ { path: '/market-pool/manage', label: 'Market Pool', icon: ShoppingCart },
  { path: '/referrals', label: 'Referrals', icon: Gift },
  { path: '/finances', label: 'Finances', icon: Wallet },
  { path: '/ledger', label: 'Payouts & Ledger', icon: Banknote },
@@ -383,6 +385,7 @@ const pageTitles: Record<string, { title: string; description: string }> = {
  '/dispatchers': { title: 'Dispatcher Verifications', description: 'Review and approve dispatcher verifications' },
  '/vendors': { title: 'Vendor Management', description: 'Manage merchants and store settings' },
  '/orders': { title: 'Order Management', description: 'Monitor and track active deliveries' },
+ '/market-pool/manage': { title: 'Market Pool Management', description: 'Manage weekly campaigns, aggregation, and refunds' },
  '/promos': { title: 'Promo Codes', description: 'Create and manage discount codes and campaigns' },
  '/chats': { title: 'Support Chats', description: 'Monitor and answer user questions in real-time' },
  '/campaigns': { title: 'Push Campaigns', description: 'Manage automated push notifications sent to users' },
