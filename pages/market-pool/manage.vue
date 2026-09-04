@@ -82,11 +82,44 @@
       <p class="text-gray-500 mt-1">Create a new campaign to start the market pool.</p>
     </div>
 
+    <!-- Create Campaign Modal -->
+    <div v-if="showCreateModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-bold text-gray-900">Create New Campaign</h3>
+          <button @click="showCreateModal = false" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Campaign Title</label>
+            <input v-model="newCampaign.title" type="text" placeholder="e.g. Week 1 Market Run" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-primary focus:ring-primary sm:text-sm px-3 py-2 border">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+            <input v-model="newCampaign.startDate" type="datetime-local" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-primary focus:ring-primary sm:text-sm px-3 py-2 border">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+            <input v-model="newCampaign.endDate" type="datetime-local" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-primary focus:ring-primary sm:text-sm px-3 py-2 border">
+          </div>
+          <button @click="createCampaign" class="w-full bg-primary text-white font-medium rounded-lg px-4 py-2 hover:bg-primary/90 mt-4 transition-colors">
+            Start Campaign
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+
+definePageMeta({
+  layout: 'admin'
+})
 
 const { $api } = useNuxtApp()
 
@@ -95,6 +128,7 @@ const campaign = ref(null)
 const loadingAggregation = ref(false)
 const aggregation = ref([])
 const showCreateModal = ref(false)
+const newCampaign = ref({ title: '', startDate: '', endDate: '' })
 
 onMounted(async () => {
   await fetchActiveCampaign()
@@ -110,6 +144,27 @@ const fetchActiveCampaign = async () => {
     }
   } catch (e) {
     console.error(e)
+  } finally {
+    loading.value = false
+  }
+}
+
+const createCampaign = async () => {
+  if (!newCampaign.value.title || !newCampaign.value.startDate || !newCampaign.value.endDate) {
+    return alert('Please fill in all fields')
+  }
+  try {
+    loading.value = true
+    await $api.post('/market-pool/campaigns', {
+      title: newCampaign.value.title,
+      startDate: new Date(newCampaign.value.startDate),
+      endDate: new Date(newCampaign.value.endDate)
+    })
+    showCreateModal.value = false
+    await fetchActiveCampaign()
+  } catch (e) {
+    console.error(e)
+    alert('Failed to create campaign')
   } finally {
     loading.value = false
   }
