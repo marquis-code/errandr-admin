@@ -93,35 +93,64 @@
     </div>
 
     <!-- Create Campaign Modal -->
-    <div v-if="showCreateModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-bold text-gray-900">Create New Campaign</h3>
-          <button @click="showCreateModal = false" class="text-gray-400 hover:text-gray-600 p-1.5 hover:bg-gray-100 rounded-full transition-colors">
+    <div v-if="showCreateModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+      <div class="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden" @click.stop>
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+          <div>
+            <h3 class="text-lg font-bold text-gray-900">Create New Campaign</h3>
+            <p class="text-xs text-gray-500 mt-1">Set up a new market pool run</p>
+          </div>
+          <button @click="showCreateModal = false" class="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-full transition-colors">
             <X class="w-5 h-5" />
           </button>
         </div>
-        <div class="space-y-4">
+        
+        <div class="p-6 space-y-5">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Campaign Title</label>
-            <input v-model="newCampaign.title" type="text" placeholder="e.g. Week 1 Market Run" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-primary focus:ring-primary sm:text-sm px-3 py-2 border">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-            <input v-model="newCampaign.startDate" type="datetime-local" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-primary focus:ring-primary sm:text-sm px-3 py-2 border">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-            <input v-model="newCampaign.endDate" type="datetime-local" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-primary focus:ring-primary sm:text-sm px-3 py-2 border">
-          </div>
-          <div class="flex items-center gap-2 bg-gray-50 p-3 rounded-lg border border-gray-100 mt-2">
-            <input type="checkbox" id="autoPopulate" v-model="autoPopulate" class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4">
-            <div class="flex flex-col">
-              <label for="autoPopulate" class="text-sm font-bold text-gray-700 cursor-pointer">Auto-populate Standard Catalog</label>
-              <p class="text-[10px] text-gray-500">Automatically adds staples (Rice, Beans, Garri, Eggs, Indomie) to the pool</p>
+            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Campaign Title</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <LayoutList class="h-4 w-4 text-gray-400" />
+              </div>
+              <input v-model="newCampaign.title" type="text" placeholder="e.g. Week 1 Market Run" class="w-full pl-10 bg-gray-50 border-gray-200 text-gray-900 rounded-xl focus:ring-primary focus:border-primary focus:bg-white sm:text-sm px-3 py-2.5 border transition-colors outline-none">
             </div>
           </div>
-          <button @click="createCampaign" class="w-full bg-primary text-white font-medium rounded-lg px-4 py-2 hover:bg-primary/90 mt-4 transition-colors">
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Start Date</label>
+              <div class="relative">
+                <input v-model="newCampaign.startDate" type="datetime-local" class="w-full bg-gray-50 border-gray-200 text-gray-900 rounded-xl focus:ring-primary focus:border-primary focus:bg-white sm:text-sm px-3 py-2.5 border transition-colors outline-none">
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">End Date</label>
+              <div class="relative">
+                <input v-model="newCampaign.endDate" type="datetime-local" class="w-full bg-gray-50 border-gray-200 text-gray-900 rounded-xl focus:ring-primary focus:border-primary focus:bg-white sm:text-sm px-3 py-2.5 border transition-colors outline-none">
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex items-start gap-3 bg-blue-50/50 p-4 rounded-xl border border-blue-100 mt-2">
+            <div class="flex items-center h-5 mt-0.5">
+              <input type="checkbox" id="autoPopulate" v-model="autoPopulate" class="rounded text-primary focus:ring-primary h-4 w-4 border-gray-300">
+            </div>
+            <div class="flex flex-col">
+              <label for="autoPopulate" class="text-sm font-bold text-gray-700 cursor-pointer">Auto-populate Standard Catalog</label>
+              <p class="text-xs text-gray-500 mt-0.5">Automatically adds staples (Rice, Beans, Garri, Eggs, Indomie) to the pool</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-3">
+          <button @click="showCreateModal = false" class="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
+            Cancel
+          </button>
+          <button 
+            @click="createCampaign" 
+            :disabled="loading"
+            class="px-5 py-2.5 text-sm font-bold text-white bg-primary hover:bg-primary/90 rounded-xl transition-all shadow-sm flex items-center gap-2 disabled:opacity-50"
+          >
             Start Campaign
           </button>
         </div>
@@ -133,7 +162,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { Plus, X, CalendarX, ShoppingCart } from 'lucide-vue-next'
+import { Plus, X, CalendarX, ShoppingCart, LayoutList } from 'lucide-vue-next'
 import { GATEWAY_ENDPOINT_WITH_AUTH as api } from '@/api_factory/axios.config'
 import { useCustomToast } from '@/composables/core/useCustomToast'
 
