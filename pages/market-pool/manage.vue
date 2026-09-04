@@ -77,7 +77,7 @@
       </div>
     </div>
     
-    <div v-else-if="!loading" class="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-200">
+    <div v-else-if="!loading" class="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-50">
       <h3 class="text-lg font-medium text-gray-900">No Active Campaign</h3>
       <p class="text-gray-500 mt-1">Create a new campaign to start the market pool.</p>
     </div>
@@ -104,6 +104,13 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
             <input v-model="newCampaign.endDate" type="datetime-local" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-primary focus:ring-primary sm:text-sm px-3 py-2 border">
           </div>
+          <div class="flex items-center gap-2 bg-gray-50 p-3 rounded-lg border border-gray-100 mt-2">
+            <input type="checkbox" id="autoPopulate" v-model="autoPopulate" class="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4">
+            <div class="flex flex-col">
+              <label for="autoPopulate" class="text-sm font-bold text-gray-700 cursor-pointer">Auto-populate Standard Catalog</label>
+              <p class="text-[10px] text-gray-500">Automatically adds staples (Rice, Beans, Garri, Eggs, Indomie) to the pool</p>
+            </div>
+          </div>
           <button @click="createCampaign" class="w-full bg-primary text-white font-medium rounded-lg px-4 py-2 hover:bg-primary/90 mt-4 transition-colors">
             Start Campaign
           </button>
@@ -115,7 +122,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 
 definePageMeta({
   layout: 'admin'
@@ -129,6 +136,34 @@ const loadingAggregation = ref(false)
 const aggregation = ref([])
 const showCreateModal = ref(false)
 const newCampaign = ref({ title: '', startDate: '', endDate: '' })
+const autoPopulate = ref(true)
+
+const formatDateForInput = (date) => {
+  const pad = (n) => n.toString().padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+
+const getNextDayOfWeek = (dayOfWeek, hour) => {
+  const date = new Date()
+  const currentDay = date.getDay()
+  const daysUntil = (dayOfWeek + 7 - currentDay) % 7 || 7
+  date.setDate(date.getDate() + daysUntil)
+  date.setHours(hour, 0, 0, 0)
+  return date
+}
+
+watch(showCreateModal, (val) => {
+  if (val) {
+    const nextMonday = getNextDayOfWeek(1, 8)
+    const nextWednesday = getNextDayOfWeek(3, 20)
+    const weekOfStr = nextMonday.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    
+    newCampaign.value.title = `Campus Market Pool - Week of ${weekOfStr}`
+    newCampaign.value.startDate = formatDateForInput(nextMonday)
+    newCampaign.value.endDate = formatDateForInput(nextWednesday)
+    autoPopulate.value = true
+  }
+})
 
 onMounted(async () => {
   await fetchActiveCampaign()
@@ -155,11 +190,28 @@ const createCampaign = async () => {
   }
   try {
     loading.value = true
-    await $api.post('/market-pool/campaigns', {
+    const res = await $api.post('/market-pool/campaigns', {
       title: newCampaign.value.title,
       startDate: new Date(newCampaign.value.startDate),
       endDate: new Date(newCampaign.value.endDate)
     })
+    
+    const createdCampaign = res.data
+    
+    if (autoPopulate.value && createdCampaign && createdCampaign._id) {
+      const standardCatalog = [
+        { name: 'Rice', description: 'Long grain parboiled rice', studentQuantity: '1 Derica', wholesaleEstimatedCost: 1000, appPrice: 1200 },
+        { name: 'Beans', description: 'Oloyin beans', studentQuantity: '1 Derica', wholesaleEstimatedCost: 1300, appPrice: 1500 },
+        { name: 'Garri', description: 'White/Yellow Garri', studentQuantity: '1 Derica', wholesaleEstimatedCost: 700, appPrice: 800 },
+        { name: 'Eggs', description: 'Large farm eggs', studentQuantity: 'Half Crate', wholesaleEstimatedCost: 2200, appPrice: 2500 },
+        { name: 'Indomie Noodles', description: 'Onion chicken flavor', studentQuantity: '1 Carton', wholesaleEstimatedCost: 7800, appPrice: 8500 }
+      ]
+      
+      await Promise.all(standardCatalog.map(item => 
+        $api.post(`/market-pool/campaigns/${createdCampaign._id}/items`, item).catch(e => console.error('Failed to add item', e))
+      ))
+    }
+    
     showCreateModal.value = false
     await fetchActiveCampaign()
   } catch (e) {
