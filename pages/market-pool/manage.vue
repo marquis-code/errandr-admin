@@ -244,6 +244,59 @@
               </div>
             </div>
           </div>
+
+          <hr class="my-8 border-gray-100" />
+
+          <div class="max-w-2xl">
+            <h3 class="font-bold text-gray-800 mb-4">General Configuration</h3>
+            <p class="text-sm text-gray-500 mb-6">Configure delivery slots and pricing rules for the market pool.</p>
+            
+            <div class="space-y-6">
+              <!-- Delivery Fee Configuration -->
+              <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <h4 class="font-bold text-sm text-gray-800 mb-3">Delivery Pricing</h4>
+                <div class="flex items-center gap-4 mb-4">
+                  <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                    <input type="radio" v-model="marketPoolConfig.feeType" value="flat" class="text-primary focus:ring-primary">
+                    Flat Fee (₦)
+                  </label>
+                  <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                    <input type="radio" v-model="marketPoolConfig.feeType" value="percentage" class="text-primary focus:ring-primary">
+                    Percentage of Cart Total (%)
+                  </label>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-1.5">
+                    {{ marketPoolConfig.feeType === 'percentage' ? 'Percentage Value (%)' : 'Flat Amount (₦)' }}
+                  </label>
+                  <input v-model.number="marketPoolConfig.feeValue" type="number" class="w-full max-w-xs bg-white border-gray-200 text-gray-900 rounded-xl focus:ring-primary px-3 py-2 border outline-none">
+                </div>
+              </div>
+
+              <!-- Delivery Slots Configuration -->
+              <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <h4 class="font-bold text-sm text-gray-800 mb-3">Delivery Time Slots</h4>
+                <div class="space-y-2 mb-3">
+                  <div v-for="(slot, index) in marketPoolConfig.slots" :key="index" class="flex gap-2 items-center">
+                    <input v-model="marketPoolConfig.slots[index]" type="text" placeholder="e.g. Morning (8am - 12pm)" class="flex-1 bg-white border-gray-200 text-gray-900 rounded-xl focus:ring-primary px-3 py-2 border outline-none">
+                    <button @click="marketPoolConfig.slots.splice(index, 1)" class="p-2 text-red-500 hover:bg-red-50 rounded-lg">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                  </div>
+                </div>
+                <button @click="marketPoolConfig.slots.push('')" class="text-sm font-bold text-primary flex items-center gap-1 hover:underline">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                  Add Time Slot
+                </button>
+              </div>
+
+              <div class="pt-2">
+                <button @click="saveMarketPoolConfig" :disabled="savingConfig" class="bg-primary text-white px-5 py-2.5 rounded-xl font-bold shadow-sm hover:bg-primary/90 transition-colors disabled:opacity-50">
+                  {{ savingConfig ? 'Saving...' : 'Save General Config' }}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     
@@ -506,7 +559,9 @@ watch(showCreateModal, (val) => {
 onMounted(async () => {
   await Promise.all([
     fetchActiveCampaign(),
-    fetchCategories()
+    fetchCategories(),
+    fetchBankSettings(),
+    fetchMarketPoolConfig()
   ])
 })
 
@@ -635,6 +690,33 @@ const saveBankSettings = async () => {
     showToast({ title: 'Error', message: 'Failed to update settings', toastType: 'error' })
   } finally {
     savingSettings.value = false
+  }
+}
+
+const marketPoolConfig = ref({ slots: ['Morning (8am - 12pm)', 'Afternoon (1pm - 5pm)'], feeType: 'flat', feeValue: 500 })
+const savingConfig = ref(false)
+
+const fetchMarketPoolConfig = async () => {
+  try {
+    const res = await api.get('/settings/market-pool/config')
+    if (res.data) {
+      marketPoolConfig.value = res.data
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const saveMarketPoolConfig = async () => {
+  try {
+    savingConfig.value = true
+    await api.put('/settings/market-pool/config', marketPoolConfig.value)
+    showToast({ title: 'Success', message: 'Config updated successfully', toastType: 'success' })
+  } catch (e) {
+    console.error(e)
+    showToast({ title: 'Error', message: 'Failed to update config', toastType: 'error' })
+  } finally {
+    savingConfig.value = false
   }
 }
 

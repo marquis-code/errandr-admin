@@ -68,8 +68,11 @@
             <div
               v-for="(option, index) in filteredOptions"
               :key="index"
-              @click="selectOption(option)"
-              class="p-3 font-medium hover:bg-gray-25 m-1 rounded-lg cursor-pointer transition-colors text-sm text-[#1A1A1B]"
+              @click="!option.disabled && selectOption(option)"
+              :class="[
+                'p-3 font-medium m-1 rounded-lg transition-colors text-sm',
+                option.disabled ? 'text-gray-400 cursor-not-allowed bg-gray-50/50' : 'hover:bg-gray-50 cursor-pointer text-[#1A1A1B]'
+              ]"
             >
               <!-- Custom option slot -->
               <slot v-if="slots.default" :option="option" :index="index" />

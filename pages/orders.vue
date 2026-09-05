@@ -290,7 +290,7 @@
                     Update Order Status
                   </button>
                   <button @click.stop="openModal(order, 'dispatcher')" class="w-full px-4 py-2 text-[11px] font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 text-left transition-colors">
-                    Assign Dispatcher
+                    {{ order.errander ? 'Reassign Dispatcher' : 'Assign Dispatcher' }}
                   </button>
                   <button @click.stop="openIssueModal(order)" class="w-full px-4 py-2 text-[11px] font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 text-left transition-colors">
                     Update Issues
@@ -525,44 +525,80 @@
     </SideDrawer>
 
     <!-- Action Modal -->
-    <div v-if="showActionModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm" @click.self="showActionModal = false">
-      <div class="bg-white rounded-2xl w-full max-w-md p-6 space-y-6 animate-fade-in-up">
-        <div class="flex justify-between items-center border-b border-gray-100 pb-4">
-          <h3 class="text-lg font-bold text-gray-900">Order Actions</h3>
-          <button @click="showActionModal = false" class="text-gray-400 hover:text-gray-600 transition-colors">
-            <X class="w-5 h-5" />
-          </button>
+    <Teleport to="body">
+      <div v-if="showActionModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm" @click.self="showActionModal = false">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6 space-y-6 animate-fade-in-up shadow-2xl">
+          <div class="flex justify-between items-center border-b border-gray-100 pb-4">
+            <h3 class="text-lg font-bold text-gray-900">Order Actions</h3>
+            <button @click="showActionModal = false" class="text-gray-400 hover:text-gray-600 transition-colors">
+              <X class="w-5 h-5" />
+            </button>
+          </div>
+        
+        <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 space-y-3 mb-6">
+          <div class="flex justify-between items-center">
+             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Current Status</span>
+             <span class="text-[11px] font-bold px-2 py-1 rounded bg-indigo-50 text-indigo-700 capitalize">{{ modalOrder?.status?.replace(/_/g, ' ') || 'Unknown' }}</span>
+          </div>
+          <div class="flex justify-between items-center" v-if="modalOrder?.errander">
+             <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Current Dispatcher</span>
+             <span class="text-[11px] font-bold text-gray-900">{{ modalOrder?.errander?.firstName }} {{ modalOrder?.errander?.lastName }}</span>
+          </div>
         </div>
         
         <div class="space-y-4">
           <div class="space-y-2">
             <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Update Order Status</label>
-            <div class="flex gap-2">
-              <select v-model="selectedOrderUpdateStatus" class="flex-1 bg-white border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2">
-                <option value="">Select status</option>
-                <option v-for="status in updateStatuses" :key="status" :value="status">{{ status.replace(/_/g, ' ') }}</option>
-              </select>
-              <button @click="handleUpdateStatus" :disabled="isUpdatingStatus || !selectedOrderUpdateStatus" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50">
+            <div class="flex gap-2 relative">
+              <SelectInput 
+                v-model="selectedOrderUpdateStatus" 
+                :options="computedStatusOptions" 
+                label="Select status" 
+                class="flex-1"
+                position="top"
+              />
+              <button @click="handleUpdateStatus" :disabled="isUpdatingStatus || !selectedOrderUpdateStatus" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50 h-[42px] self-end">
                 <Loader2 v-if="isUpdatingStatus" class="w-4 h-4 animate-spin" />
                 <span v-else>Update</span>
               </button>
             </div>
           </div>
 
-          <div class="space-y-2">
-            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Assign Dispatcher</label>
-            <div class="flex gap-2">
+          <div class="space-y-2 mt-4">
+            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{{ modalOrder?.errander ? 'Reassign Dispatcher' : 'Assign Dispatcher' }}</label>
+            <div class="flex gap-2 relative">
               <SelectInput 
                 v-model="assigningErranderId" 
-                :options="dispatcherOptions" 
-                label="Select Dispatcher" 
+                :options="filteredDispatcherOptions" 
+                :label="modalOrder?.errander ? 'Select New Dispatcher' : 'Select Dispatcher'" 
                 class="flex-1"
                 position="top"
               />
               <button @click="handleAssignDispatcher" :disabled="isAssigning || !assigningErranderId" class="px-4 py-2 bg-[#FF5C1A] text-white rounded-lg text-sm font-bold hover:bg-[#e04f15] transition-colors disabled:opacity-50 h-[42px] self-end">
                 <Loader2 v-if="isAssigning" class="w-4 h-4 animate-spin" />
-                <span v-else>Assign</span>
+                <span v-else>{{ modalOrder?.errander ? 'Reassign' : 'Assign' }}</span>
               </button>
+            </div>
+            
+            <div v-if="modalOrder?.errander && assigningErranderId" class="mt-4 p-3 bg-orange-50 border border-orange-100 rounded-lg text-xs text-orange-800">
+              <div class="font-bold flex items-center gap-1.5 mb-2 text-orange-700">
+                <AlertTriangle class="w-3.5 h-3.5" /> 
+                Reassignment Implications:
+              </div>
+              <div class="space-y-2 opacity-90">
+                 <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" v-model="revertStatus" class="rounded text-orange-600 focus:ring-orange-500 bg-white border-orange-200">
+                    <span>Revert order status to <b>Confirmed</b></span>
+                 </label>
+                 <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" v-model="forfeitFee" class="rounded text-orange-600 focus:ring-orange-500 bg-white border-orange-200">
+                    <span>The current dispatcher ({{ modalOrder?.errander?.firstName }}) forfeits their delivery fee</span>
+                 </label>
+                 <div v-if="modalOrder?.type === 'custom_errand'" class="flex items-start gap-2 mt-2 pt-2 border-t border-orange-200/50">
+                    <AlertTriangle class="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                    <span><b>Warning:</b> If item cost was already disbursed to the original dispatcher, this action will fail. You must resolve funds manually.</span>
+                 </div>
+              </div>
             </div>
           </div>
 
@@ -576,9 +612,11 @@
         </div>
       </div>
     </div>
+    </Teleport>
     <!-- Cancel Order Modal -->
-    <div v-if="showCancelModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm" @click.self="showCancelModal = false">
-      <div class="bg-white rounded-2xl w-full max-w-md p-6 space-y-6 animate-fade-in-up">
+    <Teleport to="body">
+    <div v-if="showCancelModal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm" @click.self="showCancelModal = false">
+      <div class="bg-white rounded-2xl w-full max-w-md p-6 space-y-6 animate-fade-in-up shadow-2xl">
         <div class="flex justify-between items-center border-b border-gray-100 pb-4">
           <h3 class="text-lg font-bold text-gray-900">Cancel Order</h3>
           <button @click="showCancelModal = false" class="text-gray-400 hover:text-gray-600 transition-colors">
@@ -610,10 +648,12 @@
         </div>
       </div>
     </div>
+    </Teleport>
 
     <!-- Update Issues Modal -->
+    <Teleport to="body">
     <div v-if="showIssueModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
-      <div class="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden" @click.stop>
+      <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden" @click.stop>
         <div class="p-6 border-b border-gray-100 flex items-center justify-between">
           <div>
             <h3 class="text-lg font-bold text-gray-900">Update Issues</h3>
@@ -646,6 +686,7 @@
         </div>
       </div>
     </div>
+    </Teleport>
   </div>
 </template>
 
@@ -654,7 +695,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { admin_api } from '@/api_factory/modules/admin';
 import { useCustomToast as useToast } from '@/composables/core/useCustomToast';
 const { showToast } = useToast();
-import { ShoppingBag, DollarSign, Activity, Calendar, Store, Truck, CheckCircle, Clock, XCircle, Loader2, X, MapPin } from 'lucide-vue-next';
+import { ShoppingBag, DollarSign, Activity, Calendar, Store, Truck, CheckCircle, Clock, XCircle, Loader2, X, MapPin, AlertTriangle } from 'lucide-vue-next';
 import SideDrawer from '@/components/ui/SideDrawer.vue';
 import SelectInput from '@/components/ui/SelectInput.vue';
 import DateRangePicker from '@/components/ui/DateRangePicker.vue';
@@ -707,11 +748,18 @@ const statusOptions = [
 
 const updateStatuses = ['pending', 'confirmed', 'preparing', 'ready_for_pickup', 'picked_up', 'in_transit', 'delivered', 'cancelled'];
 const showActionModal = ref(false);
+const assigningErranderId = ref('');
+const isAssigning = ref(false);
+const revertStatus = ref(true);
+const forfeitFee = ref(true);
 
 const openModal = (order: any, type: 'status' | 'dispatcher') => {
   modalOrder.value = order;
-  activeDropdown.value = null;
   showActionModal.value = true;
+  activeDropdown.value = null;
+  assigningErranderId.value = '';
+  revertStatus.value = true;
+  forfeitFee.value = true;
 };
 
 // Dropdown options
@@ -719,11 +767,27 @@ const customerOptions = ref<any[]>([]);
 const vendorOptions = ref<any[]>([]);
 const dispatcherOptions = ref<any[]>([]);
 
-const assigningErranderId = ref('');
-const isAssigning = ref(false);
-
 const selectedOrderUpdateStatus = ref('');
 const isUpdatingStatus = ref(false);
+
+const filteredDispatcherOptions = computed(() => {
+  if (!modalOrder.value?.errander) return dispatcherOptions.value;
+  return dispatcherOptions.value.filter((d: any) => d.value !== modalOrder.value.errander._id && d.value !== modalOrder.value.errander.user?._id);
+});
+
+const computedStatusOptions = computed(() => {
+  if (!modalOrder.value?.status) {
+    return updateStatuses.map(s => ({ label: s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), value: s }));
+  }
+  
+  const currentIndex = updateStatuses.indexOf(modalOrder.value.status);
+  
+  return updateStatuses.map((s, index) => ({
+    label: s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+    value: s,
+    disabled: currentIndex !== -1 && index <= currentIndex
+  }));
+});
 
 const fetchDropdowns = async () => {
   try {
@@ -897,12 +961,23 @@ const handleAssignDispatcher = async () => {
   if (!assigningErranderId.value) return;
   isAssigning.value = true;
   try {
-    await admin_api.assignOrder(modalOrder.value._id, { erranderId: assigningErranderId.value });
-    showToast({ title: 'Success', message: 'Dispatcher assigned successfully.', toastType: 'success' });
+    if (modalOrder.value?.errander) {
+      await admin_api.reassignOrder(modalOrder.value._id, { 
+        erranderId: assigningErranderId.value,
+        revertStatus: revertStatus.value,
+        forfeitFee: forfeitFee.value
+      });
+      showToast({ title: 'Success', message: 'Dispatcher reassigned successfully.', toastType: 'success' });
+    } else {
+      await admin_api.assignOrder(modalOrder.value._id, { erranderId: assigningErranderId.value });
+      showToast({ title: 'Success', message: 'Dispatcher assigned successfully.', toastType: 'success' });
+    }
     fetchOrders();
     modalOrder.value = null;
     showActionModal.value = false;
     assigningErranderId.value = '';
+    revertStatus.value = true;
+    forfeitFee.value = true;
   } catch (error: any) {
     showToast({ title: 'Error', message: error.response?.data?.message || 'Failed to assign dispatcher.', toastType: 'error' });
   } finally {
