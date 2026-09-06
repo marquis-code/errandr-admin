@@ -10,7 +10,7 @@
             <img src="@/assets/img/erranders-icon-2048.png" class="h-12 w-auto" />
           </div>
           <h1 class="text-3xl font-medium text-gray-900 tracking-tight mb-2">Admin Login</h1>
-          <p class="text-gray-500 font-medium text-sm">Access the Errandr operations dashboard</p>
+          <p class="text-gray-500 font-medium text-sm">Access the Errander operations dashboard</p>
         </div>
 
         <!-- Form -->
@@ -65,7 +65,7 @@ import { useAuth } from '@/composables/modules/auth'
 import { useUser } from '@/composables/modules/auth/user'
 
 definePageMeta({ layout: false })
-useHead({ title: 'Admin Login - Errandr Ops' })
+useHead({ title: 'Admin Login - Errander Ops' })
 
 const { login, loading } = useAuth()
 const { isLoggedIn } = useUser()

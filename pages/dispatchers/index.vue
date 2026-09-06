@@ -773,6 +773,10 @@ import SkeletonTable from '@/components/ui/SkeletonTable.vue';
 import ConfirmationModal from '@/components/ui/ConfirmationModal.vue';
 import DateRangePicker from '@/components/ui/DateRangePicker.vue';
 import { useCustomToast as useToast } from '@/composables/core/useCustomToast'
+import { useConfirmModal } from '@/composables/core/useConfirmModal'
+
+const { showToast } = useToast()
+const { confirm } = useConfirmModal()
 
 definePageMeta({ layout: 'admin' })
 useHead({ title: 'Dispatchers Management - Admin' })
@@ -841,7 +845,6 @@ const allPage = ref(1)
 const allTotalPages = computed(() => Math.ceil(allTotal.value / 10))
 
 const processing = ref<string | null>(null)
-const { showToast } = useToast()
 const selectedImage = ref<string | null>(null)
 
 // Modals
@@ -956,15 +959,21 @@ const openProfileDrawer = async (errander: any) => {
   }
 }
 
-const toggleSuspension = async (id: string, action: 'suspend' | 'activate') => {
-  if (!confirm(`Are you sure you want to ${action} this dispatcher?`)) return
-  processing.value = id
+const toggleAccountStatus = async (dispatcherId: string, currentStatus: string) => {
+  const action = currentStatus === 'active' ? 'suspend' : 'activate'
+  const isConfirmed = await confirm({
+    title: `${action === 'suspend' ? 'Suspend' : 'Activate'} Account`,
+    message: `Are you sure you want to ${action} this dispatcher?`,
+    variant: action === 'suspend' ? 'danger' : 'success',
+    confirmText: action === 'suspend' ? 'Suspend' : 'Activate'
+  })
+  if (!isConfirmed) return
+  processing.value = dispatcherId
   try {
-    await api.put(`/admin/dispatchers/${id}/${action}`)
+    await api.put(`/admin/dispatchers/${dispatcherId}/${action}`)
     showToast({ title: 'Success', message: `Dispatcher ${action}d successfully`, toastType: 'success' })
     await fetchAll()
-    // Refresh drawer data
-    const res = await api.get(`/admin/dispatchers/${id}`)
+    const res = await api.get(`/admin/dispatchers/${dispatcherId}`)
     const payload = res.data?.data || res.data;
     selectedProfile.value = payload;
   } catch (err) {
@@ -1005,17 +1014,22 @@ const confirmReject = async () => {
   }
 }
 
-const updateTier = async (id: string, tier: number) => {
-  if (!confirm(`Are you sure you want to explicitly change this dispatcher to Tier ${tier}?`)) {
-    // Re-fetch to revert the select value visually
+const changeTier = async (dispatcherId: string, tier: 1 | 2 | 3) => {
+  const isConfirmed = await confirm({
+    title: 'Change Tier',
+    message: `Are you sure you want to explicitly change this dispatcher to Tier ${tier}?`,
+    variant: 'warning',
+    confirmText: 'Change Tier'
+  })
+  if (!isConfirmed) {
     openProfileDrawer(selectedProfile.value)
     return;
   }
-  processing.value = id
+  processing.value = dispatcherId
   try {
-    await api.put(`/admin/dispatchers/${id}/tier`, { tier: Number(tier) })
+    await api.put(`/admin/dispatchers/${dispatcherId}/tier`, { tier: Number(tier) })
     showToast({ title: 'Success', message: `Tier updated successfully`, toastType: 'success' })
-    const res = await api.get(`/admin/dispatchers/${id}`)
+    const res = await api.get(`/admin/dispatchers/${dispatcherId}`)
     const payload = res.data?.data || res.data;
     selectedProfile.value = payload;
     await fetchAll()
@@ -1045,7 +1059,13 @@ const toggleSelectAll = (e: any) => {
 }
 
 const confirmBatchDelete = async () => {
-  if (!confirm(`Are you sure you want to permanently delete ${selectedDispatchers.value.length} dispatcher(s)? This action cannot be undone.`)) return;
+  const isConfirmed = await confirm({
+    title: 'Batch Delete',
+    message: `Are you sure you want to permanently delete ${selectedDispatchers.value.length} dispatcher(s)? This action cannot be undone.`,
+    variant: 'danger',
+    confirmText: 'Delete All'
+  })
+  if (!isConfirmed) return;
   processing.value = 'batch-delete'
   try {
     await api.post(`/admin/dispatchers/batch-delete`, { ids: selectedDispatchers.value })

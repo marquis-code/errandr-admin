@@ -10,6 +10,17 @@
       </button>
     </div>
 
+    <!-- Campaign Selector -->
+    <div class="mb-6 flex items-center gap-3">
+      <label class="font-bold text-gray-700 text-sm">Select Pool:</label>
+      <select v-model="campaign" @change="onCampaignChange" class="bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-primary outline-none min-w-[300px]">
+        <option :value="null">-- Select a Campaign --</option>
+        <option v-for="c in campaigns" :key="c._id" :value="c">
+          {{ c.title }} ({{ c.status.toUpperCase() }})
+        </option>
+      </select>
+    </div>
+
     <!-- Active Campaign Section -->
     <div v-if="campaign" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8">
       <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50/50">
@@ -19,9 +30,14 @@
             {{ new Date(campaign.startDate).toLocaleDateString() }} - {{ new Date(campaign.endDate).toLocaleDateString() }}
           </p>
         </div>
-        <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-bold uppercase tracking-wider rounded-full">
+      <div class="flex items-center gap-3">
+        <span :class="['px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full', campaign.status === 'open' ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-700']">
           {{ campaign.status }}
         </span>
+        <button v-if="campaign.status === 'open'" @click="promptClosePool(campaign._id)" :disabled="closingCampaign" class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1 font-bold rounded-full transition-colors disabled:opacity-50">
+          {{ closingCampaign ? 'Closing...' : 'Close Pool' }}
+        </button>
+      </div>
       </div>
 
         <div class="flex overflow-x-auto gap-2 p-2 bg-gray-50 border-b border-gray-100 mb-6 mx-2 rounded-xl mt-4">
@@ -487,6 +503,27 @@
       </div>
     </div>
 
+    <!-- Close Pool Confirmation Modal -->
+    <div v-if="showCloseModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
+      <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden" @click.stop>
+        <div class="p-6">
+          <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4">
+            <X class="w-6 h-6" />
+          </div>
+          <h2 class="text-xl font-bold text-gray-900 mb-2">Close Campaign?</h2>
+          <p class="text-gray-500 text-sm mb-6">Are you sure you want to close this pool? Students will no longer be able to join and this action cannot be undone.</p>
+          
+          <div class="flex items-center gap-3 w-full">
+            <button @click="showCloseModal = false" class="flex-1 px-4 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">Cancel</button>
+            <button @click="confirmClosePool" :disabled="closingCampaign" class="flex-1 px-4 py-2.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors disabled:opacity-50 flex justify-center items-center gap-2">
+              <span v-if="closingCampaign" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+              {{ closingCampaign ? 'Closing...' : 'Yes, Close Pool' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -501,9 +538,15 @@ definePageMeta({
 })
 
 const { showToast } = useCustomToast()
+const { confirm } = useConfirmModal()
 
 const activeTab = ref('aggregation')
 const loading = ref(true)
+const showCreateModal = ref(false)
+const showCloseModal = ref(false)
+const selectedCampaignIdToClose = ref(null)
+const closingCampaign = ref(false)
+const campaigns = ref([])
 const campaign = ref(null)
 const loadingAggregation = ref(false)
 const aggregation = ref([])
@@ -513,7 +556,6 @@ const pendingPayments = ref([])
 const bankSettings = ref({ bankName: '', accountNumber: '', accountName: '' })
 const savingSettings = ref(false)
 
-const showCreateModal = ref(false)
 const showAddItemModal = ref(false)
 const showReceiptModal = ref(false)
 const selectedReceiptUrl = ref('')
@@ -558,7 +600,7 @@ watch(showCreateModal, (val) => {
 
 onMounted(async () => {
   await Promise.all([
-    fetchActiveCampaign(),
+    fetchAllCampaigns(),
     fetchCategories(),
     fetchBankSettings(),
     fetchMarketPoolConfig()
@@ -606,7 +648,13 @@ const promptEditCategory = async (cat) => {
 }
 
 const deleteCategory = async (id) => {
-  if (confirm('Are you sure you want to delete this category?')) {
+  const isConfirmed = await confirm({
+    title: 'Delete Category',
+    message: 'Are you sure you want to delete this category?',
+    variant: 'danger',
+    confirmText: 'Delete'
+  })
+  if (isConfirmed) {
     try {
       await api.delete(`/market-pool/categories/${id}`)
       showToast({ title: 'Success', message: 'Category deleted', toastType: 'success' })
@@ -618,15 +666,40 @@ const deleteCategory = async (id) => {
   }
 }
 
-const fetchActiveCampaign = async () => {
+const fetchAllCampaigns = async () => {
   try {
     loading.value = true
-    const res = await api.get('/market-pool/active')
-    if (res.data?.campaign) {
-      campaign.value = res.data.campaign
-      catalogItems.value = res.data.items || []
-      await Promise.all([fetchAggregation(), fetchCustomRequests(), fetchCampaignOrders(), fetchBankSettings()])
+    const res = await api.get('/market-pool/campaigns')
+    campaigns.value = res.data
+    if (campaigns.value.length > 0 && !campaign.value) {
+      campaign.value = campaigns.value[0]
+      await loadCampaignData()
     }
+  } catch (e) {
+    console.error(e)
+  } finally {
+    loading.value = false
+  }
+}
+
+const onCampaignChange = async () => {
+  if (campaign.value) {
+    await loadCampaignData()
+  } else {
+    catalogItems.value = []
+    aggregation.value = []
+    customRequests.value = []
+    pendingPayments.value = []
+  }
+}
+
+const loadCampaignData = async () => {
+  if (!campaign.value) return
+  try {
+    loading.value = true
+    const res = await api.get(`/market-pool/campaigns/${campaign.value._id}/items`)
+    catalogItems.value = res.data || []
+    await Promise.all([fetchAggregation(), fetchCustomRequests(), fetchCampaignOrders(), fetchBankSettings()])
   } catch (e) {
     console.error(e)
   } finally {
@@ -647,8 +720,13 @@ const fetchCampaignOrders = async () => {
 
 const verifyPayment = async (orderId, action) => {
   const isApproving = action === 'approve'
-  const confirmed = confirm(`Are you sure you want to ${isApproving ? 'APPROVE' : 'REJECT'} this payment?`)
-  if (!confirmed) return
+  const isConfirmed = await confirm({
+    title: `${isApproving ? 'Approve' : 'Reject'} Payment`,
+    message: `Are you sure you want to ${isApproving ? 'APPROVE' : 'REJECT'} this payment?`,
+    variant: isApproving ? 'success' : 'danger',
+    confirmText: isApproving ? 'Approve' : 'Reject'
+  })
+  if (!isConfirmed) return
 
   try {
     await api.put(`/market-pool/orders/${orderId}/verify-payment`, { action })
@@ -750,12 +828,34 @@ const createCampaign = async () => {
     
     showCreateModal.value = false
     showToast({ title: 'Success', message: 'Campaign created successfully!', toastType: 'success' })
-    await fetchActiveCampaign()
+    await fetchAllCampaigns()
   } catch (e) {
     console.error(e)
     showToast({ title: 'Error', message: 'Failed to create campaign', toastType: 'error' })
   } finally {
     loading.value = false
+  }
+}
+
+const promptClosePool = (id) => {
+  selectedCampaignIdToClose.value = id
+  showCloseModal.value = true
+}
+
+const confirmClosePool = async () => {
+  if (!selectedCampaignIdToClose.value) return
+  
+  try {
+    closingCampaign.value = true
+    await api.post(`/market-pool/campaigns/${selectedCampaignIdToClose.value}/close`)
+    showToast({ title: 'Success', message: 'Campaign closed successfully!', toastType: 'success' })
+    await fetchAllCampaigns()
+    showCloseModal.value = false
+  } catch (e) {
+    console.error(e)
+    showToast({ title: 'Error', message: 'Failed to close campaign', toastType: 'error' })
+  } finally {
+    closingCampaign.value = false
   }
 }
 
