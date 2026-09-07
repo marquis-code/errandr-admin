@@ -402,7 +402,7 @@ const pageTitles: Record<string, { title: string; description: string }> = {
 const pageTitle = computed(() => pageTitles[route.path]?.title || 'Admin Dashboard')
 const pageDescription = computed(() => pageTitles[route.path]?.description || 'Welcome to Errander Admin')
 const currentPageIcon = computed(() => {
-  const item = navItems.find(item => item.path === route.path)
+  const item = navItems.value.find(item => item.path === route.path)
   return item ? item.icon : LayoutDashboard
 })
 
