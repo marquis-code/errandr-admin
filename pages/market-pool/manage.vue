@@ -85,9 +85,17 @@
             </thead>
             <tbody class="divide-y divide-gray-100">
               <tr v-for="row in aggregation" :key="row._id" class="hover:bg-gray-50/50">
-                <td class="px-4 py-3">
+                <td class="px-4 py-3 align-top">
                   <p class="font-medium text-gray-900">{{ row.item.name }}</p>
-                  <p class="text-[10px] text-gray-500">Buffer Price: ₦{{ row.item.appPrice.toLocaleString() }}</p>
+                  <p class="text-[10px] text-gray-500 mb-2">Buffer Price: ₦{{ row.item.appPrice.toLocaleString() }}</p>
+                  
+                  <div v-if="row.students && row.students.length > 0" class="flex flex-col gap-1 mt-2 p-2 bg-gray-50/80 rounded-lg border border-gray-100 max-w-[250px]">
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Student Breakdown</p>
+                    <div v-for="(student, idx) in row.students" :key="idx" class="flex items-center justify-between text-[11px]">
+                      <span class="text-gray-700 truncate pr-2">{{ student.firstName || 'Student' }} {{ student.lastName || '' }}</span>
+                      <span class="font-bold text-gray-900 shrink-0">{{ student.quantity }}x</span>
+                    </div>
+                  </div>
                 </td>
                 <td class="px-4 py-3">
                   <span class="font-bold text-lg text-primary">{{ row.totalQuantity }}</span>

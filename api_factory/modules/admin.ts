@@ -171,4 +171,20 @@ export const admin_api = {
   activateDispatcher: (id: string) => {
     return GATEWAY_ENDPOINT_WITH_AUTH.put(`/admin/dispatchers/${id}/activate`);
   },
+
+  getDepartments: () => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get('/departments');
+  },
+
+  createDepartment: (payload: any) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.post('/departments', payload);
+  },
+
+  updateDepartment: (id: string, payload: any) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/departments/${id}`, payload);
+  },
+
+  deleteDepartment: (id: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.delete(`/departments/${id}`);
+  },
 };

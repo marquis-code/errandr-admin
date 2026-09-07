@@ -410,6 +410,14 @@
                     <option value="admin">Admin</option>
                   </select>
                 </div>
+                <div v-if="editPayload.role === 'admin'" class="space-y-2">
+                  <label class="text-sm font-medium text-gray-700">Admin Department</label>
+                  <select v-model="editPayload.adminDepartment" class="w-full p-3 bg-white border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20">
+                    <option :value="null">Super Admin (No Department)</option>
+                    <option v-for="dept in departments" :key="dept._id" :value="dept._id">{{ dept.name }}</option>
+                  </select>
+                  <p class="text-[10px] text-gray-500 mt-1 leading-tight">Assign a department to restrict access, or leave as Super Admin for full access.</p>
+                </div>
                 <button type="submit" :disabled="updating" class="w-full py-3 bg-[#FF5C1A] text-white rounded-xl font-bold hover:bg-[#E04D12] transition-colors disabled:opacity-50">
                   {{ updating ? 'Saving...' : 'Save Changes' }}
                 </button>
@@ -586,6 +594,7 @@ useHead({ title: 'Users - Errander Admin' });
 
 const { showToast } = useCustomToast();
 const { users, loading, fetchUsers } = useAdminUsers();
+const departments = ref<any[]>([]);
 const searchQuery = ref('');
 const selectedRole = ref('all');
 const startDate = ref('');
@@ -672,7 +681,8 @@ const openUserDrawer = async (userId: string) => {
       firstName: selectedUser.value.firstName || '',
       lastName: selectedUser.value.lastName || '',
       phone: selectedUser.value.phoneNumber || selectedUser.value.phone || '',
-      role: selectedUser.value.role || 'student'
+      role: selectedUser.value.role || 'student',
+      adminDepartment: selectedUser.value.adminDepartment?._id || selectedUser.value.adminDepartment || null
     };
   } catch (e) {
     console.error('Failed to fetch user:', e);
@@ -688,16 +698,28 @@ const closeDrawer = () => {
   selectedUser.value = null;
 };
 
-onMounted(fetchUsers);
+onMounted(async () => {
+    fetchUsers();
+    try {
+        const res = await admin_api.getDepartments();
+        departments.value = res.data;
+    } catch (e) {
+        console.error(e);
+    }
+});
 
-const editPayload = ref({ firstName: '', lastName: '', phone: '', role: 'student' });
+const editPayload = ref({ firstName: '', lastName: '', phone: '', role: 'student', adminDepartment: null as any });
 const updating = ref(false);
 
 const handleUpdateUser = async () => {
   if (!selectedUser.value) return;
   updating.value = true;
   try {
-    await admin_api.updateUser(selectedUser.value._id, editPayload.value);
+    const payloadToUpdate = { ...editPayload.value }
+    if (payloadToUpdate.role !== 'admin') {
+      payloadToUpdate.adminDepartment = null
+    }
+    await admin_api.updateUser(selectedUser.value._id, payloadToUpdate);
     showToast({ title: 'Success', message: 'User updated successfully', toastType: 'success' });
     await fetchUsers();
     // Refresh user details
@@ -735,10 +757,10 @@ const executeAction = async () => {
     const { actionType, userId } = confirmModal.value;
     
     if (actionType === 'suspend') {
-      await api.put(`/admin/users/${userId}/suspend`);
+      await admin_api.suspendUser(userId);
       showToast({ title: 'Success', message: 'User suspended successfully', toastType: 'success' });
     } else {
-      await api.put(`/admin/users/${userId}/activate`);
+      await admin_api.activateUser(userId);
       showToast({ title: 'Success', message: 'User activated successfully', toastType: 'success' });
     }
     

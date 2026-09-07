@@ -362,7 +362,7 @@ const logoutModalOpen = ref(false)
 const searchModalOpen = ref(false)
 const isSidebarMinimized = ref(false)
 
-const navItems = [
+const rawNavItems = [
  { path: '/dashboard', label: 'Overview', icon: LayoutDashboard },
  { path: '/users', label: 'Users', icon: Users },
  { path: '/dispatchers', label: 'Dispatchers', icon: ShieldCheck },
@@ -376,8 +376,12 @@ const navItems = [
  { path: '/chats', label: 'Support Chats', icon: MessageSquare },
  { path: '/campaigns', label: 'Push Campaigns', icon: Bell },
  { path: '/reports', label: 'Reports', icon: FileText },
+ { path: '/departments', label: 'Departments & Roles', icon: Users }, // Reusing Users icon
  { path: '/settings', label: 'Settings', icon: Settings }
 ]
+
+const { hasModuleAccess } = usePermissions()
+const navItems = computed(() => rawNavItems.filter(item => hasModuleAccess(item.path)))
 
 const pageTitles: Record<string, { title: string; description: string }> = {
  '/dashboard': { title: 'Admin Overview', description: 'Platform performance and key metrics' },

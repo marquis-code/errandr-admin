@@ -742,6 +742,7 @@ const statusOptions = [
   { label: 'Ready For Pickup', value: 'ready_for_pickup' },
   { label: 'Picked Up', value: 'picked_up' },
   { label: 'In Transit', value: 'in_transit' },
+  { label: 'Intercepted', value: 'interception_in_progress' },
   { label: 'Delivered', value: 'delivered' },
   { label: 'Cancelled', value: 'cancelled' }
 ];
