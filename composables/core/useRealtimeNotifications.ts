@@ -1,4 +1,4 @@
-import { onMounted, onBeforeUnmount } from 'vue'
+import { onMounted, onBeforeUnmount, watch } from 'vue'
 import { useCustomToast } from '@/composables/core/useCustomToast'
 import { useRealtimeSocket } from '@/composables/core/useRealtimeSocket'
 import { useUser } from '@/composables/modules/auth/user'
@@ -65,25 +65,37 @@ export const useRealtimeNotifications = () => {
     })
   }
 
-  onMounted(() => {
-    connectSocket()
-
-    if (listenersAttached.value || !socket.value) return
-    listenersAttached.value = true
-
+  const attachListeners = () => {
+    if (!socket.value) return
     socket.value.emit('joinSupport', { userId: user.value?._id || user.value?.id || 'admin' })
-
     socket.value.on('notification:new', handleNotification)
     socket.value.on('audit:log', handleAudit)
     socket.value.on('chat:new-message', handleChatMessage)
-  })
+    listenersAttached.value = true
+  }
 
-  onBeforeUnmount(() => {
-    if (!socket.value || !listenersAttached.value) return
-
+  const detachListeners = () => {
+    if (!socket.value) return
     socket.value.off('notification:new', handleNotification)
     socket.value.off('audit:log', handleAudit)
     socket.value.off('chat:new-message', handleChatMessage)
     listenersAttached.value = false
+  }
+
+  watch(() => socket.value, (newSocket) => {
+    if (newSocket) {
+      attachListeners()
+    }
+  })
+
+  onMounted(() => {
+    connectSocket()
+    if (socket.value && !listenersAttached.value) {
+      attachListeners()
+    }
+  })
+
+  onBeforeUnmount(() => {
+    detachListeners()
   })
 }
