@@ -1,6 +1,7 @@
 import { onMounted, onBeforeUnmount } from 'vue'
 import { useCustomToast } from '@/composables/core/useCustomToast'
 import { useRealtimeSocket } from '@/composables/core/useRealtimeSocket'
+import { useUser } from '@/composables/modules/auth/user'
 
 const LISTENERS_KEY = 'realtime_notification_listeners'
 
@@ -16,6 +17,7 @@ const playNotificationSound = () => {
 export const useRealtimeNotifications = () => {
   const { showToast } = useCustomToast()
   const { socket, connectSocket } = useRealtimeSocket()
+  const { user } = useUser()
   const listenersAttached = useState<boolean>(LISTENERS_KEY, () => false)
 
   const handleNotification = (payload: any) => {
@@ -44,14 +46,36 @@ export const useRealtimeNotifications = () => {
     })
   }
 
+  const handleChatMessage = (payload: any) => {
+    if (!payload) return
+    
+    const senderId = payload.senderId || payload.sender?._id || payload.sender
+    const currentAdminId = user.value?._id || user.value?.id
+    if (senderId === currentAdminId) return
+
+    playNotificationSound()
+
+    const senderName = payload.senderName || payload.sender?.firstName || 'User'
+    
+    showToast({
+      title: `New Message from ${senderName}`,
+      message: payload.content || payload.message || 'Sent a message',
+      toastType: 'info',
+      duration: 5000,
+    })
+  }
+
   onMounted(() => {
     connectSocket()
 
     if (listenersAttached.value || !socket.value) return
     listenersAttached.value = true
 
+    socket.value.emit('joinSupport', { userId: user.value?._id || user.value?.id || 'admin' })
+
     socket.value.on('notification:new', handleNotification)
     socket.value.on('audit:log', handleAudit)
+    socket.value.on('chat:new-message', handleChatMessage)
   })
 
   onBeforeUnmount(() => {
@@ -59,6 +83,7 @@ export const useRealtimeNotifications = () => {
 
     socket.value.off('notification:new', handleNotification)
     socket.value.off('audit:log', handleAudit)
+    socket.value.off('chat:new-message', handleChatMessage)
     listenersAttached.value = false
   })
 }

@@ -205,6 +205,7 @@ onMounted(() => {
   connectSocket()
   
   if (socket.value) {
+    socket.value.emit('joinSupport', { userId: user.value?.id || user.value?._id || 'admin' })
     socket.value.on('chat:new-message', () => {
       // Refresh the thread list when a new message comes in so lastMessage and unreadCount updates
       fetchThreads()
