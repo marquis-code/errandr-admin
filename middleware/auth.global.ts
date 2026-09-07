@@ -10,8 +10,20 @@ export default defineNuxtRouteMiddleware((to, from) => {
     return navigateTo('/')
   }
 
-  // If the user is logged in and trying to access login page
   if (isLoggedIn.value && to.path === '/') {
-    return navigateTo('/dashboard')
+    const { hasModuleAccess } = usePermissions()
+    if (hasModuleAccess('/dashboard')) {
+      return navigateTo('/dashboard')
+    } else {
+      return navigateTo('/orders')
+    }
+  }
+
+  // If user is logged in, restrict access to modules they don't have permission for
+  if (isLoggedIn.value && to.path !== '/') {
+    const { hasModuleAccess } = usePermissions()
+    if (!hasModuleAccess(to.path)) {
+      return navigateTo('/orders') // fallback
+    }
   }
 })

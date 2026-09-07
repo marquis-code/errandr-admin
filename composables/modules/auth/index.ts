@@ -33,7 +33,12 @@ export const useAuth = () => {
         message: "You've successfully logged in.",
         toastType: "success",
       });
-      navigateTo('/dashboard');
+      const { hasModuleAccess } = usePermissions();
+      if (hasModuleAccess('/dashboard')) {
+        navigateTo('/dashboard');
+      } else {
+        navigateTo('/orders');
+      }
       return res.data;
     } catch (e: any) {
       // Error handled by axios interceptor

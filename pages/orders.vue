@@ -41,7 +41,7 @@
         </div>
       </div>
       
-      <div class="bg-white p-4 rounded-[1.25rem] border border-gray-100/60 transition-all group overflow-hidden relative shadow-none col-span-2 lg:col-span-2">
+      <div v-if="hasModuleAccess('/finances')" class="bg-white p-4 rounded-[1.25rem] border border-gray-100/60 transition-all group overflow-hidden relative shadow-none col-span-2 lg:col-span-2">
         <div class="flex items-center justify-between mb-4 relative z-10">
           <div class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/50 bg-emerald-100 text-emerald-600">
             <DollarSign class="w-4 h-4" />
@@ -705,6 +705,8 @@ definePageMeta({
 })
 
 useHead({ title: 'Orders - Errander Admin' });
+
+const { hasModuleAccess } = usePermissions();
 
 const loading = ref(true);
 const orders = ref<any[]>([]);
