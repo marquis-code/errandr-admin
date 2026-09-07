@@ -134,7 +134,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { Search, ArrowLeft, MessageSquare, MoreVertical, Lock } from 'lucide-vue-next'
 import EmbeddedSupportChat from '@/components/core/EmbeddedSupportChat.vue'
 import { chat_api } from '@/api_factory/modules/chat'
@@ -200,16 +200,38 @@ const formatTime = (dateStr: string) => {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
+const setupSocketListeners = () => {
+  if (!socket.value) return
+  
+  // Join the admin support room
+  socket.value.emit('joinSupport', { userId: user.value?.id || user.value?._id || 'admin' })
+  
+  // Remove any previous listener to avoid duplicates
+  socket.value.off('chat:new-message')
+  
+  // Listen for new messages and refresh the thread list
+  socket.value.on('chat:new-message', (msg: any) => {
+    console.log('[Admin Chats] Received chat:new-message', msg)
+    fetchThreads()
+  })
+}
+
 onMounted(() => {
   fetchThreads()
   connectSocket()
   
+  // Try immediately if socket is already connected
   if (socket.value) {
-    socket.value.emit('joinSupport', { userId: user.value?.id || user.value?._id || 'admin' })
-    socket.value.on('chat:new-message', () => {
-      // Refresh the thread list when a new message comes in so lastMessage and unreadCount updates
-      fetchThreads()
-    })
+    setupSocketListeners()
+  }
+})
+
+// CRITICAL: Watch for socket changes — the socket connects asynchronously,
+// so it's almost always null when onMounted fires. This watch ensures
+// listeners are attached as soon as the connection is established.
+watch(() => socket.value, (newSocket) => {
+  if (newSocket) {
+    setupSocketListeners()
   }
 })
 </script>

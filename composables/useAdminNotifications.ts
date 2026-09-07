@@ -30,7 +30,8 @@ export const useAdminNotifications = () => {
         }
       }
     } catch (e) {
-      console.error('Error getting notification permission:', e);
+      // Ignore version error and other notification permission errors silently 
+      // console.error('Error getting notification permission:', e);
     }
   };
 
