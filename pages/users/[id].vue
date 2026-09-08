@@ -120,7 +120,7 @@
             <h3 class="text-lg font-bold text-gray-900 mb-1">No Activity Found</h3>
             <p class="text-sm text-gray-500 max-w-sm">Activity logs and order history will appear here once the user starts interacting with the platform.</p>
           </div>
-          <div v-else class="overflow-x-auto">
+          <div v-else class="max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0">
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="border-b border-gray-100/60 bg-gray-50/50 text-[11px] uppercase tracking-wider text-gray-500">

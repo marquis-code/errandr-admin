@@ -40,7 +40,7 @@
       </div>
       </div>
 
-        <div class="flex overflow-x-auto gap-2 p-2 bg-gray-50 border-b border-gray-100 mb-6 mx-2 rounded-xl mt-4">
+        <div class="flex max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0 gap-2 p-2 bg-gray-50 border-b border-gray-100 mb-6 mx-2 rounded-xl mt-4">
           <button @click="activeTab = 'aggregation'" :class="['px-5 py-2.5 font-bold text-sm rounded-lg transition-all whitespace-nowrap', activeTab === 'aggregation' ? 'bg-white text-primary shadow-sm ring-1 ring-gray-200' : 'text-gray-500 hover:bg-white/60 hover:text-gray-700']">Aggregation Dashboard</button>
           <button @click="activeTab = 'catalog'" :class="['px-5 py-2.5 font-bold text-sm rounded-lg transition-all whitespace-nowrap', activeTab === 'catalog' ? 'bg-white text-primary shadow-sm ring-1 ring-gray-200' : 'text-gray-500 hover:bg-white/60 hover:text-gray-700']">Manage Catalog</button>
           <button @click="activeTab = 'categories'" :class="['px-5 py-2.5 font-bold text-sm rounded-lg transition-all whitespace-nowrap', activeTab === 'categories' ? 'bg-white text-primary shadow-sm ring-1 ring-gray-200' : 'text-gray-500 hover:bg-white/60 hover:text-gray-700']">Categories</button>
@@ -73,7 +73,7 @@
 
           <div v-if="loadingAggregation" class="text-sm text-gray-500 py-4">Loading aggregation data...</div>
           
-          <div v-else-if="aggregation.length > 0" class="overflow-x-auto">
+          <div v-else-if="aggregation.length > 0" class="max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0">
           <table class="w-full text-left text-sm">
             <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
               <tr>
@@ -419,7 +419,7 @@
             <label class="block text-sm font-semibold text-gray-700 mb-1.5">Item Images</label>
             <input type="file" multiple @change="handleImageUpload" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer">
             <div v-if="uploadingImage" class="text-xs text-gray-500 mt-2">Uploading images...</div>
-            <div class="flex gap-2 mt-3 overflow-x-auto pb-2">
+            <div class="flex gap-2 mt-3 max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0 pb-2">
               <div v-for="(img, idx) in [...(newItem.images || []), ...(localImagePreviews || [])]" :key="idx" class="relative group flex-shrink-0">
                 <img :src="(typeof img === 'string' && img !== '[object Object]') ? img : (img?.url || '')" class="w-24 h-24 object-cover rounded-xl border border-gray-200" />
                 <button @click="removeImage(idx, img)" class="absolute top-1 right-1 bg-white/90 rounded-full p-1 hover:bg-white text-red-500 shadow-sm border border-gray-100">

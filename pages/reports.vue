@@ -7,7 +7,7 @@
         <p class="text-xs font-medium text-gray-500">Review user complaints and manage dispute resolutions.</p>
       </div>
 
-      <div class="flex items-center gap-1 p-1 bg-gray-50 border border-gray-100 rounded-lg overflow-x-auto max-w-full">
+      <div class="flex items-center gap-1 p-1 bg-gray-50 border border-gray-100 rounded-lg max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0 max-w-full">
         <button
           v-for="tab in tabs"
           :key="tab.key"

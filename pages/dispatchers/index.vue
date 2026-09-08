@@ -56,7 +56,7 @@
         <p class="text-sm text-gray-500 mt-1">There are no pending dispatcher verifications to review.</p>
       </div>
 
-      <div v-else class="overflow-x-auto">
+      <div v-else class="max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="border-b border-gray-100 bg-gray-50 text-[11px] uppercase tracking-wider text-gray-500">
@@ -245,7 +245,7 @@
           <p class="text-sm text-gray-500 mt-1">There are currently no registered dispatchers.</p>
         </div>
 
-        <div v-else class="overflow-x-auto">
+        <div v-else class="max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0">
           <!-- Batch Actions Toolbar -->
           <div v-if="selectedDispatchers.length > 0" class="bg-red-50/80 backdrop-blur-sm px-6 py-4 border-b border-red-100 flex justify-between items-center">
             <span class="text-red-700 font-bold text-sm tracking-tight">{{ selectedDispatchers.length }} dispatcher(s) selected</span>

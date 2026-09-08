@@ -155,7 +155,7 @@
         <p class="text-sm text-gray-500 mt-1 max-w-sm mx-auto">Try adjusting your filters or date range to find what you're looking for.</p>
       </div>
 
-      <div v-else class="overflow-x-auto">
+      <div v-else class="max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0">
         <table class="w-full text-left border-collapse min-w-[1200px]">
           <thead>
             <tr class="border-b border-gray-100/50 bg-gray-50/20">

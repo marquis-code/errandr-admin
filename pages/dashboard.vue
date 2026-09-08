@@ -139,7 +139,7 @@
           </div>
 
           <!-- High-Density Order Grid -->
-          <div v-else class="overflow-x-auto">
+          <div v-else class="max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0">
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="border-b border-gray-100/50 bg-gray-50/20">

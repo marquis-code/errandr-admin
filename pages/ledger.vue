@@ -6,7 +6,7 @@
       <!-- Top Row: Title & Type Filters -->
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h2 class="text-xl font-bold text-gray-900 tracking-tight">Ledger & Payouts</h2>
-        <div class="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-2 md:pb-0">
+        <div class="flex items-center gap-2 max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0 custom-scrollbar pb-2 md:pb-0">
           <button 
             v-for="filter in typeFilters" 
             :key="filter.value"
@@ -84,7 +84,7 @@
 
     <!-- Main Table Card -->
     <div class="bg-white rounded-[1.25rem] border border-gray-100 shadow-sm overflow-hidden">
-      <div class="overflow-x-auto">
+      <div class="max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="border-b border-gray-100 bg-gray-50/50">

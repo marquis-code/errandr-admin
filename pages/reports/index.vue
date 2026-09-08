@@ -36,7 +36,7 @@
  </button>
  <span class="text-sm font-medium text-gray-400">No filters applied</span>
 
- <div class="ml-auto flex gap-2 overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
+ <div class="ml-auto flex gap-2 max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0 pb-2 md:pb-0 hide-scrollbar">
  <button 
  v-for="s in ['all', 'pending', 'resolved', 'rejected']" :key="s" 
  @click="statusFilter = s"
@@ -59,7 +59,7 @@
  </div>
 
  <div v-else class="bg-white">
- <div class="overflow-x-auto pb-20">
+ <div class="max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0 pb-20">
  <table class="w-full text-left border-collapse">
  <thead>
  <tr class="border-b border-gray-100">

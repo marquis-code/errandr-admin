@@ -54,7 +54,7 @@
 
       <!-- Tabs -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="flex overflow-x-auto border-b border-gray-100">
+        <div class="flex max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0 border-b border-gray-100">
           <button @click="activeTab = 'overview'" :class="activeTab === 'overview' ? 'text-[#FF5C1A] border-b-2 border-[#FF5C1A] font-bold' : 'text-gray-500 hover:text-gray-700 font-medium'" class="px-6 py-4 whitespace-nowrap transition-colors">Overview</button>
           <button @click="activeTab = 'operations'" :class="activeTab === 'operations' ? 'text-[#FF5C1A] border-b-2 border-[#FF5C1A] font-bold' : 'text-gray-500 hover:text-gray-700 font-medium'" class="px-6 py-4 whitespace-nowrap transition-colors">Operations & KYC</button>
           <button @click="activeTab = 'errands'" :class="activeTab === 'errands' ? 'text-[#FF5C1A] border-b-2 border-[#FF5C1A] font-bold' : 'text-gray-500 hover:text-gray-700 font-medium'" class="px-6 py-4 whitespace-nowrap transition-colors">Errands History</button>

@@ -54,7 +54,7 @@
         </div>
       </div>
       
-      <div class="flex overflow-x-auto pb-2 hide-scrollbar gap-2 flex-1">
+      <div class="flex max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0 pb-2 hide-scrollbar gap-2 flex-1">
         <button 
           v-for="tab in tabs" 
           :key="tab.key" 
@@ -93,7 +93,7 @@
       </div>
 
       <!-- Table View -->
-      <div v-else class="overflow-x-auto">
+      <div v-else class="max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0 overflow-visible">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="border-b border-gray-100/60 bg-gray-50/50 text-[11px] uppercase tracking-wider text-gray-500">

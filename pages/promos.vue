@@ -24,7 +24,7 @@
 
     <!-- Promo Codes Table -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-      <div class="overflow-x-auto">
+      <div class="max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="border-b border-gray-100 bg-gray-50/50">

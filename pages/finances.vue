@@ -389,7 +389,7 @@
     <!-- Transaction Ledger -->
     <div class="bg-white rounded-xl border border-gray-100 overflow-hidden min-h-[400px] shadow-sm">
       <div class="border-b border-gray-100 bg-gray-50/50">
-        <div class="flex items-center justify-between p-4 pb-0 overflow-x-auto">
+        <div class="flex items-center justify-between p-4 pb-0 max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0">
           <div class="flex items-center gap-6">
             <button @click="activeCategory = 'all'" :class="activeCategory === 'all' ? 'text-[#FF5C1A] border-b-2 border-[#FF5C1A] pb-4 font-bold' : 'text-gray-500 hover:text-gray-900 pb-4 font-semibold text-sm transition-colors'">All Transactions</button>
             <button @click="activeCategory = 'deposits'" :class="activeCategory === 'deposits' ? 'text-[#FF5C1A] border-b-2 border-[#FF5C1A] pb-4 font-bold' : 'text-gray-500 hover:text-gray-900 pb-4 font-semibold text-sm transition-colors'">Deposits</button>
@@ -414,7 +414,7 @@
         <EmptyState title="No transactions yet" description="When payments are made, they will show up here." />
       </div>
 
-      <div v-else class="overflow-x-auto">
+      <div v-else class="max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0">
         <table class="w-full text-left border-collapse">
           <thead>
             <tr class="bg-black text-white border-b border-gray-800">

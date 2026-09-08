@@ -19,7 +19,7 @@
         <div v-if="loading" class="p-10 flex justify-center">
           <Loader2 class="w-8 h-8 text-[#FF5C1A] animate-spin" />
         </div>
-        <div v-else class="overflow-x-auto w-full">
+        <div v-else class="max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0 w-full">
           <table class="w-full text-left border-collapse min-w-[700px]">
           <thead>
             <tr class="bg-gray-50/80 border-b border-gray-100 text-sm font-semibold text-gray-600">
