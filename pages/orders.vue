@@ -128,7 +128,7 @@
     </div>
 
     <!-- Controls (Dropdowns instead of raw search) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 w-full">
       <SelectInput 
         v-model="selectedCustomer" 
         :options="customerOptions" 
@@ -154,6 +154,13 @@
         v-model="selectedStatus" 
         :options="statusOptions" 
         label="Filter by Status" 
+        class="shadow-none"
+        position="standalone"
+      />
+      <SelectInput 
+        v-model="selectedType" 
+        :options="typeOptions" 
+        label="Filter by Type" 
         class="shadow-none"
         position="standalone"
       />
@@ -758,6 +765,7 @@ const fastestErranders = ref<any[]>([]);
 const startDate = ref('');
 const endDate = ref('');
 const selectedStatus = ref('all');
+const selectedType = ref('all');
 const selectedCustomer = ref('');
 const selectedVendor = ref('');
 const selectedErrander = ref('');
@@ -777,6 +785,13 @@ const statusOptions = [
   { label: 'Intercepted', value: 'interception_in_progress' },
   { label: 'Delivered', value: 'delivered' },
   { label: 'Cancelled', value: 'cancelled' }
+];
+
+const typeOptions = [
+  { label: 'All Types', value: 'all' },
+  { label: 'Food Delivery', value: 'food_delivery' },
+  { label: 'Custom Errand', value: 'custom_errand' },
+  { label: 'Package Delivery', value: 'package_delivery' }
 ];
 
 const updateStatuses = ['pending', 'confirmed', 'preparing', 'ready_for_pickup', 'picked_up', 'in_transit', 'delivered', 'cancelled'];
@@ -876,6 +891,7 @@ const fetchOrders = async (isPolling: boolean = false) => {
         startDate: startDate.value || undefined,
         endDate: endDate.value || undefined,
         status: selectedStatus.value !== 'all' ? selectedStatus.value : undefined,
+        type: selectedType.value !== 'all' ? selectedType.value : undefined,
         customerId: selectedCustomer.value || undefined,
         vendorId: selectedVendor.value || undefined,
         erranderId: selectedErrander.value || undefined
@@ -916,7 +932,7 @@ const changePage = (page: number) => {
   }
 };
 
-watch([selectedStatus, selectedCustomer, selectedVendor, selectedErrander], () => {
+watch([selectedStatus, selectedType, selectedCustomer, selectedVendor, selectedErrander], () => {
   currentPage.value = 1;
   fetchOrders();
 });

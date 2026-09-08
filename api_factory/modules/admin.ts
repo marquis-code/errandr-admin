@@ -93,6 +93,7 @@ export const admin_api = {
       if (query.search) url += `&search=${query.search}`;
       if (query.sortBy) url += `&sortBy=${query.sortBy}`;
       if (query.sortOrder) url += `&sortOrder=${query.sortOrder}`;
+      if (query.type) url += `&type=${query.type}`;
       if (query.exportAsCsv) url += `&exportAsCsv=${query.exportAsCsv}`;
     }
     const isExport = query?.exportAsCsv;
