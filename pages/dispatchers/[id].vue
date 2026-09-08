@@ -53,7 +53,7 @@
       </div>
 
       <!-- Tabs -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-visible">
         <div class="flex max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0 border-b border-gray-100">
           <button @click="activeTab = 'overview'" :class="activeTab === 'overview' ? 'text-[#FF5C1A] border-b-2 border-[#FF5C1A] font-bold' : 'text-gray-500 hover:text-gray-700 font-medium'" class="px-6 py-4 whitespace-nowrap transition-colors">Overview</button>
           <button @click="activeTab = 'operations'" :class="activeTab === 'operations' ? 'text-[#FF5C1A] border-b-2 border-[#FF5C1A] font-bold' : 'text-gray-500 hover:text-gray-700 font-medium'" class="px-6 py-4 whitespace-nowrap transition-colors">Operations & KYC</button>
@@ -303,7 +303,7 @@
 
     <!-- Manual Debit Modal -->
     <div v-if="showManualDebitModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden">
+      <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-visible">
         <div class="p-6 border-b border-gray-100 flex items-center justify-between">
           <h3 class="text-lg font-bold text-gray-900">Manual Payout / Deduct</h3>
           <button @click="showManualDebitModal = false" class="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600">

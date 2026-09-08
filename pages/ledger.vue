@@ -83,7 +83,7 @@
     </div>
 
     <!-- Main Table Card -->
-    <div class="bg-white rounded-[1.25rem] border border-gray-100 shadow-sm overflow-hidden">
+    <div class="bg-white rounded-[1.25rem] border border-gray-100 shadow-sm overflow-visible">
       <div class="max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0">
         <table class="w-full text-left border-collapse">
           <thead>

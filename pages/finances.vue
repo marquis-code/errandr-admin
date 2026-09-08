@@ -387,7 +387,7 @@
     </div>
 
     <!-- Transaction Ledger -->
-    <div class="bg-white rounded-xl border border-gray-100 overflow-hidden min-h-[400px] shadow-sm">
+    <div class="bg-white rounded-xl border border-gray-100 overflow-visible min-h-[400px] shadow-sm">
       <div class="border-b border-gray-100 bg-gray-50/50">
         <div class="flex items-center justify-between p-4 pb-0 max-md:overflow-x-auto md:overflow-visible pb-24 md:pb-0">
           <div class="flex items-center gap-6">
@@ -592,7 +592,7 @@
               Transaction Details
             </h4>
             
-            <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-visible">
               <div class="flex items-center justify-between p-3 border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
                 <span class="text-[11px] font-semibold text-gray-500">Transaction ID</span>
                 <div class="flex items-center gap-2">
@@ -678,7 +678,7 @@
               <Sparkles class="w-3.5 h-3.5" />
               Metadata
             </h4>
-            <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden divide-y divide-gray-50">
+            <div class="bg-white rounded-lg border border-gray-100 shadow-sm overflow-visible divide-y divide-gray-50">
               <div class="flex justify-between items-center p-2.5 hover:bg-gray-50 transition-colors" v-for="(value, key) in selectedTransaction.metadata" :key="key">
                 <span class="text-[10px] font-semibold text-gray-500 capitalize">{{ key.replace(/([A-Z])/g, ' $1').trim() }}</span>
                 <span class="text-[10px] font-bold text-gray-900 text-right truncate max-w-[200px]" :title="String(value)">{{ value }}</span>

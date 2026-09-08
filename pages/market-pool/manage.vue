@@ -513,7 +513,7 @@
 
     <!-- Close Pool Confirmation Modal -->
     <div v-if="showCloseModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fade-in">
-      <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden" @click.stop>
+      <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-visible" @click.stop>
         <div class="p-6">
           <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4">
             <X class="w-6 h-6" />

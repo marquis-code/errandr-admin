@@ -21,7 +21,7 @@
       </div>
 
       <!-- Departments List -->
-      <div class="bg-white rounded-[1.25rem] border border-gray-100/60 shadow-sm hover:shadow-md transition-all overflow-hidden relative">
+      <div class="bg-white rounded-[1.25rem] border border-gray-100/60 shadow-sm hover:shadow-md transition-all overflow-visible relative">
         <div class="px-6 py-5 border-b border-gray-100/60 bg-gray-50/50 flex justify-between items-center">
           <h3 class="text-sm font-bold text-gray-900 tracking-tight uppercase">Configured Departments</h3>
         </div>

@@ -29,7 +29,7 @@
 
     <!-- Stats Grid (No Shadows) -->
     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-      <div class="bg-white p-4 rounded-[1.25rem] border border-gray-100/60 transition-all group overflow-hidden relative shadow-none col-span-2 lg:col-span-1">
+      <div class="bg-white p-4 rounded-[1.25rem] border border-gray-100/60 transition-all group overflow-visible relative shadow-none col-span-2 lg:col-span-1">
         <div class="flex items-center justify-between mb-4 relative z-10">
           <div class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/50 bg-blue-100 text-blue-600">
             <ShoppingBag class="w-4 h-4" />
@@ -41,7 +41,7 @@
         </div>
       </div>
       
-      <div v-if="hasModuleAccess('/finances')" class="bg-white p-4 rounded-[1.25rem] border border-gray-100/60 transition-all group overflow-hidden relative shadow-none col-span-2 lg:col-span-2">
+      <div v-if="hasModuleAccess('/finances')" class="bg-white p-4 rounded-[1.25rem] border border-gray-100/60 transition-all group overflow-visible relative shadow-none col-span-2 lg:col-span-2">
         <div class="flex items-center justify-between mb-4 relative z-10">
           <div class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/50 bg-emerald-100 text-emerald-600">
             <DollarSign class="w-4 h-4" />
@@ -53,7 +53,7 @@
         </div>
       </div>
 
-      <div class="bg-white p-4 rounded-[1.25rem] border border-gray-100/60 transition-all group overflow-hidden relative shadow-none">
+      <div class="bg-white p-4 rounded-[1.25rem] border border-gray-100/60 transition-all group overflow-visible relative shadow-none">
         <div class="flex items-center justify-between mb-4 relative z-10">
           <div class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/50 bg-amber-100 text-amber-600">
             <Clock class="w-4 h-4" />
@@ -65,7 +65,7 @@
         </div>
       </div>
 
-      <div class="bg-white p-4 rounded-[1.25rem] border border-gray-100/60 transition-all group overflow-hidden relative shadow-none">
+      <div class="bg-white p-4 rounded-[1.25rem] border border-gray-100/60 transition-all group overflow-visible relative shadow-none">
         <div class="flex items-center justify-between mb-4 relative z-10">
           <div class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/50 bg-purple-100 text-purple-600">
             <Loader2 class="w-4 h-4" />
@@ -77,7 +77,7 @@
         </div>
       </div>
 
-      <div class="bg-white p-4 rounded-[1.25rem] border border-gray-100/60 transition-all group overflow-hidden relative shadow-none">
+      <div class="bg-white p-4 rounded-[1.25rem] border border-gray-100/60 transition-all group overflow-visible relative shadow-none">
         <div class="flex items-center justify-between mb-4 relative z-10">
           <div class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/50 bg-teal-100 text-teal-600">
             <CheckCircle class="w-4 h-4" />
@@ -89,7 +89,7 @@
         </div>
       </div>
 
-      <div class="bg-white p-4 rounded-[1.25rem] border border-gray-100/60 transition-all group overflow-hidden relative shadow-none">
+      <div class="bg-white p-4 rounded-[1.25rem] border border-gray-100/60 transition-all group overflow-visible relative shadow-none">
         <div class="flex items-center justify-between mb-4 relative z-10">
           <div class="w-10 h-10 rounded-xl flex items-center justify-center border border-white/50 bg-rose-100 text-rose-600">
             <XCircle class="w-4 h-4" />
@@ -135,7 +135,7 @@
     </div>
 
     <!-- Table Section -->
-    <div class="bg-white rounded-[1.25rem] border border-gray-100/60 overflow-hidden min-h-[400px] shadow-none">
+    <div class="bg-white rounded-[1.25rem] border border-gray-100/60 overflow-visible min-h-[400px] shadow-none">
       <div v-if="loading" class="p-10 space-y-6">
         <div v-for="i in 5" :key="`skeleton-${i}`" class="flex items-center gap-4 animate-pulse">
           <div class="w-12 h-12 rounded-full bg-gray-100" />
@@ -653,7 +653,7 @@
     <!-- Update Issues Modal -->
     <Teleport to="body">
     <div v-if="showIssueModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
-      <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden" @click.stop>
+      <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-visible" @click.stop>
         <div class="p-6 border-b border-gray-100 flex items-center justify-between">
           <div>
             <h3 class="text-lg font-bold text-gray-900">Update Issues</h3>

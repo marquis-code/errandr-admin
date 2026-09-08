@@ -38,7 +38,7 @@
 
     <!-- Pending Table -->
     <!-- Pending Table -->
-    <div class="bg-white rounded-[1.25rem] border border-gray-100/60 overflow-hidden shadow-sm hover:shadow-md transition-all group relative">
+    <div class="bg-white rounded-[1.25rem] border border-gray-100/60 overflow-visible shadow-sm hover:shadow-md transition-all group relative">
       <div class="px-6 py-5 border-b border-gray-100/60 bg-gray-50/50">
         <h3 class="text-sm font-bold text-gray-900 tracking-tight uppercase">Requires Admin Review</h3>
       </div>
@@ -224,7 +224,7 @@
 
 
 
-      <div class="bg-white rounded-[1.25rem] border border-gray-100/60 overflow-hidden shadow-sm hover:shadow-md transition-all group relative">
+      <div class="bg-white rounded-[1.25rem] border border-gray-100/60 overflow-visible shadow-sm hover:shadow-md transition-all group relative">
         <div class="px-6 py-5 border-b border-gray-100/60 bg-gray-50/50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <h3 class="text-sm font-bold text-gray-900 tracking-tight uppercase">Registered Dispatchers</h3>
           <div class="w-full md:w-auto">

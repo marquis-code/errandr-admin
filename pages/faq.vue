@@ -12,7 +12,7 @@
       <h1 class="text-4xl font-medium text-gray-900 tracking-tight mb-2">Admin Runbooks</h1>
       <p class="text-lg text-gray-500 mb-10">Common operational procedures for the Errander Ops team.</p>
       <div class="space-y-6">
-        <div v-for="(faq, i) in faqs" :key="i" class="bg-gray-50 rounded-2xl border border-gray-100 overflow-hidden">
+        <div v-for="(faq, i) in faqs" :key="i" class="bg-gray-50 rounded-2xl border border-gray-100 overflow-visible">
           <button @click="openIndex = openIndex === i ? -1 : i" class="w-full flex items-center justify-between p-6 text-left">
             <span class="font-bold text-gray-900">{{ faq.q }}</span>
             <ChevronDown class="w-5 h-5 text-gray-400 transition-transform" :class="{ 'rotate-180': openIndex === i }" />

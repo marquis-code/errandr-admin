@@ -15,7 +15,7 @@
       </div>
 
       <!-- Table -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-visible">
         <div v-if="loading" class="p-10 flex justify-center">
           <Loader2 class="w-8 h-8 text-[#FF5C1A] animate-spin" />
         </div>

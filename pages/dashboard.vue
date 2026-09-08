@@ -40,7 +40,7 @@
         
         <!-- Primary Stats -->
         <template v-else>
-          <div v-for="stat in dashboardStats" :key="stat.label" class="bg-white p-5 rounded-[1.25rem] border border-gray-100/60 hover:border-gray-200 transition-all hover:shadow-md group overflow-hidden relative">
+          <div v-for="stat in dashboardStats" :key="stat.label" class="bg-white p-5 rounded-[1.25rem] border border-gray-100/60 hover:border-gray-200 transition-all hover:shadow-md group overflow-visible relative">
             <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-gray-50 to-transparent rounded-bl-full opacity-50 -z-10 group-hover:scale-110 transition-transform"></div>
             <div class="flex items-center justify-between mb-5 relative z-10">
               <div :class="stat.bgClass" class="w-11 h-11 rounded-xl flex items-center justify-center border border-white/50 shadow-sm">
@@ -103,7 +103,7 @@
     <!-- Middle Section -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mt-6">
       <!-- Recent Activity -->
-      <div class="xl:col-span-2 bg-white rounded-[1.25rem] border border-gray-100/60 shadow-sm overflow-hidden flex flex-col">
+      <div class="xl:col-span-2 bg-white rounded-[1.25rem] border border-gray-100/60 shadow-sm overflow-visible flex flex-col">
         <div class="p-5 flex items-center justify-between border-b border-gray-100/50 bg-gray-50/30">
           <div class="flex items-center gap-3">
             <div class="w-1.5 h-4 bg-[#FF5C1A] rounded-full"></div>
@@ -237,7 +237,7 @@
         </div>
 
         <!-- Service Monitor Board -->
-        <div class="bg-white rounded-[1.25rem] border border-gray-100/60 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-[1.25rem] border border-gray-100/60 shadow-sm overflow-visible">
           <div class="p-5 flex items-center justify-between border-b border-gray-100/50 bg-gray-50/30">
             <div class="flex items-center gap-2">
               <Activity class="w-4 h-4 text-emerald-500" />

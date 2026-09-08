@@ -53,7 +53,7 @@
     </div>
 
     <!-- Facilitators Tab -->
-    <div v-if="activeTab === 'facilitators'" class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+    <div v-if="activeTab === 'facilitators'" class="bg-white rounded-xl border border-gray-100 overflow-visible">
       <div class="p-4 border-b border-gray-100 flex items-center justify-between gap-4">
         <div class="relative flex-1 max-w-sm">
           <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -139,7 +139,7 @@
     </div>
 
     <!-- Referrals Tab -->
-    <div v-if="activeTab === 'referrals'" class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+    <div v-if="activeTab === 'referrals'" class="bg-white rounded-xl border border-gray-100 overflow-visible">
       <div class="p-4 border-b border-gray-100 flex items-center justify-between">
         <h3 class="font-semibold text-gray-900 text-sm">All Referrals</h3>
         <span class="text-xs font-medium text-gray-500">{{ referralData?.total || 0 }} total</span>
@@ -218,7 +218,7 @@
     </div>
 
     <!-- Leaderboard Tab -->
-    <div v-if="activeTab === 'leaderboard'" class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+    <div v-if="activeTab === 'leaderboard'" class="bg-white rounded-xl border border-gray-100 overflow-visible">
       <div class="p-4 border-b border-gray-100 flex items-center gap-2">
         <h3 class="font-semibold text-gray-900 text-sm">Leaderboard</h3>
         <span class="text-[10px] font-medium text-gray-500 bg-gray-100 border border-gray-100 px-1.5 py-0.5 rounded">TOP 20</span>

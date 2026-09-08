@@ -80,7 +80,7 @@
       </div>
 
       <!-- Table Section -->
-      <div class="bg-white rounded-[1.25rem] border border-gray-100/60 shadow-sm hover:shadow-md transition-all overflow-hidden relative">
+      <div class="bg-white rounded-[1.25rem] border border-gray-100/60 shadow-sm hover:shadow-md transition-all overflow-visible relative">
         <div class="px-6 py-5 border-b border-gray-100/60 bg-gray-50/50 flex justify-between items-center">
           <h3 class="text-sm font-bold text-gray-900 tracking-tight uppercase">Platform Users</h3>
         </div>
@@ -458,7 +458,7 @@
 
     <!-- Funding Modal -->
     <div v-if="fundModal.isOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
-      <div class="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden" @click.stop>
+      <div class="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-visible" @click.stop>
         <div class="p-6 border-b border-gray-100 flex items-center justify-between">
           <h3 class="text-xl font-bold text-gray-900">Fund User Wallet</h3>
           <button @click="fundModal.isOpen = false" class="p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-colors">
@@ -514,7 +514,7 @@
     </div>
     <!-- Debit Modal -->
     <div v-if="debitModal.isOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
-      <div class="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-hidden" @click.stop>
+      <div class="bg-white rounded-2xl w-full max-w-md shadow-xl overflow-visible" @click.stop>
         <div class="p-6 border-b border-gray-100 flex items-center justify-between">
           <h3 class="text-xl font-bold text-gray-900">Manual Payout / Deduct</h3>
           <button @click="debitModal.isOpen = false" class="p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-colors">
