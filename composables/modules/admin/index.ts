@@ -93,7 +93,17 @@ export const useAdminVendors = () => {
     }
   };
 
-  return { loading, vendors, fetchVendors, approveVendor, rejectVendor, toggleVendorVisibility, deleteVendor };
+  const toggleVendorOnline = async (id: string) => {
+    try {
+      await admin_api.toggleVendorOnline(id);
+      showToast({ title: "Success", message: "Vendor online status toggled", toastType: "success" });
+      await fetchVendors();
+    } catch (e: any) {
+      showToast({ title: "Error", message: e.response?.data?.message || "Failed to toggle online status", toastType: "error" });
+    }
+  };
+
+  return { loading, vendors, fetchVendors, approveVendor, rejectVendor, toggleVendorVisibility, deleteVendor, toggleVendorOnline };
 };
 
 export const useAdminReports = () => {

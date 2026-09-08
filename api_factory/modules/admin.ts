@@ -45,6 +45,10 @@ export const admin_api = {
     return GATEWAY_ENDPOINT_WITH_AUTH.put(`/admin/vendors/${id}/visibility`, payload);
   },
 
+  toggleVendorOnline: (id: string) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/vendors/${id}/toggle-online`);
+  },
+
   deleteVendor: (id: string) => {
     return GATEWAY_ENDPOINT_WITH_AUTH.delete(`/admin/vendors/${id}`);
   },

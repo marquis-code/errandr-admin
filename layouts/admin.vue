@@ -321,6 +321,7 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useUser } from '@/composables/modules/auth/user'
 import { useAdminNotifications } from '@/composables/useAdminNotifications'
+import { useSocket } from '@/composables/useSocket'
 import { useRouter, useRoute } from 'vue-router'
 import { 
  LayoutDashboard, 
@@ -352,10 +353,23 @@ const router = useRouter()
 const { user, logOut } = useUser()
 
 const { requestPermissionAndRegister, listenForNotifications } = useAdminNotifications()
+const { connect, on, emit } = useSocket('realtime')
 
 onMounted(() => {
   requestPermissionAndRegister()
   listenForNotifications()
+
+  connect()
+  if (user.value?._id) {
+    emit('register', { userId: user.value._id })
+  }
+
+  on('notification:new-order', () => {
+    try {
+      const audio = new Audio('/sounds/order-alert.mp3')
+      audio.play().catch(() => {})
+    } catch (_) {}
+  })
 })
 const showMobileMenu = ref(false)
 const logoutModalOpen = ref(false)

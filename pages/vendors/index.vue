@@ -222,6 +222,15 @@
                       {{ vendor.isVisible !== false ? 'Hide from Website' : 'Show on Website' }}
                     </button>
 
+                    <button 
+                      @click.stop="activeDropdownId = null; initiateAction('toggleOnline', vendor._id)" 
+                      class="w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition-colors"
+                      :class="vendor.isOnline ? 'text-gray-600 hover:bg-gray-50' : 'text-emerald-600 hover:bg-emerald-50'"
+                    >
+                      <Store class="w-4 h-4" /> 
+                      {{ vendor.isOnline ? 'Force Offline' : 'Force Online' }}
+                    </button>
+
                     <div class="h-px w-full bg-gray-100 my-1"></div>
 
                     <button 
@@ -692,7 +701,7 @@ useHead({ title: 'Vendors - Errander Admin' });
 
 const router = useRouter();
 const { showToast } = useCustomToast();
-const { vendors, loading, fetchVendors, approveVendor, rejectVendor, toggleVendorVisibility, deleteVendor } = useAdminVendors();
+const { vendors, loading, fetchVendors, approveVendor, rejectVendor, toggleVendorVisibility, deleteVendor, toggleVendorOnline } = useAdminVendors();
 const activeTab = ref('all');
 const searchQuery = ref('');
 const selectedVendor = ref<any>(null);
@@ -907,7 +916,7 @@ const emptyStateDescription = computed(() => {
 
 onMounted(fetchVendors);
 
-const initiateAction = (action: 'approve' | 'reject' | 'delete' | 'toggleVisibility', vendorId: string, payload?: any) => {
+const initiateAction = (action: 'approve' | 'reject' | 'delete' | 'toggleVisibility' | 'toggleOnline', vendorId: string, payload?: any) => {
   confirmModal.value.vendorId = vendorId;
   confirmModal.value.actionType = action;
   confirmModal.value.payload = payload;
@@ -935,6 +944,14 @@ const initiateAction = (action: 'approve' | 'reject' | 'delete' | 'toggleVisibil
       : 'Are you sure you want to hide this vendor from the website? Customers will no longer see them.';
     confirmModal.value.type = 'warning';
     confirmModal.value.confirmText = payload ? 'Show' : 'Hide';
+  } else if (action === 'toggleOnline') {
+    const isOnline = vendors.value.find(v => v._id === vendorId)?.isOnline;
+    confirmModal.value.title = isOnline ? 'Force Offline' : 'Force Online';
+    confirmModal.value.message = isOnline 
+      ? 'Are you sure you want to force this vendor offline? They will stop receiving orders.'
+      : 'Are you sure you want to force this vendor online? They will start receiving orders.';
+    confirmModal.value.type = 'warning';
+    confirmModal.value.confirmText = isOnline ? 'Force Offline' : 'Force Online';
   }
 };
 
@@ -959,6 +976,11 @@ const executeAction = async () => {
       await toggleVendorVisibility(vendorId, payload);
       if (selectedVendor.value?._id === vendorId) {
         selectedVendor.value.isVisible = payload;
+      }
+    } else if (actionType === 'toggleOnline') {
+      await toggleVendorOnline(vendorId);
+      if (selectedVendor.value?._id === vendorId) {
+        selectedVendor.value.isOnline = !selectedVendor.value.isOnline;
       }
     }
   } finally {
