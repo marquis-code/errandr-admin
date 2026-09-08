@@ -720,7 +720,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { admin_api } from '@/api_factory/modules/admin';
 import { useCustomToast as useToast } from '@/composables/core/useCustomToast';
 const { showToast } = useToast();
@@ -857,8 +857,17 @@ const fetchFastestErranders = async () => {
   }
 };
 
-const fetchOrders = async () => {
-  loading.value = true;
+const pollInterval = ref<any>(null);
+const knownOrderIds = ref<Set<string>>(new Set());
+const isInitialLoad = ref(true);
+
+const playOrderAlert = () => {
+  const audio = new Audio('/sounds/order-alert.mp3');
+  audio.play().catch(e => console.error('Audio play failed:', e));
+};
+
+const fetchOrders = async (isPolling: boolean = false) => {
+  if (!isPolling) loading.value = true;
   try {
     const res = await admin_api.getRecentOrders(
       currentPage.value,
@@ -873,17 +882,30 @@ const fetchOrders = async () => {
       }
     );
     const payload = res.data.data || res.data;
-    orders.value = payload.orders || [];
+    const newOrders = payload.orders || [];
+    orders.value = newOrders;
     totalRecords.value = payload.total || 0;
     totalPages.value = payload.totalPages || 1;
     
     if (payload.stats) {
       orderStats.value = payload.stats;
     }
+
+    if (currentPage.value === 1) {
+      if (!isInitialLoad.value && newOrders.length > 0) {
+        const newIds = newOrders.map((o: any) => o._id);
+        const hasNew = newIds.some((id: string) => !knownOrderIds.value.has(id));
+        if (hasNew) {
+          playOrderAlert();
+        }
+      }
+      newOrders.forEach((o: any) => knownOrderIds.value.add(o._id));
+      isInitialLoad.value = false;
+    }
   } catch (e) {
     console.error(e);
   } finally {
-    loading.value = false;
+    if (!isPolling) loading.value = false;
   }
 };
 
@@ -1066,9 +1088,15 @@ onMounted(() => {
   fetchOrders();
   fetchFastestErranders();
   
+  // Set up polling
+  pollInterval.value = setInterval(() => {
+    fetchOrders(true);
+  }, 10000); // 10 seconds
+  
   // Close dropdown on outside click
   window.addEventListener('click', () => {
     activeDropdown.value = null;
+  });
   
   // Automatically open order from query parameter
   const route = useRoute();
@@ -1082,6 +1110,9 @@ onMounted(() => {
     });
   }
 });
+
+onUnmounted(() => {
+  if (pollInterval.value) clearInterval(pollInterval.value);
 });
 </script>
 
