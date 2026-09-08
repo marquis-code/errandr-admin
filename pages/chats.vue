@@ -127,6 +127,7 @@
         :current-user-id="user?.id || user?._id"
         :receiver-name="activeChat.userName"
         :receiver-avatar="activeChat.userData?.avatar"
+        :receiver-phone="activeChat.userData?.phone"
         @close="activeChat = null"
       />
     </div>
@@ -158,12 +159,15 @@ const fetchThreads = async () => {
   loading.value = true
   try {
     const res = await chat_api.getSupportThreads() as any
+    console.log('[Admin Chats] fetchThreads response:', res)
     if ([200, 201].includes(res?.status)) {
        const data = res.data?.data || res.data || []
+       console.log('[Admin Chats] parsed data:', data)
        threads.value = data.map((t: any) => ({
          ...t,
          userName: t.userData ? `${t.userData.firstName || ''} ${t.userData.lastName || ''}`.trim() || t.userData.email : 'User'
        }))
+       console.log('[Admin Chats] threads.value:', threads.value)
     }
   } catch (e) {
     console.error('Failed to fetch support threads', e)
@@ -200,6 +204,11 @@ const formatTime = (dateStr: string) => {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
+const handleNewThreadMessage = (msg: any) => {
+    console.log('[Admin Chats] Received chat:new-message', msg)
+    fetchThreads()
+}
+
 const setupSocketListeners = () => {
   if (!socket.value) return
   
@@ -207,13 +216,10 @@ const setupSocketListeners = () => {
   socket.value.emit('joinSupport', { userId: user.value?.id || user.value?._id || 'admin' })
   
   // Remove any previous listener to avoid duplicates
-  socket.value.off('chat:new-message')
+  socket.value.off('chat:new-message', handleNewThreadMessage)
   
   // Listen for new messages and refresh the thread list
-  socket.value.on('chat:new-message', (msg: any) => {
-    console.log('[Admin Chats] Received chat:new-message', msg)
-    fetchThreads()
-  })
+  socket.value.on('chat:new-message', handleNewThreadMessage)
 }
 
 onMounted(() => {
@@ -232,6 +238,12 @@ onMounted(() => {
 watch(() => socket.value, (newSocket) => {
   if (newSocket) {
     setupSocketListeners()
+  }
+})
+
+onUnmounted(() => {
+  if (socket.value) {
+    socket.value.off('chat:new-message', handleNewThreadMessage)
   }
 })
 </script>

@@ -18,6 +18,11 @@
             {{ isTyping ? 'Typing...' : 'Online' }}
           </p>
         </div>
+        
+        <a v-if="receiverPhone" :href="`tel:${receiverPhone}`" class="p-2 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-100 transition-colors shadow-sm border border-emerald-100 flex items-center gap-2 font-semibold text-sm">
+          <Phone class="w-4 h-4" />
+          <span class="hidden sm:inline">Call</span>
+        </a>
       </div>
 
       <!-- Messages Area -->
@@ -61,11 +66,11 @@
               {{ msg.sender?.firstName || msg.senderName || 'User' }}
             </p>
 
-            <div v-if="msg.messageType === 'image'" class="mb-2 -mx-2 -mt-1">
-              <img :src="msg.attachment" class="rounded-2xl max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity border border-white/20" @click="msg.attachment && openImage(msg.attachment)" />
+            <div v-if="msg.messageType === 'image' && (msg.attachments?.[0] || msg.attachment)" class="mb-2 -mx-2 -mt-1">
+              <img :src="msg.attachments?.[0] || msg.attachment" class="rounded-2xl max-w-full h-auto cursor-pointer hover:opacity-90 transition-opacity border border-white/20" @click="openImage(msg.attachments?.[0] || msg.attachment)" />
             </div>
-            <div v-if="msg.messageType === 'voice'" class="mb-2 min-w-[200px] flex items-center gap-3 py-2">
-              <audio :src="msg.attachment" controls class="h-8 w-full custom-audio" />
+            <div v-if="msg.messageType === 'voice' && (msg.attachments?.[0] || msg.attachment)" class="mb-2 min-w-[200px] flex items-center gap-3 py-2">
+              <audio :src="msg.attachments?.[0] || msg.attachment" controls class="h-8 w-full custom-audio" />
             </div>
 
             <div class="flex items-end gap-3 flex-wrap">
@@ -106,6 +111,17 @@
             />
           </div>
 
+          <input type="file" ref="fileInput" class="hidden" accept="image/*" @change="handleFileUpload" />
+          <button 
+            @click="triggerFileUpload" 
+            :disabled="uploadingMedia"
+            class="w-12 h-12 rounded-2xl bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 flex items-center justify-center transition-all disabled:opacity-50 border border-gray-100 shrink-0" 
+            title="Attach file"
+          >
+            <div v-if="uploadingMedia" class="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+            <Paperclip v-else class="w-5 h-5" />
+          </button>
+
           <button 
             @click="handleSend"
             :disabled="!newMsgText.trim()"
@@ -122,11 +138,13 @@
 
 <script setup lang="ts">
 import { 
-  ArrowLeft, User, Send, Check, CheckCheck
+  ArrowLeft, User, Send, Check, CheckCheck, Phone, Paperclip
 } from 'lucide-vue-next';
 import { ref, onMounted, nextTick, watch, onUnmounted } from 'vue';
 import { chat_api } from '@/api_factory/modules/chat';
 import { useRealtimeSocket } from '@/composables/core/useRealtimeSocket';
+import { GATEWAY_ENDPOINT_WITH_AUTH } from '@/api_factory/axios.config';
+import { useCustomToast } from '@/composables/core/useCustomToast';
 
 const props = defineProps<{
   isOpen: boolean;
@@ -134,6 +152,7 @@ const props = defineProps<{
   currentUserId: string;
   receiverName?: string;
   receiverAvatar?: string;
+  receiverPhone?: string;
 }>();
 
 const emit = defineEmits(['close']);
@@ -143,6 +162,10 @@ const messageContainer = ref<HTMLElement | null>(null);
 const messages = ref<any[]>([]);
 const loading = ref(false);
 const isTyping = ref(false);
+
+const fileInput = ref<HTMLInputElement | null>(null);
+const uploadingMedia = ref(false);
+const { showToast } = useCustomToast();
 
 const { socket, emitWithAck, isConnected, connectSocket } = useRealtimeSocket();
 
@@ -161,6 +184,28 @@ const fetchMessages = async () => {
   }
 };
 
+const handleNewMessage = (msg: any) => {
+    // Only add if it belongs to this thread
+    const senderId = msg.senderId || msg.sender?._id || msg.sender;
+    const receiverId = msg.receiverId || msg.receiver?._id || msg.receiver;
+    if (senderId === props.supportUserId || receiverId === props.supportUserId || msg.roomId === props.supportUserId) {
+      // Check for duplicates before pushing
+      if (!messages.value.some(m => m._id === msg._id)) {
+        messages.value.push(msg);
+        scrollToBottom();
+      }
+    }
+};
+
+const handleUserTyping = (payload: any) => {
+    if (payload.userId === props.supportUserId || payload.roomId === props.supportUserId) {
+      isTyping.value = payload.isTyping;
+      if (payload.isTyping) {
+        setTimeout(() => isTyping.value = false, 3000);
+      }
+    }
+};
+
 const setupListeners = () => {
   connectSocket();
   if (!socket.value) return;
@@ -168,24 +213,12 @@ const setupListeners = () => {
   // Join the admin support room to receive broadcasts
   socket.value.emit('joinSupport', { userId: props.supportUserId });
 
-  socket.value.on('chat:new-message', (msg: any) => {
-    // Only add if it belongs to this thread
-    const senderId = msg.senderId || msg.sender?._id || msg.sender;
-    const receiverId = msg.receiverId || msg.receiver?._id || msg.receiver;
-    if (senderId === props.supportUserId || receiverId === props.supportUserId || msg.roomId === props.supportUserId) {
-      messages.value.push(msg);
-      scrollToBottom();
-    }
-  });
+  // Remove existing listeners to avoid duplicates if setupListeners is called multiple times
+  socket.value.off('chat:new-message', handleNewMessage);
+  socket.value.off('chat:user-typing', handleUserTyping);
 
-  socket.value.on('chat:user-typing', (payload: any) => {
-    if (payload.userId === props.supportUserId) {
-      isTyping.value = payload.isTyping;
-      if (payload.isTyping) {
-        setTimeout(() => isTyping.value = false, 3000);
-      }
-    }
-  });
+  socket.value.on('chat:new-message', handleNewMessage);
+  socket.value.on('chat:user-typing', handleUserTyping);
 };
 
 const handleSend = async () => {
@@ -193,19 +226,10 @@ const handleSend = async () => {
   const content = newMsgText.value;
   newMsgText.value = '';
   
-  // Optimistic
-  const tempMsg = {
-    _id: `temp_${Date.now()}`,
-    senderId: props.currentUserId,
-    receiverId: props.supportUserId,
-    content: content,
-    message: content,
-    messageType: 'text',
-    roomType: 'support',
-    createdAt: new Date().toISOString(),
-  };
-  messages.value.push(tempMsg);
-  scrollToBottom();
+  if (typingTimeout) clearTimeout(typingTimeout);
+  if (isConnected.value && socket.value) {
+    socket.value.emit('chat:typing', { userId: props.currentUserId, roomId: props.supportUserId, roomType: 'support', isTyping: false });
+  }
 
   if (isConnected.value && socket.value) {
     const response = await emitWithAck('chat:send-message', {
@@ -214,13 +238,12 @@ const handleSend = async () => {
       content,
       messageType: 'text',
       roomType: 'support',
-      roomId: props.supportUserId // Pass the support user's ID as the roomId
+      roomId: props.supportUserId,
+      senderName: 'Admin',
+      senderType: 'admin'
     });
     if (!response?.success) {
       await sendViaRest(content);
-    } else {
-       // Replace temp with real
-       messages.value = messages.value.filter(m => m._id !== tempMsg._id);
     }
   } else {
     await sendViaRest(content);
@@ -245,9 +268,89 @@ const sendViaRest = async (content: string) => {
   }
 };
 
+const triggerFileUpload = () => {
+  fileInput.value?.click();
+};
+
+const handleFileUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  if (!file) return;
+
+  uploadingMedia.value = true;
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await GATEWAY_ENDPOINT_WITH_AUTH.post('/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    const attachmentUrl = res.data?.url || res.data?.data?.url;
+    
+    if (attachmentUrl) {
+      if (!isConnected.value) {
+        await connectSocket();
+      }
+
+      const tempId = Date.now().toString();
+      const newMsg = {
+        _id: tempId,
+        senderId: props.currentUserId,
+        receiverId: props.supportUserId,
+        message: 'Shared an image',
+        messageType: 'image',
+        roomType: 'support',
+        attachments: [attachmentUrl],
+        senderType: 'admin',
+        sender: {
+          _id: props.currentUserId,
+          firstName: 'Admin',
+          role: 'admin'
+        },
+        createdAt: new Date().toISOString(),
+      };
+
+      messages.value.push(newMsg);
+      scrollToBottom();
+
+      const ack = await emitWithAck('chat:send-message', {
+        tempId,
+        senderId: props.currentUserId,
+        receiverId: props.supportUserId,
+        message: 'Shared an image',
+        messageType: 'image',
+        attachments: [attachmentUrl],
+        roomType: 'support',
+        senderName: 'Admin',
+        senderType: 'admin'
+      });
+      
+      if (ack && ack.success && ack.message) {
+        const idx = messages.value.findIndex(m => m._id === tempId);
+        if (idx !== -1) {
+          messages.value[idx] = ack.message;
+        }
+      }
+    }
+  } catch (err: any) {
+    console.error('File upload failed', err);
+    showToast({ title: 'Error', message: 'Failed to upload image.', toastType: 'error' });
+  } finally {
+    uploadingMedia.value = false;
+    if (fileInput.value) fileInput.value.value = '';
+  }
+};
+
+let typingTimeout: any = null;
 const handleTyping = () => {
   if (isConnected.value && socket.value) {
     socket.value.emit('chat:typing', { userId: props.currentUserId, roomId: props.supportUserId, roomType: 'support', isTyping: true });
+    
+    if (typingTimeout) clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      if (socket.value) {
+        socket.value.emit('chat:typing', { userId: props.currentUserId, roomId: props.supportUserId, roomType: 'support', isTyping: false });
+      }
+    }, 2000);
   }
 };
 
@@ -290,9 +393,10 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (socket.value) {
-    socket.value.off('chat:new-message');
-    socket.value.off('chat:user-typing');
+    socket.value.off('chat:new-message', handleNewMessage);
+    socket.value.off('chat:user-typing', handleUserTyping);
   }
+  if (typingTimeout) clearTimeout(typingTimeout);
 });
 </script>
 

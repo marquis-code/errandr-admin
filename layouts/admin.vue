@@ -214,7 +214,7 @@
 
         <!-- Right: Actions & Profile -->
         <div class="flex items-center gap-5 min-w-[250px] justify-end">
-          <div class="flex items-center gap-3">
+          <!-- <div class="flex items-center gap-3">
              <button class="relative p-2.5 rounded-xl bg-gray-50 border border-gray-200/80 text-gray-500 hover:text-[#FF5C1A] hover:border-[#FF5C1A]/30 hover:bg-orange-50 transition-all shadow-sm">
                 <Bell class="w-5 h-5" />
                 <span class="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
@@ -222,7 +222,7 @@
              <button class="p-2.5 rounded-xl bg-gray-50 border border-gray-200/80 text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all shadow-sm">
                 <LayoutDashboard class="w-5 h-5" />
              </button>
-          </div>
+          </div> -->
           
           <div class="h-8 w-px bg-gray-200"></div>
 
