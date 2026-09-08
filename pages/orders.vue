@@ -102,6 +102,31 @@
       </div>
     </div>
 
+    <!-- Fastest Erranders Widget -->
+    <div v-if="fastestErranders.length > 0" class="bg-indigo-50/30 border border-indigo-100 rounded-[1.25rem] p-4 my-4">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
+          <Truck class="w-4 h-4" />
+        </div>
+        <h3 class="text-sm font-bold text-gray-900 tracking-tight">Top Fastest Dispatchers</h3>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div v-for="(errander, index) in fastestErranders" :key="errander.user?._id || index" class="bg-white rounded-xl p-3 border border-indigo-50 flex items-center gap-3 shadow-sm">
+          <div class="w-10 h-10 rounded-full bg-gray-100 flex-shrink-0 flex items-center justify-center font-bold text-gray-500 overflow-hidden relative">
+            <img v-if="errander.user?.avatar" :src="errander.user.avatar" class="w-full h-full object-cover" />
+            <span v-else>{{ errander.user?.firstName?.charAt(0) || '?' }}</span>
+            <div v-if="index === 0" class="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center text-[8px] border-2 border-white">🥇</div>
+            <div v-if="index === 1" class="absolute -top-1 -right-1 w-4 h-4 bg-gray-300 rounded-full flex items-center justify-center text-[8px] border-2 border-white">🥈</div>
+            <div v-if="index === 2" class="absolute -top-1 -right-1 w-4 h-4 bg-amber-600 rounded-full flex items-center justify-center text-[8px] border-2 border-white">🥉</div>
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-bold text-gray-900 truncate">{{ errander.user?.firstName }} {{ errander.user?.lastName }}</p>
+            <p class="text-[10px] font-medium text-gray-500 truncate mt-0.5">Avg: <span class="font-bold text-indigo-600">{{ Math.floor(errander.averageDeliveryTimeMs / 60000) }}m</span> ({{ errander.totalDeliveries }} trips)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Controls (Dropdowns instead of raw search) -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 w-full">
       <SelectInput 
@@ -272,6 +297,10 @@
                   </span>
                   <span v-else class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100/50 uppercase tracking-wider flex items-center gap-1.5">
                     <Activity class="w-3.5 h-3.5" /> {{ order.status?.replace('_', ' ') }}
+                  </span>
+                  
+                  <span v-if="order.status === 'delivered' && getDeliveryDuration(order)" class="text-[9px] font-bold text-gray-500 bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded mt-1 flex items-center gap-1" title="Time from acceptance to delivery">
+                    <Clock class="w-3 h-3" /> {{ getDeliveryDuration(order) }}
                   </span>
                 </div>
               </td>
@@ -723,6 +752,7 @@ const orderStats = ref({
   cancelled: 0,
   totalRevenue: 0
 });
+const fastestErranders = ref<any[]>([]);
 
 // Filters
 const startDate = ref('');
@@ -818,6 +848,15 @@ const fetchDropdowns = async () => {
   }
 };
 
+const fetchFastestErranders = async () => {
+  try {
+    const res = await admin_api.getFastestDispatchers(4);
+    fastestErranders.value = res.data?.data || res.data || [];
+  } catch (e) {
+    console.error('Failed to load fastest erranders', e);
+  }
+};
+
 const fetchOrders = async () => {
   loading.value = true;
   try {
@@ -889,6 +928,22 @@ const formatTimeAgo = (dateStr: string) => {
   if (diffInMins < 60) return `${diffInMins} mins ago`;
   if (diffInMins < 1440) return `${Math.floor(diffInMins / 60)} hrs ago`;
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+};
+
+const getDeliveryDuration = (order: any) => {
+  if (!order.statusHistory || !order.statusHistory.length) return null;
+  const acceptedStatus = order.statusHistory.find((h: any) => ['accepted', 'confirmed', 'preparing', 'ready_for_pickup', 'picked_up', 'in_transit'].includes(h.status));
+  const acceptanceTime = acceptedStatus ? new Date(acceptedStatus.timestamp) : new Date(order.createdAt);
+  
+  const deliveredStatus = order.statusHistory.find((h: any) => h.status === 'delivered');
+  const deliveryTime = order.actualDeliveryTime ? new Date(order.actualDeliveryTime) : (deliveredStatus ? new Date(deliveredStatus.timestamp) : null);
+  
+  if (!deliveryTime) return null;
+  
+  const diffInMins = Math.floor((deliveryTime.getTime() - acceptanceTime.getTime()) / 60000);
+  if (diffInMins <= 0) return 'Instant';
+  if (diffInMins < 60) return `${diffInMins}m`;
+  return `${Math.floor(diffInMins / 60)}h ${diffInMins % 60}m`;
 };
 
 const formatWhatsAppNumber = (phone: string | undefined | null) => {
@@ -1009,6 +1064,7 @@ const handleUpdateStatus = async () => {
 onMounted(() => {
   fetchDropdowns();
   fetchOrders();
+  fetchFastestErranders();
   
   // Close dropdown on outside click
   window.addEventListener('click', () => {

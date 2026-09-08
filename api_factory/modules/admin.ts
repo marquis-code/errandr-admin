@@ -191,4 +191,8 @@ export const admin_api = {
   deleteDepartment: (id: string) => {
     return GATEWAY_ENDPOINT_WITH_AUTH.delete(`/departments/${id}`);
   },
+
+  getFastestDispatchers: (limit: number = 4) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get(`/admin/dispatchers-fastest?limit=${limit}`);
+  },
 };
