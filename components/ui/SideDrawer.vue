@@ -7,7 +7,7 @@
     <Transition name="drawer-slide">
       <div 
         v-if="isOpen" 
-        class="fixed right-0 md:right-4 top-0 md:top-4 bottom-0 md:bottom-4 z-[101] bg-white shadow-2xl overflow-y-auto flex flex-col md:rounded-[1.25rem]"
+        class="fixed right-0 md:right-4 top-0 md:top-4 bottom-0 md:bottom-4 z-[101] bg-white shadow-2xl flex flex-col md:rounded-[1.25rem]"
         :class="size === 'full' ? 'w-full md:w-[calc(100%-2rem)]' : 'w-full md:w-[460px]'"
       >
         <!-- Header -->
@@ -18,7 +18,7 @@
         </div>
         
         <!-- Content -->
-        <div class="flex-1 px-6 pb-8">
+        <div class="flex-1 px-6 pb-8 overflow-y-auto min-h-0 custom-scrollbar">
           <slot></slot>
         </div>
       </div>
