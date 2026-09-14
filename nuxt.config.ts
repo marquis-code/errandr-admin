@@ -113,6 +113,8 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
+      baseUrl: process.env.VITE_BASE_URL || process.env.VITE_API_BASE_URL || 'https://api.erranders.org',
+      wsBase: process.env.VITE_WS_URL || process.env.VITE_BASE_URL || process.env.VITE_API_BASE_URL || 'https://api.erranders.org',
       firebaseApiKey: process.env.NUXT_PUBLIC_FIREBASE_API_KEY || '',
       firebaseAuthDomain: process.env.NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
       firebaseProjectId: process.env.NUXT_PUBLIC_FIREBASE_PROJECT_ID || '',
