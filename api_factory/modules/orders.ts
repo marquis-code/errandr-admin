@@ -28,4 +28,8 @@ export const orders_api = {
   assignOrder: (id: string) => {
     return GATEWAY_ENDPOINT_WITH_AUTH.put(`/orders/${id}/assign`);
   },
+
+  getAdminRecurringOrders: (page = 1, limit = 20) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get(`/recurring-orders/admin?page=${page}&limit=${limit}`);
+  }
 };

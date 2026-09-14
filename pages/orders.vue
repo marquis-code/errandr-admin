@@ -844,20 +844,29 @@ const fetchDropdowns = async () => {
       admin_api.getVendors().catch(e => ({ data: { vendors: [] } })),
       admin_api.getDispatchers(1, 100).catch(e => ({ data: { dispatchers: [] } }))
     ]);
-    customerOptions.value = (usersRes.data?.users || usersRes.data || []).map((u: any) => ({
-      label: `${u.firstName || ''} ${u.lastName || ''} - ${u.email}`,
-      value: u._id
-    }));
-    vendorOptions.value = (vendorsRes.data?.vendors || vendorsRes.data || []).map((v: any) => ({
-      label: `${v.storeName}`,
-      value: v._id
-    }));
+    customerOptions.value = [
+      { label: 'All Customers', value: 'all' },
+      ...(usersRes.data?.users || usersRes.data || []).map((u: any) => ({
+        label: `${u.firstName || ''} ${u.lastName || ''} - ${u.email}`,
+        value: u._id
+      }))
+    ];
+    vendorOptions.value = [
+      { label: 'All Vendors', value: 'all' },
+      ...(vendorsRes.data?.vendors || vendorsRes.data || []).map((v: any) => ({
+        label: `${v.storeName}`,
+        value: v._id
+      }))
+    ];
     
     const dList = dispatchersRes.data?.data?.dispatchers || dispatchersRes.data?.dispatchers || dispatchersRes.data || [];
-    dispatcherOptions.value = dList.map((d: any) => ({
-      label: `${d.user?.firstName || d.firstName || ''} ${d.user?.lastName || d.lastName || ''} - ${d.user?.phone || d.phone || 'No phone'}`,
-      value: d.user?._id || d._id
-    }));
+    dispatcherOptions.value = [
+      { label: 'All Erranders', value: 'all' },
+      ...dList.map((d: any) => ({
+        label: `${d.user?.firstName || d.firstName || ''} ${d.user?.lastName || d.lastName || ''} - ${d.user?.phone || d.phone || 'No phone'}`,
+        value: d._id
+      }))
+    ];
   } catch (e) {
     console.error('Failed to load dropdowns', e);
   }
@@ -892,9 +901,9 @@ const fetchOrders = async (isPolling: boolean = false) => {
         endDate: endDate.value || undefined,
         status: selectedStatus.value !== 'all' ? selectedStatus.value : undefined,
         type: selectedType.value !== 'all' ? selectedType.value : undefined,
-        customerId: selectedCustomer.value || undefined,
-        vendorId: selectedVendor.value || undefined,
-        erranderId: selectedErrander.value || undefined
+        customerId: (selectedCustomer.value && selectedCustomer.value !== 'all') ? selectedCustomer.value : undefined,
+        vendorId: (selectedVendor.value && selectedVendor.value !== 'all') ? selectedVendor.value : undefined,
+        erranderId: (selectedErrander.value && selectedErrander.value !== 'all') ? selectedErrander.value : undefined
       }
     );
     const payload = res.data.data || res.data;
@@ -944,6 +953,7 @@ const clearFilters = () => {
   selectedVendor.value = '';
   selectedErrander.value = '';
   selectedStatus.value = 'all';
+  selectedType.value = 'all';
   currentPage.value = 1;
   fetchOrders();
 };

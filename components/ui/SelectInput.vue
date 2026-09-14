@@ -168,11 +168,11 @@
     let val: string | number
     if (typeof option === 'string') {
       val = option
-    } else if (option.value) {
+    } else if (option.value !== undefined) {
       val = option.value
-    } else if (option.code) {
+    } else if (option.code !== undefined) {
       val = option.code
-    } else if (option.name) {
+    } else if (option.name !== undefined) {
       val = option.name
     } else {
       val = option
