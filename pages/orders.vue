@@ -864,7 +864,7 @@ const fetchDropdowns = async () => {
       { label: 'All Erranders', value: 'all' },
       ...dList.map((d: any) => ({
         label: `${d.user?.firstName || d.firstName || ''} ${d.user?.lastName || d.lastName || ''} - ${d.user?.phone || d.phone || 'No phone'}`,
-        value: d._id
+        value: d.user?._id || d._id
       }))
     ];
   } catch (e) {
