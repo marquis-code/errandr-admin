@@ -505,14 +505,59 @@
             </div>
           </div>
           
-          <!-- Ordered Items -->
-          <div class="space-y-4 mt-6" v-if="selectedOrder.packs?.length || selectedOrder.items?.length">
+          <!-- Ordered Items or Custom Errand -->
+          <div class="space-y-4 mt-6" v-if="selectedOrder.type === 'custom_errand' || selectedOrder.packs?.length || selectedOrder.items?.length">
             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">
-              Ordered Items
+              {{ selectedOrder.type === 'custom_errand' ? 'Custom Errand Details' : 'Ordered Items' }}
             </h4>
-
+            
+            <!-- Custom Errand Details -->
+            <div v-if="selectedOrder.type === 'custom_errand' && selectedOrder.customDetails" class="px-2 space-y-4">
+              <div v-if="selectedOrder.customDetails.description">
+                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Description</p>
+                <p class="text-xs text-gray-700 whitespace-pre-wrap leading-relaxed">{{ selectedOrder.customDetails.description }}</p>
+              </div>
+              
+              <div v-if="selectedOrder.customDetails.attachedVoiceNote">
+                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                  Voice Note
+                </p>
+                <audio controls class="w-full h-10 mt-1">
+                  <source :src="selectedOrder.customDetails.attachedVoiceNote" type="audio/mpeg">
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+  
+              <div v-if="selectedOrder.customDetails.attachedImage || (selectedOrder.customDetails.attachedImages && selectedOrder.customDetails.attachedImages.length > 0)">
+                <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                  Attached Images
+                </p>
+                <div class="flex gap-2 flex-wrap">
+                  <a v-if="selectedOrder.customDetails.attachedImage" :href="selectedOrder.customDetails.attachedImage" target="_blank" class="w-20 h-20 rounded-lg overflow-hidden border border-gray-200 block group relative">
+                    <img :src="selectedOrder.customDetails.attachedImage" class="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                  </a>
+                  <a v-for="(img, idx) in selectedOrder.customDetails.attachedImages" :key="idx" :href="img" target="_blank" class="w-20 h-20 rounded-lg overflow-hidden border border-gray-200 block group relative">
+                    <img :src="img" class="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                  </a>
+                </div>
+              </div>
+              
+              <div v-if="selectedOrder.customDetails.estimatedItemCost" class="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
+                <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Estimated Item Cost</span>
+                <span class="font-bold text-gray-900">₦{{ Number(selectedOrder.customDetails.estimatedItemCost).toLocaleString() }}</span>
+              </div>
+            </div>
+            
             <!-- Render Packs -->
-            <template v-if="selectedOrder.packs?.length">
+            <template v-else-if="selectedOrder.packs?.length">
               <div v-for="pack in selectedOrder.packs" :key="pack.name" class="space-y-3 px-2 mb-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
                 <h5 class="text-[10px] font-bold text-[#FF5C1A] uppercase tracking-widest border-b border-gray-200 pb-1 mb-2">{{ pack.name }}</h5>
                 <div v-for="item in pack.items" :key="item.name" class="flex items-start justify-between mb-2 last:mb-0">
