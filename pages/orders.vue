@@ -255,6 +255,9 @@
                       </a>
                     </div>
                   </div>
+                  <div v-if="order.interception && (order.interception.status === 'accepted' || order.interception.status === 'completed')" class="flex items-center gap-1.5 ml-5">
+                    <span class="text-[9px] font-black text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-100">🤝 INTERCEPTED</span>
+                  </div>
                 </div>
               </td>
               
@@ -456,7 +459,8 @@
           <!-- Errander Info -->
           <div class="space-y-4 mt-6" v-if="selectedOrder.errander">
             <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2 flex justify-between items-center">
-              Assigned Dispatcher
+              {{ selectedOrder.interception && (selectedOrder.interception.status === 'accepted' || selectedOrder.interception.status === 'completed') ? 'Dispatchers (Intercepted)' : 'Assigned Dispatcher' }}
+              <span v-if="selectedOrder.interception && (selectedOrder.interception.status === 'accepted' || selectedOrder.interception.status === 'completed')" class="text-[9px] font-black text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-100">🤝 INTERCEPTED</span>
             </h4>
             <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm px-2">
               <div>
@@ -470,6 +474,33 @@
               <div class="col-span-2">
                 <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Vehicle</p>
                 <p class="text-xs font-medium text-gray-700 leading-relaxed capitalize">{{ selectedOrder.errander?.vehicleType?.replace('_', ' ') || 'Not specified' }} {{ selectedOrder.errander?.plateNumber ? `(${selectedOrder.errander.plateNumber})` : '' }}</p>
+              </div>
+              <div v-if="selectedOrder.interception && (selectedOrder.interception.status === 'accepted' || selectedOrder.interception.status === 'completed')" class="col-span-2">
+                <p class="text-[10px] font-semibold text-indigo-500 uppercase tracking-wide mb-1">💰 Payout (60%)</p>
+                <p class="text-xs font-black text-indigo-600">₦{{ Math.round((selectedOrder.erranderPayout || selectedOrder.deliveryFee || 0) * 0.6).toLocaleString() }}</p>
+              </div>
+            </div>
+
+            <!-- Second Errander (Interception) -->
+            <div v-if="selectedOrder.interception && (selectedOrder.interception.status === 'accepted' || selectedOrder.interception.status === 'completed') && selectedOrder.interception.secondErrander" class="mt-4 bg-purple-50 border border-purple-100 rounded-xl p-3">
+              <p class="text-[10px] font-bold text-purple-600 uppercase tracking-wider mb-3 flex items-center gap-1">🤝 Second Dispatcher (Hand-off)</p>
+              <div class="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Name</p>
+                  <p class="font-bold text-gray-900">{{ selectedOrder.interception.secondErrander?.firstName || 'N/A' }} {{ selectedOrder.interception.secondErrander?.lastName || '' }}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Phone</p>
+                  <p class="font-bold text-gray-900">{{ selectedOrder.interception.secondErrander?.phone || 'N/A' }}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Hand-off Point</p>
+                  <p class="text-xs font-medium text-gray-700">{{ selectedOrder.interception.point || 'N/A' }}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-semibold text-purple-500 uppercase tracking-wide mb-1">💰 Payout (40%)</p>
+                  <p class="text-xs font-black text-purple-600">₦{{ Math.round((selectedOrder.erranderPayout || selectedOrder.deliveryFee || 0) * 0.4).toLocaleString() }}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -547,6 +578,23 @@
               <div class="flex justify-between items-center pt-3 border-t border-gray-100">
                 <span class="text-xs font-black text-gray-900 uppercase">Total Paid</span>
                 <span class="text-lg font-black text-[#FF5C1A]">₦{{ Number(selectedOrder.total || selectedOrder.totalAmount || 0).toLocaleString() }}</span>
+              </div>
+
+              <!-- Interception Payout Split -->
+              <div v-if="selectedOrder.interception && (selectedOrder.interception.status === 'accepted' || selectedOrder.interception.status === 'completed')" class="mt-4 bg-purple-50 border border-purple-100 rounded-xl p-3 space-y-2">
+                <p class="text-[10px] font-bold text-purple-700 uppercase tracking-wider mb-2">🤝 Interception Payout Split</p>
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-gray-600 font-semibold">Errander Payout (Total)</span>
+                  <span class="text-gray-900 font-black">₦{{ Number(selectedOrder.erranderPayout || selectedOrder.deliveryFee || 0).toLocaleString() }}</span>
+                </div>
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-indigo-600 font-semibold">→ {{ selectedOrder.errander?.firstName || 'Primary' }} (60%)</span>
+                  <span class="text-indigo-700 font-black">₦{{ Math.round((selectedOrder.erranderPayout || selectedOrder.deliveryFee || 0) * 0.6).toLocaleString() }}</span>
+                </div>
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-purple-600 font-semibold">→ {{ selectedOrder.interception?.secondErrander?.firstName || 'Second' }} (40%)</span>
+                  <span class="text-purple-700 font-black">₦{{ Math.round((selectedOrder.erranderPayout || selectedOrder.deliveryFee || 0) * 0.4).toLocaleString() }}</span>
+                </div>
               </div>
             </div>
           </div>
