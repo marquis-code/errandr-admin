@@ -101,6 +101,7 @@
               <th class="py-4 px-4 font-bold whitespace-nowrap">Type & Category</th>
               <th class="py-4 px-4 font-bold whitespace-nowrap">Stats & Promo</th>
               <th class="py-4 px-4 font-bold whitespace-nowrap text-center">Status</th>
+              <th class="py-4 px-4 font-bold whitespace-nowrap text-right">Wallet Balance</th>
               <th class="py-4 px-4 font-bold whitespace-nowrap">Owner</th>
               <th class="py-4 px-6 font-bold whitespace-nowrap text-right">Actions</th>
             </tr>
@@ -151,6 +152,11 @@
                   <StatusBadge :status="vendor.status" class="scale-75" />
                 </div>
               </td>
+              <td class="py-4 px-4 text-right">
+                <span class="text-sm font-bold text-gray-900">
+                  ₦{{ vendor.walletBalance?.toLocaleString() || '0' }}
+                </span>
+              </td>
               <td class="py-4 px-4">
                 <div class="flex flex-col">
                   <div class="flex items-center gap-1.5 mb-1">
@@ -191,8 +197,11 @@
                     <button @click.stop="activeDropdownId = null; selectedVendor = vendor; activeDrawerTab = 'transactions'" class="w-full text-left px-4 py-2 text-sm text-gray-900 hover:bg-gray-100 flex items-center gap-2 font-medium">
                       <Receipt class="w-4 h-4 text-emerald-500" /> View Transactions
                     </button>
+                    <button @click.stop="activeDropdownId = null; vendorForPayout = vendor; showCreditWalletModal = true" class="w-full text-left px-4 py-2 text-sm text-gray-900 hover:bg-gray-100 flex items-center gap-2 font-medium">
+                      <DollarSign class="w-4 h-4 text-emerald-500" /> Credit Wallet
+                    </button>
                     <button @click.stop="activeDropdownId = null; vendorForPayout = vendor; showManualDebitModal = true" class="w-full text-left px-4 py-2 text-sm text-gray-900 hover:bg-gray-100 flex items-center gap-2 font-medium">
-                      <DollarSign class="w-4 h-4 text-rose-500" /> Manual Payout
+                      <DollarSign class="w-4 h-4 text-rose-500" /> Debit Wallet
                     </button>
                     
                     <div class="h-px w-full bg-gray-100 my-1"></div>
@@ -297,7 +306,7 @@
           <template v-if="activeDrawerTab === 'transactions'">
             <div class="space-y-4">
               <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100 pb-2">Recent Transactions</h4>
-              <TransactionsList :vendor-id="selectedVendor._id" />
+              <WalletTransactionsList :vendor-id="selectedVendor?.owner?._id || selectedVendor?.owner || selectedVendor?.user" />
             </div>
           </template>
 
@@ -639,6 +648,37 @@
       </template>
     </SideDrawer>
     
+    <!-- Credit Wallet Modal -->
+    <div v-if="showCreditWalletModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-visible">
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+          <h3 class="text-lg font-bold text-gray-900">Credit Wallet</h3>
+          <button @click="closeCreditWalletModal" class="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+        <div class="p-6 space-y-4">
+          <p class="text-sm text-gray-600">Manually add funds to the vendor's wallet (e.g. adjustments, bonuses).</p>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Amount (₦)</label>
+            <input v-model="creditAmount" type="number" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A]" placeholder="e.g. 5000">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Reason / Description</label>
+            <input v-model="creditReason" type="text" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A]" placeholder="e.g. Bonus payout">
+          </div>
+          <button 
+            @click="submitCreditWallet" 
+            :disabled="!creditAmount || isSubmittingCredit"
+            class="w-full py-3 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+          >
+            <span v-if="isSubmittingCredit" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+            <span v-else>Process Credit</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Manual Debit Modal -->
     <div v-if="showManualDebitModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-visible">
@@ -690,8 +730,10 @@ import SideDrawer from '@/components/ui/SideDrawer.vue';
 import DateRangePicker from '@/components/ui/DateRangePicker.vue';
 
 import { admin_api } from '@/api_factory/modules/admin';
+import { wallets_api } from '@/api_factory/modules/wallets';
 import { GATEWAY_ENDPOINT_WITH_AUTH } from '@/api_factory/axios.config';
 import { useCustomToast } from '@/composables/core/useCustomToast';
+import WalletTransactionsList from '@/components/wallets/WalletTransactionsList.vue';
 
 definePageMeta({
   layout: 'admin'
@@ -716,6 +758,45 @@ const debitAmount = ref<number | null>(null);
 const debitReason = ref('');
 const isSubmittingDebit = ref(false);
 const proofFile = ref<File | null>(null);
+
+const showCreditWalletModal = ref(false);
+const creditAmount = ref<number | null>(null);
+const creditReason = ref('');
+const isSubmittingCredit = ref(false);
+
+const closeCreditWalletModal = () => {
+  showCreditWalletModal.value = false;
+  vendorForPayout.value = null;
+  creditAmount.value = null;
+  creditReason.value = '';
+}
+
+const submitCreditWallet = async () => {
+  const ownerId = vendorForPayout.value?.owner?._id || vendorForPayout.value?.owner || vendorForPayout.value?.user;
+  const finalId = typeof ownerId === 'object' ? ownerId._id : ownerId;
+
+  if (!creditAmount.value || creditAmount.value <= 0) {
+    showToast({ title: 'Error', message: 'Please enter a valid amount', toastType: 'error' });
+    return;
+  }
+  
+  if (!finalId) {
+    showToast({ title: 'Error', message: 'Vendor owner information is missing', toastType: 'error' });
+    return;
+  }
+  
+  isSubmittingCredit.value = true;
+  try {
+    await wallets_api.fundWalletByAdmin(finalId, Number(creditAmount.value), creditReason.value);
+    showToast({ title: 'Success', message: 'Wallet credited successfully', toastType: 'success' });
+    closeCreditWalletModal();
+    await fetchVendors(); // Refresh balances
+  } catch (error: any) {
+    showToast({ title: 'Error', message: error.response?.data?.message || 'Failed to credit wallet', toastType: 'error' });
+  } finally {
+    isSubmittingCredit.value = false;
+  }
+};
 
 const handleFileUpload = (e: any) => {
   if (e.target.files && e.target.files[0]) {
