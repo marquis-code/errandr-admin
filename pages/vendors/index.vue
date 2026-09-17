@@ -66,7 +66,10 @@
         </button>
       </div>
       
-      <div class="flex-shrink-0">
+      <div class="flex-shrink-0 flex items-center gap-2">
+        <button @click="showPayoutConfigModal = true" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-2">
+          <Settings class="w-4 h-4" /> Payout Config
+        </button>
         <DateRangePicker v-model:start="startDate" v-model:end="endDate" />
       </div>
     </div>
@@ -713,12 +716,38 @@
         </div>
       </div>
     </div>
+    <!-- Global Payout Config Modal -->
+    <div v-if="showPayoutConfigModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-visible">
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+          <h3 class="text-lg font-bold text-gray-900">Global Payout Configuration</h3>
+          <button @click="showPayoutConfigModal = false" class="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+        <div class="p-6 space-y-4">
+          <p class="text-sm text-gray-600">Set the minimum wallet balance required before vendors and erranders can request payouts.</p>
+          <div>
+            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Minimum Payout Amount (₦)</label>
+            <input v-model.number="minimumPayoutAmount" type="number" step="100" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A]" placeholder="e.g. 1000">
+          </div>
+          <button 
+            @click="savePayoutConfig" 
+            :disabled="isSavingPayoutConfig"
+            class="w-full py-3 bg-gray-900 text-white rounded-lg font-bold hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center"
+          >
+            <span v-if="isSavingPayoutConfig" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+            <span v-else>Save Configuration</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useAdminVendors } from '@/composables/modules/admin';
-import { Search, Store, Eye, EyeOff, Trash2, CheckCircle, XCircle, RefreshCcw, Star, Globe, Copy, User, Mail, Phone, GraduationCap, Banknote, AlertCircle, Percent, MoreVertical, Edit, Loader2, LayoutList, Shield, Calendar, Clock, DollarSign, Image as ImageIcon, MapPin, Edit2, Receipt } from 'lucide-vue-next';
+import { Search, Store, Eye, EyeOff, Trash2, CheckCircle, XCircle, RefreshCcw, Star, Globe, Copy, User, Mail, Phone, GraduationCap, Banknote, AlertCircle, Percent, MoreVertical, Edit, Loader2, LayoutList, Shield, Calendar, Clock, DollarSign, Image as ImageIcon, MapPin, Edit2, Receipt, Settings, X } from 'lucide-vue-next';
 import { onMounted, ref, computed, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import VendorMenuManager from "@/components/vendors/VendorMenuManager.vue";
@@ -752,17 +781,45 @@ const endDate = ref('');
 const activeDrawerTab = ref('overview');
 const activeDropdownId = ref<string | null>(null);
 
-const vendorForPayout = ref<any>(null);
-const showManualDebitModal = ref(false);
-const debitAmount = ref<number | null>(null);
 const debitReason = ref('');
-const isSubmittingDebit = ref(false);
-const proofFile = ref<File | null>(null);
-
 const showCreditWalletModal = ref(false);
-const creditAmount = ref<number | null>(null);
-const creditReason = ref('');
+const showManualDebitModal = ref(false);
 const isSubmittingCredit = ref(false);
+const isSubmittingDebit = ref(false);
+const vendorForPayout = ref<any>(null);
+
+const showPayoutConfigModal = ref(false);
+const minimumPayoutAmount = ref(1000);
+const isSavingPayoutConfig = ref(false);
+
+const loadPayoutConfig = async () => {
+  try {
+    const res = await admin_api.getPayoutSettings();
+    if (res.data) {
+      minimumPayoutAmount.value = res.data.amount || 1000;
+    }
+  } catch (e) {
+    console.error('Failed to load payout settings', e);
+  }
+};
+
+const savePayoutConfig = async () => {
+  isSavingPayoutConfig.value = true;
+  try {
+    await admin_api.updatePayoutSettings({ amount: minimumPayoutAmount.value });
+    showToast({ title: 'Success', message: 'Payout configuration saved!', toastType: 'success' });
+    showPayoutConfigModal.value = false;
+  } catch (e: any) {
+    console.error('Failed to save payout config', e);
+    showToast({ title: 'Error', message: e.response?.data?.message || 'Failed to save payout config', toastType: 'error' });
+  } finally {
+    isSavingPayoutConfig.value = false;
+  }
+};
+
+const creditAmount = ref<number | null>(null);
+const debitAmount = ref<number | null>(null);
+const proofFile = ref<File | null>(null);
 
 const closeCreditWalletModal = () => {
   showCreditWalletModal.value = false;
@@ -995,7 +1052,10 @@ const emptyStateDescription = computed(() => {
   return `There are currently no vendors under ${activeTab.value}.`;
 });
 
-onMounted(fetchVendors);
+onMounted(() => {
+  fetchVendors();
+  loadPayoutConfig();
+});
 
 const initiateAction = (action: 'approve' | 'reject' | 'delete' | 'toggleVisibility' | 'toggleOnline', vendorId: string, payload?: any) => {
   confirmModal.value.vendorId = vendorId;

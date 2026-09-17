@@ -665,6 +665,25 @@
               </ul>
             </div>
           </div>
+
+          <div class="space-y-2">
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-medium text-gray-400 ml-1 lowercase">minimum payout (₦)</label>
+              <button @click="showInfo('minimumPayout')" class="w-4 h-4 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center hover:bg-[#FF5C1A]/10 hover:text-[#FF5C1A] transition-colors">
+                <Info class="w-3 h-3" />
+              </button>
+            </div>
+            <input 
+              v-model.number="erranderForm.minimumPayout"
+              type="number" required min="100" step="100"
+              class="w-full bg-gray-50 border border-gray-100 text-gray-900 text-sm rounded-2xl focus:ring-[#FF5C1A] focus:border-[#FF5C1A] block px-5 py-3.5 transition-all outline-none" 
+            />
+            
+            <div v-if="activeInfo === 'minimumPayout'" class="bg-gray-900 text-white p-4 rounded-xl text-xs space-y-2 relative mt-2 animate-scale-in">
+              <div class="absolute -top-1.5 left-10 w-3 h-3 bg-gray-900 rotate-45"></div>
+              <p>the minimum amount (in naira) an errander must have in their wallet before they can withdraw funds.</p>
+            </div>
+          </div>
         </div>
 
         <div class="flex justify-end pt-6 border-t border-gray-50">
@@ -757,6 +776,7 @@ const savingErrander = ref(false);
 
 const erranderForm = reactive({
   maxConcurrentOrders: 0,
+  minimumPayout: 1000,
 });
 
 const form = reactive({
@@ -848,8 +868,9 @@ const confirmSave = (type: string) => {
     confirmModal.changes.push(`campaign: <strong>${examBrethrenForm.isActive ? 'active — free delivery 10pm-2am' : 'inactive'}</strong>`);
     if (examBrethrenForm.isActive) confirmModal.changes.push('note: delivery fees will be waived between 10pm and 2am. this cost is absorbed by the platform.');
   } else if (type === 'erranders') {
-    confirmModal.message = 'you are about to update errander configuration. this affects how many orders they can accept at once.';
+    confirmModal.message = 'you are about to update errander configuration. this affects how many orders they can accept at once and their payouts.';
     confirmModal.changes.push(`max concurrent orders: <strong>${erranderForm.maxConcurrentOrders === 0 ? 'infinite (0)' : erranderForm.maxConcurrentOrders}</strong>`);
+    confirmModal.changes.push(`minimum payout: <strong>₦${erranderForm.minimumPayout}</strong>`);
   }
 
   confirmModal.show = true;
@@ -869,12 +890,13 @@ const executeConfirmedSave = async () => {
 // ─── Load Settings ────────────────
 const loadSettings = async () => {
   try {
-    const [errandRes, commsRes, advertRes, examBrethrenRes, erranderSettingsRes] = await Promise.all([
+    const [errandRes, commsRes, advertRes, examBrethrenRes, erranderSettingsRes, payoutRes] = await Promise.all([
       admin_api.getCustomErrandSettings(),
       admin_api.getCommunicationsSettings(),
       admin_api.getAdvertSettings(),
       admin_api.getExamBrethrenSettings(),
-      admin_api.getErranderSettings()
+      admin_api.getErranderSettings(),
+      admin_api.getPayoutSettings()
     ]);
     
     if (errandRes.data) {
@@ -920,6 +942,10 @@ const loadSettings = async () => {
 
     if (erranderSettingsRes.data) {
       erranderForm.maxConcurrentOrders = erranderSettingsRes.data.maxConcurrentOrders ?? 0;
+    }
+
+    if (payoutRes.data) {
+      erranderForm.minimumPayout = payoutRes.data.amount ?? 1000;
     }
   } catch (e: any) {
     console.error('Failed to load settings:', e);
@@ -1012,6 +1038,9 @@ const saveErranderSettings = async () => {
   try {
     await admin_api.updateErranderSettings({
       maxConcurrentOrders: Number(erranderForm.maxConcurrentOrders),
+    });
+    await admin_api.updatePayoutSettings({
+      amount: Number(erranderForm.minimumPayout),
     });
     showToast({ title: 'success', message: 'errander settings updated!', toastType: 'success' });
   } catch (e: any) {

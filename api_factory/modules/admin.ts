@@ -81,6 +81,14 @@ export const admin_api = {
     return GATEWAY_ENDPOINT_WITH_AUTH.put('/settings/erranders', payload);
   },
 
+  getPayoutSettings: () => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get('/settings/payout');
+  },
+
+  updatePayoutSettings: (payload: { amount: number }) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put('/settings/payout', payload);
+  },
+
   getRecentOrders: (page: number = 1, limit: number = 10, query?: Record<string, any>) => {
     let url = `/admin/orders/recent?page=${page}&limit=${limit}`;
     if (query) {

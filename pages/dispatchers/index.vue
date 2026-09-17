@@ -2,9 +2,14 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Dispatcher Verifications</h1>
-      <button @click="fetchPending" class="p-2 text-gray-400 hover:text-gray-900 transition-colors">
-        <RefreshCw class="w-5 h-5" :class="{ 'animate-spin': loading }" />
-      </button>
+      <div class="flex items-center gap-2">
+        <button @click="showPayoutConfigModal = true" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold hover:bg-emerald-700 transition-colors shadow-sm flex items-center gap-2">
+          <Settings class="w-4 h-4" /> Payout Config
+        </button>
+        <button @click="fetchPending" class="p-2 text-gray-400 hover:text-gray-900 transition-colors">
+          <RefreshCw class="w-5 h-5" :class="{ 'animate-spin': loading }" />
+        </button>
+      </div>
     </div>
 
     <!-- Tabs -->
@@ -762,11 +767,39 @@
       </div>
     </div>
   </div>
+
+  <!-- Global Payout Config Modal -->
+  <div v-if="showPayoutConfigModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-visible">
+      <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="text-lg font-bold text-gray-900">Global Payout Configuration</h3>
+        <button @click="showPayoutConfigModal = false" class="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-gray-600">
+          <X class="w-5 h-5" />
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <p class="text-sm text-gray-600">Set the minimum wallet balance required before vendors and erranders can request payouts.</p>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Minimum Payout Amount (₦)</label>
+          <input v-model.number="minimumPayoutAmount" type="number" step="100" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5C1A]/20 focus:border-[#FF5C1A]" placeholder="e.g. 1000">
+        </div>
+        <button 
+          @click="savePayoutConfig" 
+          :disabled="isSavingPayoutConfig"
+          class="w-full py-3 bg-gray-900 text-white rounded-lg font-bold hover:bg-black transition-colors disabled:opacity-50 flex items-center justify-center"
+        >
+          <span v-if="isSavingPayoutConfig" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+          <span v-else>Save Configuration</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { GATEWAY_ENDPOINT_WITH_AUTH as api } from '@/api_factory/axios.config';
-import { Bike, FileText, CheckCircle, XCircle, Search, User, MapPin, MoreHorizontal, Shield, Edit2, Star, Clock, AlertTriangle, AlertCircle, RefreshCw, Eye, Hash, Calendar, DollarSign, Image as ImageIcon, Receipt, Trash2, MoreVertical, Edit, X } from 'lucide-vue-next';
+import { admin_api } from '@/api_factory/modules/admin';
+import { Bike, FileText, CheckCircle, XCircle, Search, User, MapPin, MoreHorizontal, Shield, Edit2, Star, Clock, AlertTriangle, AlertCircle, RefreshCw, Eye, Hash, Calendar, DollarSign, Image as ImageIcon, Receipt, Trash2, MoreVertical, Edit, X, Settings } from 'lucide-vue-next';
 import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 import SkeletonTable from '@/components/ui/SkeletonTable.vue';
@@ -792,6 +825,7 @@ onMounted(() => {
   document.addEventListener('click', closeDropdown);
   fetchPending();
   fetchAll();
+  loadPayoutConfig();
 });
 onUnmounted(() => {
   document.removeEventListener('click', closeDropdown);
@@ -846,6 +880,36 @@ const allTotalPages = computed(() => Math.ceil(allTotal.value / 10))
 
 const processing = ref<string | null>(null)
 const selectedImage = ref<string | null>(null)
+
+// Payout Config
+const showPayoutConfigModal = ref(false);
+const minimumPayoutAmount = ref(1000);
+const isSavingPayoutConfig = ref(false);
+
+const loadPayoutConfig = async () => {
+  try {
+    const res = await admin_api.getPayoutSettings();
+    if (res.data) {
+      minimumPayoutAmount.value = res.data.amount || 1000;
+    }
+  } catch (e) {
+    console.error('Failed to load payout settings', e);
+  }
+};
+
+const savePayoutConfig = async () => {
+  isSavingPayoutConfig.value = true;
+  try {
+    await admin_api.updatePayoutSettings({ amount: minimumPayoutAmount.value });
+    showToast({ title: 'Success', message: 'Payout configuration saved!', toastType: 'success' });
+    showPayoutConfigModal.value = false;
+  } catch (e: any) {
+    console.error('Failed to save payout config', e);
+    showToast({ title: 'Error', message: e.response?.data?.message || 'Failed to save payout config', toastType: 'error' });
+  } finally {
+    isSavingPayoutConfig.value = false;
+  }
+};
 
 // Modals
 const approveModalOpen = ref(false)
