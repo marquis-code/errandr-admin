@@ -187,6 +187,48 @@
               <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">Estimated Item Cost</span>
               <span class="font-bold text-gray-900">₦{{ Number(order.customDetails.estimatedItemCost).toLocaleString() }}</span>
             </div>
+
+            <!-- Vendor Payment Details (Aggressive Audit) -->
+            <div v-if="order.vendorPaymentDetails || order.itemsPhoto" class="mt-4 bg-orange-50 border border-orange-200 rounded-xl p-4">
+              <p class="text-[10px] font-bold text-orange-600 uppercase tracking-wider mb-4 flex items-center gap-1">🏦 Vendor Payment Audit</p>
+              
+              <div v-if="order.itemsPhoto" class="mb-4">
+                <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-2">Proof of Purchase</p>
+                <a :href="order.itemsPhoto" target="_blank" class="w-full h-32 rounded-lg overflow-hidden border border-gray-200 block group relative">
+                  <img :src="order.itemsPhoto" class="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                  <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                  </div>
+                </a>
+              </div>
+              
+              <div class="grid grid-cols-2 gap-y-4 gap-x-4 text-sm" v-if="order.vendorPaymentDetails">
+                <div class="col-span-2">
+                  <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Amount Paid</p>
+                  <p class="text-sm font-black text-orange-700">₦{{ order.actualItemCost ? order.actualItemCost.toLocaleString() : 'N/A' }} <span v-if="order.itemCostDisbursementStatus" class="uppercase text-[9px] bg-orange-200 text-orange-800 px-2 py-0.5 rounded ml-2">{{ order.itemCostDisbursementStatus }}</span></p>
+                </div>
+                <div class="col-span-2 border-t border-orange-100 pt-3">
+                  <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Account Name</p>
+                  <p class="text-xs font-bold text-gray-900">{{ order.vendorPaymentDetails.accountName }}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Account Number</p>
+                  <p class="font-mono text-xs font-bold text-gray-900">{{ order.vendorPaymentDetails.accountNumber }}</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Bank Name</p>
+                  <p class="text-xs font-bold text-gray-900">{{ order.vendorPaymentDetails.bankName }}</p>
+                </div>
+                <div class="col-span-2 pt-2">
+                  <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Transfer Reference</p>
+                  <p class="font-mono text-[10px] text-gray-600 break-all">{{ order.vendorPaymentDetails.transferReference }}</p>
+                </div>
+                <div class="col-span-2" v-if="order.vendorPaymentDetails.transferredAt">
+                  <p class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Transferred At</p>
+                  <p class="text-[10px] font-bold text-gray-700">{{ new Date(order.vendorPaymentDetails.transferredAt).toLocaleString() }}</p>
+                </div>
+              </div>
+            </div>
           </div>
           
           <!-- Render Packs -->
