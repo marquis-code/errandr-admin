@@ -59,5 +59,17 @@ export const wallets_api = {
 
   debitWalletByAdmin: (userId: string, amount: number, description?: string, proofOfTransaction?: string) => {
     return GATEWAY_ENDPOINT_WITH_AUTH.post(`/wallets/admin/debit/${userId}`, { amount, description, proofOfTransaction });
+  },
+
+  updatePreferencesByAdmin: (userId: string, payload: { preference: string; bankDetails?: any }) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.put(`/wallets/admin/preferences/${userId}`, payload);
+  },
+
+  getBanks: () => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.get('/payments/banks');
+  },
+
+  resolveAccount: (payload: { account_number: string; bank_code?: string; account_bank?: string }) => {
+    return GATEWAY_ENDPOINT_WITH_AUTH.post('/payments/resolve-account', payload);
   }
 };

@@ -60,6 +60,14 @@
       </div>
     </div>
 
+    <!-- Payout Configuration -->
+    <PayoutConfiguration 
+      v-if="user" 
+      :userId="props.userId" 
+      :initialWallet="user.wallet" 
+      @updated="fetchUserDetails" 
+    />
+
     <!-- Payout History Table -->
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
       <div class="p-6 border-b border-gray-100/60 bg-gray-50/30 flex items-center justify-between">
@@ -176,6 +184,7 @@ import { admin_api } from '@/api_factory/modules/admin';
 import { wallets_api } from '@/api_factory/modules/wallets';
 import { TrendingUp, Banknote, Wallet, History, ArrowDownLeft, ArrowUpRight, Receipt } from 'lucide-vue-next';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
+import PayoutConfiguration from '@/components/users/PayoutConfiguration.vue';
 
 const props = defineProps({
   userId: {
