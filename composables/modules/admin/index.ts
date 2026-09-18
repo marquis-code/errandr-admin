@@ -195,6 +195,7 @@ export const useAdminFinances = () => {
       await wallets_api.approvePayout(id);
       showToast({ title: 'Success', message: 'Payout approved successfully', toastType: 'success' });
       await fetchFinances();
+      await fetchTransactions(currentPage.value);
     } catch (error: any) {
       showToast({ title: 'Error', message: error.message || 'Failed to approve payout', toastType: 'error' });
     } finally {
@@ -209,6 +210,7 @@ export const useAdminFinances = () => {
       await wallets_api.rejectPayout(id);
       showToast({ title: 'Success', message: 'Payout rejected successfully', toastType: 'success' });
       await fetchFinances();
+      await fetchTransactions(currentPage.value);
     } catch (error: any) {
       showToast({ title: 'Error', message: error.message || 'Failed to reject payout', toastType: 'error' });
     } finally {
@@ -239,8 +241,9 @@ export const useAdminFinances = () => {
       await wallets_api.markPayoutAsPaid(id);
       showToast({ title: 'Success', message: 'Payout marked as paid manually', toastType: 'success' });
       await fetchFinances();
+      await fetchTransactions(currentPage.value);
     } catch (error: any) {
-      showToast({ title: 'Error', message: error.message || 'Failed to update payout', toastType: 'error' });
+      showToast({ title: 'Error', message: error.message || 'Failed to mark payout as paid', toastType: 'error' });
     } finally {
       loading.value = false;
     }
