@@ -16,9 +16,9 @@
       <!-- Payout Frequency -->
       <div>
         <h4 class="text-sm font-bold text-gray-900 mb-3">Payout Frequency</h4>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <button 
-            v-for="freq in ['daily', 'weekly', 'monthly']" 
+            v-for="freq in ['manual', 'daily', 'weekly', 'monthly']" 
             :key="freq"
             @click="form.preference = freq"
             class="flex items-center justify-between p-4 rounded-xl border-2 transition-all text-left"
@@ -27,7 +27,7 @@
             <div>
               <p class="text-sm font-bold capitalize" :class="form.preference === freq ? 'text-blue-700' : 'text-gray-900'">{{ freq }} Payouts</p>
               <p class="text-xs mt-1" :class="form.preference === freq ? 'text-blue-600/80' : 'text-gray-500'">
-                {{ freq === 'daily' ? 'Next day processing' : freq === 'weekly' ? 'Every Friday' : '1st of every month' }}
+                {{ freq === 'manual' ? 'When requested' : freq === 'daily' ? 'Next day processing' : freq === 'weekly' ? 'Every Friday' : '1st of every month' }}
               </p>
             </div>
             <div 
@@ -117,7 +117,7 @@ const saving = ref(false);
 const isAccountVerified = ref(false);
 
 const form = ref({
-  preference: 'weekly',
+  preference: 'manual',
   bankDetails: {
     bankName: '',
     bankCode: '',
