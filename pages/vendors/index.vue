@@ -409,11 +409,22 @@
                   <p class="text-lg font-black text-gray-900">{{ selectedVendor.totalRatings || 0 }}</p>
                 </div>
                 
-                <div class="col-span-2 mt-2" v-if="selectedVendor.bankDetails">
+                <div class="col-span-2 mt-2" v-if="selectedVendor.bankDetails && !selectedVendor.owner">
                   <div class="bg-gray-50 rounded-lg p-3">
                     <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Bank Payout Details</p>
                     <p class="font-bold text-gray-900 text-sm">{{ selectedVendor.bankDetails.bankName }}</p>
                     <p class="text-sm text-gray-600 font-mono">{{ selectedVendor.bankDetails.accountNumber }} - <span class="uppercase">{{ selectedVendor.bankDetails.accountName }}</span></p>
+                  </div>
+                </div>
+                
+                <div class="col-span-2 mt-2" v-if="selectedVendor.owner">
+                  <div class="bg-gray-50 rounded-lg p-3">
+                    <PayoutConfiguration 
+                      :userId="typeof selectedVendor.owner === 'object' ? selectedVendor.owner._id : selectedVendor.owner" 
+                      :initialWallet="typeof selectedVendor.owner === 'object' ? (selectedVendor.owner.wallet || {}) : {}" 
+                      @updated="fetchVendors"
+                      class="!mt-0 !border-0 !shadow-none !bg-transparent"
+                    />
                   </div>
                 </div>
               </div>
@@ -757,6 +768,7 @@ import StatusBadge from '@/components/ui/StatusBadge.vue';
 import ConfirmationModal from '@/components/ui/ConfirmationModal.vue';
 import SideDrawer from '@/components/ui/SideDrawer.vue';
 import DateRangePicker from '@/components/ui/DateRangePicker.vue';
+import PayoutConfiguration from '@/components/users/PayoutConfiguration.vue';
 
 import { admin_api } from '@/api_factory/modules/admin';
 import { wallets_api } from '@/api_factory/modules/wallets';
