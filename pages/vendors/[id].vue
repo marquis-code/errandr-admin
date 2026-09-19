@@ -126,6 +126,15 @@
               </div>
             </div>
           </div>
+          
+          <div class="pt-4 border-t border-gray-100" v-if="vendor.owner">
+            <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Payout Schedule</h3>
+            <PayoutConfiguration 
+              :userId="typeof vendor.owner === 'object' ? vendor.owner._id : vendor.owner" 
+              :initialWallet="vendor.owner?.wallet || {}" 
+              class="!mt-0"
+            />
+          </div>
         </div>
 
         <!-- Documents Tab -->
@@ -216,6 +225,7 @@ import StatusBadge from '@/components/ui/StatusBadge.vue';
 import ConfirmationModal from '@/components/ui/ConfirmationModal.vue';
 import VendorMenuManager from '@/components/vendors/VendorMenuManager.vue';
 import UserFinances from '@/components/users/UserFinances.vue';
+import PayoutConfiguration from '@/components/users/PayoutConfiguration.vue';
 import { useCustomToast } from '@/composables/core/useCustomToast';
 
 definePageMeta({
