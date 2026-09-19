@@ -97,9 +97,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { Settings, CheckCircle } from 'lucide-vue-next';
 import { wallets_api } from '@/api_factory/modules/wallets';
+import { admin_api } from '@/api_factory/modules/admin';
 import { useCustomToast } from '@/composables/core/useCustomToast';
 
 const props = defineProps({
@@ -131,14 +132,49 @@ watch(() => props.initialWallet, (newVal) => {
     if (newVal.payoutPreference) {
       form.value.preference = newVal.payoutPreference;
     }
-    if (newVal.bankDetails) {
-      form.value.bankDetails = { ...newVal.bankDetails };
-      if (newVal.bankDetails.accountName) {
+    const bankDetails = newVal.bankDetails || (newVal.bankAccounts && newVal.bankAccounts.length > 0 ? newVal.bankAccounts[0] : null);
+    if (bankDetails && bankDetails.accountNumber) {
+      form.value.bankDetails = { 
+        bankName: bankDetails.bankName || '',
+        bankCode: bankDetails.bankCode || '',
+        accountNumber: bankDetails.accountNumber || '',
+        accountName: bankDetails.accountName || ''
+      };
+      if (form.value.bankDetails.accountName) {
+        isAccountVerified.value = true;
+      }
+    } else {
+      loadWalletFromUser();
+    }
+  } else {
+    loadWalletFromUser();
+  }
+}, { immediate: true, deep: true });
+
+const loadWalletFromUser = async () => {
+  if (!props.userId) return;
+  try {
+    const res = await admin_api.getUserDetails(props.userId);
+    const userWallet = res.data?.wallet || {};
+    if (userWallet.payoutPreference) {
+      form.value.preference = userWallet.payoutPreference;
+    }
+    const bankDetails = userWallet.bankDetails || (userWallet.bankAccounts && userWallet.bankAccounts.length > 0 ? userWallet.bankAccounts[0] : null);
+    if (bankDetails && bankDetails.accountNumber) {
+      form.value.bankDetails = { 
+        bankName: bankDetails.bankName || '',
+        bankCode: bankDetails.bankCode || '',
+        accountNumber: bankDetails.accountNumber || '',
+        accountName: bankDetails.accountName || ''
+      };
+      if (form.value.bankDetails.accountName) {
         isAccountVerified.value = true;
       }
     }
+  } catch (e) {
+    console.error('Failed to fetch user details for wallet', e);
   }
-}, { immediate: true, deep: true });
+};
 
 const fetchBanks = async () => {
   try {
